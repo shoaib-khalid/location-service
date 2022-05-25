@@ -53,8 +53,8 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("template-service")
-                .description("Used for api template")
+                .title("location-service")
+                .description("Used to manage filtering based on location")
                 .termsOfServiceUrl("not added yet")
                 .license("not added yet")
                 .licenseUrl("").version("1.0").build();

@@ -18,7 +18,7 @@ public class SessionAuthenticationEntryPoint implements AuthenticationEntryPoint
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException {
-        System.out.println("CHECKING SessionAuthenticationEntryPoint commence ::: ");
+        // System.out.println("CHECKING SessionAuthenticationEntryPoint commence ::: ");
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
     }
 }
