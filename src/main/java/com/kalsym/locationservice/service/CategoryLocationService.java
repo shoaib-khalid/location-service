@@ -2,7 +2,6 @@ package com.kalsym.locationservice.service;
 
 
 import java.util.List;
-import java.util.Map;
 
 import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.ParentCategory;
@@ -25,10 +24,8 @@ import org.springframework.data.domain.Example;
 // import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatcher;
 
-import javafx.util.Pair;  
 
 import org.springframework.stereotype.Service;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
