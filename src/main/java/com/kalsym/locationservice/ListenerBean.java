@@ -82,7 +82,6 @@ public class ListenerBean {
             }
 
             List<Authority> authorities = new ArrayList<>();
-            System.out.println("CHECKING ListenerBean handleEvent map"+map);
 
             map.forEach((RequestMappingInfo requestMappingInfo, HandlerMethod handlerMethod) -> {
                 try {
@@ -96,7 +95,7 @@ public class ListenerBean {
                         authority.setId(requestMappingInfo.getName());
                         authority.setName(handlerMethod.getMethod().getName());
                         authority.setDescription(requestMappingInfo.toString());
-                        authority.setServiceId("template-service");
+                        authority.setServiceId("location-service");
 
                         if (null != authority.getId()) {
                             authorities.add(authority);
