@@ -36,11 +36,11 @@ public class CategoryLocationService {
     
     //Get By Query WITH Pagination
     //Child category 
-    public Page<Category> getQueryChildCategory(String city, String state,String regionCountryId, String postcode, String parentCategoryId, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
+    public Page<Category> getQueryChildCategory(String city, String stateId,String regionCountryId, String postcode, String parentCategoryId, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
     
         Store storeMatch = new Store();
         storeMatch.setCity(city);
-        storeMatch.setState(state);
+        storeMatch.setState(stateId);
         storeMatch.setRegionCountryId(regionCountryId);
         storeMatch.setPostcode(postcode);
 
@@ -56,7 +56,7 @@ public class CategoryLocationService {
                 .matchingAll()
                 .withIgnoreCase()
                 .withMatcher("city", new GenericPropertyMatcher().exact())
-                .withMatcher("state", new GenericPropertyMatcher().exact())
+                .withMatcher("stateId", new GenericPropertyMatcher().exact())
                 .withMatcher("regionCountryId", new GenericPropertyMatcher().exact())
                 .withMatcher("postcode", new GenericPropertyMatcher().exact())
                 .withMatcher("parentCategoryId", new GenericPropertyMatcher().exact())
@@ -77,9 +77,9 @@ public class CategoryLocationService {
     }
     
     //parent category
-    public List<Object> getQueryParentCategories(String city, String state, String regionCountryId, String postcode){
+    public List<Object> getQueryParentCategories(String city, String stateId, String regionCountryId, String postcode){
 
-        List<Object[]> result = categoryRepository.getParentCategoriesBasedOnLocation(state,city,postcode,regionCountryId);
+        List<Object[]> result = categoryRepository.getParentCategoriesBasedOnLocation(stateId,city,postcode,regionCountryId);
         // System.out.println("Checking result 1 :::"+result.toString());
         List<Object> parentCategoriesList = result.stream()
         .map(m -> {

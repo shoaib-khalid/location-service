@@ -6,7 +6,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.kalsym.locationservice.model.Category;
+import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.service.CategoryLocationService;
+import com.kalsym.locationservice.service.ProductService;
 import com.kalsym.locationservice.utility.HttpResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,28 +25,28 @@ import org.springframework.data.domain.Sort;
 
 
 @RestController
-@RequestMapping("/categories-location")
-public class CategoryLocationController {
+@RequestMapping("/products-location")
+public class ProductController {
     
     @Autowired
-    CategoryLocationService categoryLocationService;
+    ProductService productService;
 
-    @GetMapping(path = {"/child-category"}, name = "store-customers-get")
+    @GetMapping(path = {"/search"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
-    public ResponseEntity<HttpResponse> getByQueryChildCategory(
+    public ResponseEntity<HttpResponse> getByQueryProduct(
         HttpServletRequest request,
         @RequestParam(required = false) String city,
         @RequestParam(required = false) String stateId,
         @RequestParam(required = false) String regionCountryId,
         @RequestParam(required = false) String postcode,
-        @RequestParam(required = false) String parentCategoryId,
+        @RequestParam(required = false) String status,
         @RequestParam(required = false, defaultValue = "name") String sortByCol,
         @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<Category> body = categoryLocationService.getQueryChildCategory(city,stateId,regionCountryId,postcode,parentCategoryId,sortByCol,sortingOrder,page,pageSize);
+        Page<ProductMain> body = productService.getQueryProduct(city,stateId,regionCountryId,postcode,status,sortByCol,sortingOrder,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
@@ -53,17 +55,22 @@ public class CategoryLocationController {
 
     }
 
-    @GetMapping(path = {"/parent-category"}, name = "store-customers-get")
+    @GetMapping(path = {"/raw"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
-    public ResponseEntity<HttpResponse> getByQueryParentCategory(
+    public ResponseEntity<HttpResponse> getByRawQueryProduct(
         HttpServletRequest request,
         @RequestParam(required = false) String city,
         @RequestParam(required = false) String stateId,
         @RequestParam(required = false) String regionCountryId,
-        @RequestParam(required = false) String postcode
+        @RequestParam(required = false) String postcode,
+        @RequestParam(required = false) List<String> status,
+        @RequestParam(required = false, defaultValue = "name") String sortByCol,
+        @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        List<Object> body = categoryLocationService.getQueryParentCategories(city,stateId,regionCountryId,postcode);
+        Page<ProductMain> body = productService.getRawQueryProduct(city,stateId,regionCountryId,postcode,status,sortByCol,sortingOrder,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
@@ -71,8 +78,4 @@ public class CategoryLocationController {
         return ResponseEntity.status(response.getStatus()).body(response);
 
     }
-
-    
-
-
 }
