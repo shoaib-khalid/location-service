@@ -109,7 +109,7 @@ public class ProductService {
         else{
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
         }
-        Page<ProductMain> result = productRepository.getProductBasedOnLocation(status,stateId,regionCountryId,pageable);
+        Page<ProductMain> result = productRepository.getProductBasedOnLocation(status,stateId,regionCountryId,city,postcode,pageable);
 
         return result;
     }

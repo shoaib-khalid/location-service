@@ -20,6 +20,8 @@ public interface ProductRepository extends JpaRepository<ProductMain,String> {
             + "FROM ProductMain pwd "
             + "WHERE pwd.status IN :status "
             + "AND pwd.storeDetails.state LIKE CONCAT('%', :stateId ,'%') "
+            + "AND pwd.storeDetails.city LIKE CONCAT('%', :city ,'%') "
+            + "AND pwd.storeDetails.postcode LIKE CONCAT('%', :postcode ,'%') "
             + "AND pwd.storeDetails.regionCountryId LIKE CONCAT('%', :regionCountryId ,'%')"
 
     )
@@ -27,6 +29,8 @@ public interface ProductRepository extends JpaRepository<ProductMain,String> {
             @Param("status") List<String> status,
             @Param("stateId") String stateId,
             @Param("regionCountryId") String regionCountryId,
+            @Param("city") String city,
+            @Param("postcode") String postcode,
             Pageable pageable
     );
 }
