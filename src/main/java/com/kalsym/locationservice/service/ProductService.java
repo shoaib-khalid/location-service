@@ -3,13 +3,10 @@ package com.kalsym.locationservice.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kalsym.locationservice.model.Category;
-import com.kalsym.locationservice.model.ParentCategory;
 import com.kalsym.locationservice.model.Store;
 import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.repository.ProductRepository;
 
-import org.hibernate.dialect.MySQL55Dialect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -17,12 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Example;
-
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatcher;
-
-
 import org.springframework.stereotype.Service;
-import java.util.stream.Collectors;
+
 @Service
 public class ProductService {
     
@@ -41,7 +35,6 @@ public class ProductService {
         ProductMain productMainMatch = new ProductMain();
         productMainMatch.setStatus(status);
         productMainMatch.setStoreDetails(storeMatch);
-        // System.out.println("IMAN CHECKING ::::::::::::::::::::::::::::"+productMainMatch.getStatus().toString());
 
         ExampleMatcher matcher = ExampleMatcher
                 .matchingAll()
@@ -53,11 +46,7 @@ public class ProductService {
                 .withMatcher("status", new GenericPropertyMatcher().exact())
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
 
-        System.out.println("Checking matcher :::"+matcher);
-
         Example<ProductMain> example = Example.of(productMainMatch, matcher);
-
-        System.out.println("Checking example :::"+example);
 
         Pageable pageable;
    
