@@ -36,7 +36,7 @@ public class LandingConfigController {
 
     @GetMapping(path = {"/location"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
-    public ResponseEntity<HttpResponse> getL(
+    public ResponseEntity<HttpResponse> getLocationConfig(
         HttpServletRequest request,
         @RequestParam(required = false) String cityId,
         @RequestParam(required = false) Boolean isDisplay,

@@ -30,11 +30,13 @@ public class LocationConfigService {
        public Page<LocationConfig> getQueryLocationConfig(String cityId,Boolean isDisplay, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
        
         LocationConfig LocationConfigMatch = new LocationConfig();
+        LocationConfigMatch.setCityId(cityId);
         LocationConfigMatch.setIsDisplay(isDisplay);
-
+        
         ExampleMatcher matcher = ExampleMatcher
                 .matchingAll()
                 .withIgnoreCase()
+                .withMatcher("cityId", new GenericPropertyMatcher().exact())
                 .withMatcher("isDisplay", new GenericPropertyMatcher().exact())
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
 
