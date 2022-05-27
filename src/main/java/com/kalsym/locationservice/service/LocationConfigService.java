@@ -1,14 +1,9 @@
 package com.kalsym.locationservice.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.kalsym.locationservice.model.RegionCity;
-import com.kalsym.locationservice.model.Store;
+import com.kalsym.locationservice.model.RegionCountryState;
 import com.kalsym.locationservice.model.Config.LocationConfig;
-import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.repository.LocationConfigRepository;
-import com.kalsym.locationservice.repository.ProductRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.ExampleMatcher;
@@ -25,12 +20,19 @@ public class LocationConfigService {
     
     @Autowired
     LocationConfigRepository locationConfigRepository;
-
-       //Get By Query USING EXAMPLE MATCHER
-       public Page<LocationConfig> getQueryLocationConfig(String cityId,Boolean isDisplay, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
+    
+    //Get By Query USING EXAMPLE MATCHER for 
+    public Page<LocationConfig> getQueryLocationConfig(String cityId,Boolean isDisplay, String regionCountryId, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
        
+        RegionCountryState regionCountryStateMatch = new RegionCountryState();
+        regionCountryStateMatch.setRegionCountryId(regionCountryId);
+
+        RegionCity regionCityMatch = new RegionCity();
+        regionCityMatch.setRegionCountryState(regionCountryStateMatch);
+        
         LocationConfig LocationConfigMatch = new LocationConfig();
         LocationConfigMatch.setCityId(cityId);
+        LocationConfigMatch.setCityDetails(regionCityMatch);
         LocationConfigMatch.setIsDisplay(isDisplay);
         
         ExampleMatcher matcher = ExampleMatcher
@@ -38,6 +40,7 @@ public class LocationConfigService {
                 .withIgnoreCase()
                 .withMatcher("cityId", new GenericPropertyMatcher().exact())
                 .withMatcher("isDisplay", new GenericPropertyMatcher().exact())
+                .withMatcher("regionCountryId", new GenericPropertyMatcher().exact())
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
 
         Example<LocationConfig> example = Example.of(LocationConfigMatch, matcher);
@@ -55,7 +58,7 @@ public class LocationConfigService {
 
     }
 
-    // CREATE 
+    // CREATE LocationConfig
     public LocationConfig createLocationConfig(LocationConfig locationConfig){
         
 
@@ -68,5 +71,7 @@ public class LocationConfigService {
         
         return locationConfigRepository.save(locationConfig);
     }
+
+
 
 }

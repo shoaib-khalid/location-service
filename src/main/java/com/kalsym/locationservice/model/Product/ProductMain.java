@@ -36,7 +36,9 @@ public class ProductMain implements Serializable {
     private String name;
 
     private String thumbnailUrl;
-    
+
+    private String seoUrl;
+
     private String status;
 
     @OneToOne()

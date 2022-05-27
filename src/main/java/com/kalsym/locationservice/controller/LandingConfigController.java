@@ -7,10 +7,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.Config.LocationConfig;
+import com.kalsym.locationservice.model.Config.StoreConfig;
 import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.service.CategoryLocationService;
 import com.kalsym.locationservice.service.LocationConfigService;
 import com.kalsym.locationservice.service.ProductService;
+import com.kalsym.locationservice.service.StoreConfigService;
 import com.kalsym.locationservice.utility.HttpResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,19 +36,23 @@ public class LandingConfigController {
     @Autowired
     LocationConfigService locationConfigService;
 
+    @Autowired
+    StoreConfigService storeConfigService;
+
     @GetMapping(path = {"/location"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getLocationConfig(
         HttpServletRequest request,
         @RequestParam(required = false) String cityId,
         @RequestParam(required = false) Boolean isDisplay,
+        @RequestParam(required = false) String regionCountryId,
         @RequestParam(required = false, defaultValue = "cityId") String sortByCol,
         @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<LocationConfig> body = locationConfigService.getQueryLocationConfig(cityId,isDisplay,sortByCol,sortingOrder,page,pageSize);
+        Page<LocationConfig> body = locationConfigService.getQueryLocationConfig(cityId,isDisplay,regionCountryId,sortByCol,sortingOrder,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
@@ -81,6 +87,25 @@ public class LandingConfigController {
  
         return ResponseEntity.status(response.getStatus()).body(response);
 
+
+    }
+
+    @GetMapping(path = {"/store"}, name = "store-customers-get")
+    @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
+    public ResponseEntity<HttpResponse> getDisplayStoreConfig(
+        HttpServletRequest request,
+        @RequestParam(required = false) Boolean isDisplay,
+        @RequestParam(required = false) String regionCountryId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int pageSize
+    ) {
+
+        Page<StoreConfig> body = storeConfigService.getQueryStoreConfig(isDisplay,regionCountryId,page,pageSize);
+        
+        HttpResponse response = new HttpResponse(request.getRequestURI());
+        response.setData(body);
+        response.setStatus(HttpStatus.OK);
+        return ResponseEntity.status(response.getStatus()).body(response);
 
     }
 }
