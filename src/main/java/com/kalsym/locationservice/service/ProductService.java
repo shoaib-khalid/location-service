@@ -1,15 +1,27 @@
 package com.kalsym.locationservice.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+import com.kalsym.locationservice.enums.DiscountCalculationType;
+import com.kalsym.locationservice.model.RegionCountry;
 import com.kalsym.locationservice.model.Store;
+import com.kalsym.locationservice.model.Discount.StoreDiscountProduct;
+import com.kalsym.locationservice.model.Product.ItemDiscount;
+import com.kalsym.locationservice.model.Product.ProductInventoryWithDetails;
 import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.repository.ProductRepository;
+import com.kalsym.locationservice.repository.RegionCountriesRepository;
+import com.kalsym.locationservice.repository.StoreDiscountProductRepository;
+import com.kalsym.locationservice.repository.StoreDiscountRepository;
+import com.kalsym.locationservice.utility.ProductDiscount;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,6 +34,15 @@ public class ProductService {
     
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    RegionCountriesRepository regionCountriesRepository;
+
+    @Autowired
+    StoreDiscountRepository storeDiscountRepository;
+
+    @Autowired
+    StoreDiscountProductRepository storeDiscountProductRepository;
 
     //Get By Query USING EXAMPLE MATCHER
     public Page<ProductMain> getQueryProduct(String city, String stateId,String regionCountryId, String postcode, String status, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
@@ -98,8 +119,69 @@ public class ProductService {
         else{
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
         }
+
+        //get reqion country for store
+        RegionCountry regionCountry = null;
+        Optional<RegionCountry> optRegion = regionCountriesRepository.findById(regionCountryId);
+        if (optRegion.isPresent()) {
+            regionCountry = optRegion.get();
+        }
+
+        //find the based on location with pageable
         Page<ProductMain> result = productRepository.getProductBasedOnLocation(status,stateId,regionCountryId,city,postcode,pageable);
 
-        return result;
+        //extract the result of content of pageable in order to proceed with dicount of item 
+        List<ProductMain> productList = result.getContent();
+        // List<ProductMain> productWithDetailsList = new ArrayList<>();
+
+        ProductMain[] productWithDetailsList = new ProductMain[productList.size()];
+
+
+        for (int x=0;x<productList.size();x++) {
+
+            //check for item discount in hashmap
+            ProductMain productDetails = productList.get(x);
+            for (int i=0;i<productDetails.getProductInventories().size();i++) {
+                
+                ProductInventoryWithDetails productInventory = productDetails.getProductInventories().get(i);
+                String storeId = productDetails.getStoreDetails().getId();
+
+                //ItemDiscount discountDetails = discountedItemMap.get(productInventory.getItemCode());
+                /*ItemDiscount discountDetails = hashmapLoader.GetDiscountedItemMap(storeId, productInventory.getItemCode());*/
+                ItemDiscount discountDetails = ProductDiscount.getItemDiscount(storeDiscountRepository, storeId, productInventory.getItemCode(), regionCountry);
+                if (discountDetails != null) {                    
+                    double discountedPrice = productInventory.getPrice();
+                    if (discountDetails.calculationType.equals(DiscountCalculationType.FIX)) {
+                        discountedPrice = productInventory.getPrice() - discountDetails.discountAmount;
+                    } else if (discountDetails.calculationType.equals(DiscountCalculationType.PERCENT)) {
+                        discountedPrice = productInventory.getPrice() - (discountDetails.discountAmount / 100 * productInventory.getPrice());
+                    }
+                    discountDetails.discountedPrice = discountedPrice;
+                    discountDetails.normalPrice = productInventory.getPrice();                    
+                    productInventory.setItemDiscount(discountDetails); 
+                } else {
+                    //get inactive discount if any
+                    List<StoreDiscountProduct> discountList = storeDiscountProductRepository.findByItemCode(productInventory.getItemCode());
+                    if (!discountList.isEmpty()) {
+                        StoreDiscountProduct storeDiscountProduct = discountList.get(0);
+                        ItemDiscount inactiveDiscount = new ItemDiscount();
+                        inactiveDiscount.discountId = storeDiscountProduct.getStoreDiscountId();
+                        productInventory.setItemDiscountInactive(inactiveDiscount);
+                    }
+                
+                }
+            }
+
+            productWithDetailsList[x]=productDetails;
+
+        }
+
+    
+        List<ProductMain> newArrayList = new ArrayList<>(Arrays.asList(productWithDetailsList));
+
+        //Page mapper
+        Page<ProductMain> output = new PageImpl<ProductMain>(newArrayList,pageable,result.getTotalElements());
+        // System.out.println("CHECKINNGGGGGGGGGGGGGGGGGGGGG ::::"+output);
+        return output;
     }
 }
