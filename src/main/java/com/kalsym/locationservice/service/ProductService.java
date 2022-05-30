@@ -132,10 +132,8 @@ public class ProductService {
 
         //extract the result of content of pageable in order to proceed with dicount of item 
         List<ProductMain> productList = result.getContent();
-        // List<ProductMain> productWithDetailsList = new ArrayList<>();
 
         ProductMain[] productWithDetailsList = new ProductMain[productList.size()];
-
 
         for (int x=0;x<productList.size();x++) {
 
@@ -176,12 +174,12 @@ public class ProductService {
 
         }
 
-    
+        // convert array to array list
         List<ProductMain> newArrayList = new ArrayList<>(Arrays.asList(productWithDetailsList));
 
         //Page mapper
         Page<ProductMain> output = new PageImpl<ProductMain>(newArrayList,pageable,result.getTotalElements());
-        // System.out.println("CHECKINNGGGGGGGGGGGGGGGGGGGGG ::::"+output);
+        
         return output;
     }
 }

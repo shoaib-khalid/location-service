@@ -5,7 +5,8 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -32,13 +33,19 @@ public class Store implements Serializable {
 
     private String city;
 
-    // private String state;
+    private String storeDescription;
+
+    private String domain;
     
     @Column(name="regionCountryStateId")
     private String state;
 
     private String postcode;
 
-    private String regionCountryId; 
+    private String regionCountryId;
+    
+    @OneToOne()
+    @JoinColumn(name = "id",referencedColumnName="storeId", insertable = false, updatable = false, nullable = true)
+    private StoreAsset storeAsset;  
 
 }
