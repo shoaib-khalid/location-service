@@ -136,13 +136,37 @@ public class CategoryLocationService {
 
     // }
 
-    public Page<Category> getQueryStore(String city, String stateId,String regionCountryId, String postcode, String parentCategoryId,int page, int pageSize){
+    public Page<Category> getQueryStore(String city, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
     
+        //Handling null value in order to use query
+        if (city == null || city.isEmpty()) {
+            city = "";
+        }
+
+        // if (stateId == null || stateId.isEmpty()) {
+        //     stateId = "";
+        // }
+
+        if (regionCountryId == null || regionCountryId.isEmpty()) {
+            regionCountryId = "";
+        }
+
+        // if (postcode == null || postcode.isEmpty()) {
+        //     postcode = "";
+        // }
+
+        if (parentCategoryId == null || parentCategoryId.isEmpty()) {
+            parentCategoryId = "";
+        }
+
+        if (storeName == null || storeName.isEmpty()) {
+            storeName = "";
+        }
 
         Pageable pageable = PageRequest.of(page, pageSize);
 
         //find the based on location with pageable
-        Page<Category> result = categoryRepository.getStoreBasedOnParentCategories(city,stateId,regionCountryId,postcode,parentCategoryId,pageable);
+        Page<Category> result = categoryRepository.getStoreBasedOnParentCategories(city,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable);
    
         // if (sortingOrder==Sort.Direction.DESC){
         //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());

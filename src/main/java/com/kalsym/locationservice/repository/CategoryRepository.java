@@ -96,6 +96,7 @@ public interface CategoryRepository extends JpaRepository<Category,String> {
             + "FROM Category sc "
             + "WHERE sc.storeDetails.regionCountryId = :regionCountryId "
             + "AND sc.parentCategory.parentId LIKE CONCAT('%', :parentCategoryId ,'%') "
+            + "AND sc.storeDetails.name LIKE CONCAT('%', :storeName ,'%') "
             + "AND sc.storeDetails.city = :city "
             + "OR sc.storeDetails.state = :state "
             + "OR sc.storeDetails.postcode = :postcode "
@@ -107,6 +108,7 @@ public interface CategoryRepository extends JpaRepository<Category,String> {
         @Param("regionCountryId") String regionCountryId,
         @Param("postcode") String postcode,
         @Param("parentCategoryId") String parentCategoryId,
+        @Param("storeName") String storeName,
         Pageable pageable
     );
 
