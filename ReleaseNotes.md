@@ -1,4 +1,10 @@
 ##################################################
+# location-service-1.0.4 | 31-May-2022
+##################################################
+
+1. Create new endpoint parent-category/stores (get unique store based on location and parent category id)
+
+##################################################
 # location-service-1.0.3 | 30-May-2022
 ##################################################
 1. Modify response body for getByQueryProduct , getDisplayStoreConfig
