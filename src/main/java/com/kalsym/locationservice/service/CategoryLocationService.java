@@ -93,7 +93,68 @@ public class CategoryLocationService {
         .collect(Collectors.toList());
 
         return parentCategoriesList ;
-    } 
+    }
+
+    //get the store distinct
+    // public Page<Category> getQueryStoreDistinct(String city, String stateId,String regionCountryId, String postcode, String parentCategoryId, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
+    
+    //     Store storeMatch = new Store();
+    //     storeMatch.setCity(city);
+    //     storeMatch.setState(stateId);
+    //     storeMatch.setRegionCountryId(regionCountryId);
+    //     storeMatch.setPostcode(postcode);
+
+
+    //     ParentCategory parentCategoryMatch = new ParentCategory();
+    //     parentCategoryMatch.setParentId(parentCategoryId);
+       
+    //     Category categoryMatch = new Category();
+    //     categoryMatch.setStoreDetails(storeMatch);
+    //     categoryMatch.setParentCategory(parentCategoryMatch);
+
+    //     ExampleMatcher matcher = ExampleMatcher
+    //             .matchingAll()
+    //             .withIgnoreCase()
+    //             .withMatcher("city", new GenericPropertyMatcher().exact())
+    //             .withMatcher("stateId", new GenericPropertyMatcher().exact())
+    //             .withMatcher("regionCountryId", new GenericPropertyMatcher().exact())
+    //             .withMatcher("postcode", new GenericPropertyMatcher().exact())
+    //             .withMatcher("parentCategoryId", new GenericPropertyMatcher().exact())
+    //             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+    //     Example<Category> example = Example.of(categoryMatch, matcher);
+
+    //     Pageable pageable = PageRequest.of(page, pageSize);
+   
+    //     // if (sortingOrder==Sort.Direction.DESC){
+    //     //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+    //     // }
+    //     // else{
+    //     //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+    //     // }
+        
+    //     return categoryRepository.findAll(example,pageable);
+
+    // }
+
+    public Page<Category> getQueryStore(String city, String stateId,String regionCountryId, String postcode, String parentCategoryId,int page, int pageSize){
+    
+
+        Pageable pageable = PageRequest.of(page, pageSize);
+
+        //find the based on location with pageable
+        Page<Category> result = categoryRepository.getStoreBasedOnParentCategories(city,stateId,regionCountryId,postcode,parentCategoryId,pageable);
+   
+        // if (sortingOrder==Sort.Direction.DESC){
+        //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+        // }
+        // else{
+        //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+        // }
+        
+        // return categoryRepository.findAll(example,pageable);
+
+        return result;
+    }
 
      
 }
