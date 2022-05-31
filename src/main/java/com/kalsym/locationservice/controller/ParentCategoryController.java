@@ -23,7 +23,7 @@ import org.springframework.data.domain.Sort;
 
 
 @RestController
-@RequestMapping("/parent-category")
+@RequestMapping("")
 public class ParentCategoryController {
     
     @Autowired
@@ -31,7 +31,7 @@ public class ParentCategoryController {
 
     @GetMapping(path = {"/stores"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
-    public ResponseEntity<HttpResponse> getByQueryChildCategory(
+    public ResponseEntity<HttpResponse> getStores(
         HttpServletRequest request,
         @RequestParam(required = false) String city,
         @RequestParam(required = false) String stateId,
