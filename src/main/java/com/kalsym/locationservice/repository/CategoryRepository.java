@@ -81,14 +81,23 @@ public interface CategoryRepository extends JpaRepository<Category,String> {
         // + "AND pwd.storeDetails.city = :city "
         // + "OR pwd.storeDetails.state = :stateId "
         // + "OR pwd.storeDetails.postcode = :postcode"
+
+        // " SELECT sc "
+        // + "FROM Category sc "
+        // + "WHERE sc.storeDetails.regionCountryId = :regionCountryId "
+        // + "AND sc.parentCategory.parentId = :parentCategoryId "
+        // + "AND pwd.storeDetails.city = :city "
+        // + "OR pwd.storeDetails.state = :stateId "
+        // + "OR pwd.storeDetails.postcode = :postcode"
     @Query(
             " SELECT sc "
             + "FROM Category sc "
             + "WHERE sc.storeDetails.regionCountryId = :regionCountryId "
             + "AND sc.parentCategory.parentId = :parentCategoryId "
-            + "AND pwd.storeDetails.city = :city "
-            + "OR pwd.storeDetails.state = :stateId "
-            + "OR pwd.storeDetails.postcode = :postcode"
+            + "AND sc.storeDetails.city = :city "
+            + "OR sc.storeDetails.state = :state "
+            + "OR sc.storeDetails.postcode = :postcode "
+            + "GROUP BY sc.storeDetails.id"
     )
     Page<Category> getStoreBasedOnParentCategories(
         @Param("city") String city,
