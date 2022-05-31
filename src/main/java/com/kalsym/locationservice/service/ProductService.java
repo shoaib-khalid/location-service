@@ -82,7 +82,7 @@ public class ProductService {
 
     }
 
-    public Page<ProductMain> getRawQueryProduct(String city, String stateId,String regionCountryId, String postcode, List<String> status, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
+    public Page<ProductMain> getRawQueryProduct(String city, String stateId,String regionCountryId, String postcode, List<String> status,String name, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
     
         //Handling null value in order to use query
         if (regionCountryId == null || regionCountryId.isEmpty()) {
@@ -99,6 +99,10 @@ public class ProductService {
 
         if (postcode == null || postcode.isEmpty()) {
             postcode = "";
+        }
+
+        if (name == null || name.isEmpty()) {
+            name = "";
         }
 
         if (status == null) {
@@ -128,7 +132,7 @@ public class ProductService {
         }
 
         //find the based on location with pageable
-        Page<ProductMain> result = productRepository.getProductBasedOnLocation(status,stateId,regionCountryId,city,postcode,pageable);
+        Page<ProductMain> result = productRepository.getProductBasedOnLocation(status,stateId,regionCountryId,city,postcode,name,pageable);
 
         //extract the result of content of pageable in order to proceed with dicount of item 
         List<ProductMain> productList = result.getContent();

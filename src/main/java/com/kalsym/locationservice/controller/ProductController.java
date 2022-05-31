@@ -64,13 +64,14 @@ public class ProductController {
         @RequestParam(required = true) String regionCountryId,
         @RequestParam(required = false) String postcode,
         @RequestParam(required = false) List<String> status,
+        @RequestParam(required = false) String name,
         @RequestParam(required = false, defaultValue = "name") String sortByCol,
         @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<ProductMain> body = productService.getRawQueryProduct(city,stateId,regionCountryId,postcode,status,sortByCol,sortingOrder,page,pageSize);
+        Page<ProductMain> body = productService.getRawQueryProduct(city,stateId,regionCountryId,postcode,status,name,sortByCol,sortingOrder,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

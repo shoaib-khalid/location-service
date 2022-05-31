@@ -38,15 +38,27 @@ public interface ProductRepository extends JpaRepository<ProductMain,String> {
         // + "OR pwd.storeDetails.state = :stateId "
         // + "OR pwd.storeDetails.postcode = :postcode"
 
+        // " SELECT pwd "
+        // + "FROM ProductMain pwd "
+        // + "WHERE pwd.status IN :status "
+        // + "AND pwd.name LIKE CONCAT('%', :name ,'%') "
+        // + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
+        // + "AND pwd.status IN :status "
+        // + "AND pwd.storeDetails.city = :city "
+        // + "OR pwd.storeDetails.state = :stateId "
+        // + "OR pwd.storeDetails.postcode = :postcode"
+
 
     @Query(
             " SELECT pwd "
             + "FROM ProductMain pwd "
-            + "WHERE pwd.storeDetails.regionCountryId = :regionCountryId "
+            + "WHERE pwd.status IN :status "
+            + "AND pwd.name LIKE CONCAT('%', :name ,'%') "
+            + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
             + "AND pwd.status IN :status "
             + "AND pwd.storeDetails.city = :city "
-            + "OR pwd.storeDetails.state = :stateId "
-            + "OR pwd.storeDetails.postcode = :postcode"
+            + "AND pwd.storeDetails.state LIKE CONCAT('%', :stateId ,'%') "
+            + "AND pwd.storeDetails.postcode LIKE CONCAT('%', :postcode ,'%')"
     )
     Page<ProductMain> getProductBasedOnLocation(
             @Param("status") List<String> status,
@@ -54,6 +66,7 @@ public interface ProductRepository extends JpaRepository<ProductMain,String> {
             @Param("regionCountryId") String regionCountryId,
             @Param("city") String city,
             @Param("postcode") String postcode,
+            @Param("name") String name,
             Pageable pageable
     );
 }
