@@ -66,13 +66,14 @@ public class ParentCategoryController {
         @RequestParam(required = false) String regionCountryId,
         @RequestParam(required = false) String parentCategoryId,
         @RequestParam(required = false) String cityId,
+        @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String name,
         @RequestParam(required = false) List<String> status,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,name,page,pageSize);
+        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

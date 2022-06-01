@@ -187,7 +187,7 @@ public class ProductService {
         return output;
     }
 
-    public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(List<String> status,String regionCountryId,String parentCategoryId, String cityId, String name,int page, int pageSize){
+    public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(List<String> status,String regionCountryId,String parentCategoryId, String cityId, String cityName, String name,int page, int pageSize){
 
         //Handling null value in order to use query
         if (regionCountryId == null || regionCountryId.isEmpty()) {
@@ -196,6 +196,10 @@ public class ProductService {
 
         if (cityId == null || cityId.isEmpty()) {
             cityId = "";
+        }
+
+        if (cityName == null || cityName.isEmpty()) {
+            cityName = "";
         }
 
         if (name == null || name.isEmpty()) {
@@ -226,7 +230,7 @@ public class ProductService {
         }
 
         //find the based on location with pageable
-        Page<ProductMain> result = productRepository.getProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,name,pageable);
+        Page<ProductMain> result = productRepository.getProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable);
 
         //extract the result of content of pageable in order to proceed with dicount of item 
         List<ProductMain> productList = result.getContent();

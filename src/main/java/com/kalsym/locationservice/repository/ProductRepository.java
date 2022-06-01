@@ -52,13 +52,15 @@ public interface ProductRepository extends JpaRepository<ProductMain,String> {
         + "AND pwd.name LIKE CONCAT('%', :name ,'%') "
         + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
         + "AND pwd.status IN :status "
-        + "AND pwd.storeDetails.city = :cityId "
+        + "AND pwd.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
+        + "AND pwd.storeDetails.city LIKE CONCAT('%', :cityId ,'%')"
     )
     Page<ProductMain> getProductByParentCategoryIdAndLocation(
             @Param("status") List<String> status,
             @Param("regionCountryId") String regionCountryId,
             @Param("parentCategoryId") String parentCategoryId,
             @Param("cityId") String cityId,
+            @Param("cityName") String cityName,
             @Param("name") String name,
             Pageable pageable
     );
