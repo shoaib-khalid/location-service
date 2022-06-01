@@ -95,10 +95,12 @@ public class LandingConfigController {
         @RequestParam(required = false) Boolean isDisplay,
         @RequestParam(required = false) String regionCountryId,
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int pageSize
+        @RequestParam(defaultValue = "10") int pageSize,
+        @RequestParam(required = false) String sortByCol,
+        @RequestParam(required = false) Sort.Direction sortingOrder
     ) {
 
-        Page<StoreConfig> body = storeConfigService.getQueryStoreConfig(isDisplay,regionCountryId,page,pageSize);
+        Page<StoreConfig> body = storeConfigService.getQueryStoreConfig(isDisplay,regionCountryId,page,pageSize,sortByCol,sortingOrder);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

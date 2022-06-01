@@ -23,7 +23,7 @@ public class StoreConfigService {
     StoreConfigRepository storeConfigRepository;
     
     //Get By Query USING EXAMPLE MATCHER for 
-    public Page<StoreConfig> getQueryStoreConfig(Boolean isDisplay, String regionCountryId, int page, int pageSize){
+    public Page<StoreConfig> getQueryStoreConfig(Boolean isDisplay, String regionCountryId, int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
        
         Store storeMatch = new Store();
         storeMatch.setRegionCountryId(regionCountryId);
@@ -41,7 +41,17 @@ public class StoreConfigService {
 
         Example<StoreConfig> example = Example.of(storeConfigMatch, matcher);
 
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable;
+   
+        if (sortingOrder==Sort.Direction.DESC){
+            pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+        }
+        else if (sortingOrder==Sort.Direction.ASC){
+            pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+        }
+        else{
+            pageable = PageRequest.of(page, pageSize);
+        }
 
         return storeConfigRepository.findAll(example,pageable);
 
