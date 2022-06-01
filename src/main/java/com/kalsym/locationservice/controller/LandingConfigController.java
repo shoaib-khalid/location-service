@@ -94,7 +94,6 @@ public class LandingConfigController {
         HttpServletRequest request,
         @RequestParam(required = false) Boolean isDisplay,
         @RequestParam(required = false) String regionCountryId,
-        @RequestParam(required = false) int sequence,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize
     ) {
