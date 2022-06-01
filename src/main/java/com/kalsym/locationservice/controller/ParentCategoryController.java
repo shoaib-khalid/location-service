@@ -48,6 +48,7 @@ public class ParentCategoryController {
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
+        //CAN SORT BY parentName
         Page<Category> body = categoryLocationService.getQueryStore(city,stateId,regionCountryId,postcode,parentCategoryId,storeName,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());

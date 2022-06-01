@@ -143,11 +143,25 @@ public class CategoryLocationService {
         return result;
     }
 
-    public Page<ParentCategory> getQueryParentCategoriesBasedOnLocation(String city, String stateId, String regionCountryId, String postcode,int page, int pageSize){
+    public Page<ParentCategory> getQueryParentCategoriesBasedOnLocation(String city, String stateId, String regionCountryId, String postcode, String parentCategoryId, String sortByCol,Sort.Direction sortingOrder, int page, int pageSize){
 
-        Pageable pageable = PageRequest.of(page, pageSize);
+        if (parentCategoryId == null || parentCategoryId.isEmpty()) {
+            parentCategoryId = "";
+        }
 
-        Page<ParentCategory> result = parentCategoryRepository.getParentCategoriesBasedOnLocationQuery(stateId,city,postcode,regionCountryId,pageable);
+        Pageable pageable;
+
+        if (sortingOrder==Sort.Direction.DESC){
+            pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+        }
+        else if(sortingOrder==Sort.Direction.ASC){
+            pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+        }
+        else{
+            pageable = PageRequest.of(page, pageSize);
+        }
+
+        Page<ParentCategory> result = parentCategoryRepository.getParentCategoriesBasedOnLocationQuery(stateId,city,postcode,regionCountryId,parentCategoryId,pageable);
 
         return result;
     }

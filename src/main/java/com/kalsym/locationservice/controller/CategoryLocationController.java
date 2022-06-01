@@ -62,11 +62,14 @@ public class CategoryLocationController {
         @RequestParam(required = false) String stateId,
         @RequestParam(required = false) String regionCountryId,
         @RequestParam(required = false) String postcode,
+        @RequestParam(required = false) String parentCategoryId,
+        @RequestParam(required = false) String sortByCol,
+        @RequestParam(required = false) Sort.Direction sortingOrder,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<ParentCategory> body = categoryLocationService.getQueryParentCategoriesBasedOnLocation(city,stateId,regionCountryId,postcode,page,pageSize);
+        Page<ParentCategory> body = categoryLocationService.getQueryParentCategoriesBasedOnLocation(city,stateId,regionCountryId,postcode,parentCategoryId,sortByCol,sortingOrder,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
