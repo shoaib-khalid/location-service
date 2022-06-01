@@ -11,6 +11,7 @@ import com.kalsym.locationservice.model.Store;
 // import com.kalsym.locationservice.repository.CategoryLocationRepository;
 // import com.kalsym.locationservice.repository.LocationCategoryRepository;
 import com.kalsym.locationservice.repository.CategoryRepository;
+import com.kalsym.locationservice.repository.ParentCategoryRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.ExampleMatcher;
@@ -33,6 +34,9 @@ public class CategoryLocationService {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Autowired
+    ParentCategoryRepository parentCategoryRepository;
     
     //Get By Query WITH Pagination
     //Child category 
@@ -95,47 +99,6 @@ public class CategoryLocationService {
         return parentCategoriesList ;
     }
 
-    //get the store distinct
-    // public Page<Category> getQueryStoreDistinct(String city, String stateId,String regionCountryId, String postcode, String parentCategoryId, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
-    
-    //     Store storeMatch = new Store();
-    //     storeMatch.setCity(city);
-    //     storeMatch.setState(stateId);
-    //     storeMatch.setRegionCountryId(regionCountryId);
-    //     storeMatch.setPostcode(postcode);
-
-
-    //     ParentCategory parentCategoryMatch = new ParentCategory();
-    //     parentCategoryMatch.setParentId(parentCategoryId);
-       
-    //     Category categoryMatch = new Category();
-    //     categoryMatch.setStoreDetails(storeMatch);
-    //     categoryMatch.setParentCategory(parentCategoryMatch);
-
-    //     ExampleMatcher matcher = ExampleMatcher
-    //             .matchingAll()
-    //             .withIgnoreCase()
-    //             .withMatcher("city", new GenericPropertyMatcher().exact())
-    //             .withMatcher("stateId", new GenericPropertyMatcher().exact())
-    //             .withMatcher("regionCountryId", new GenericPropertyMatcher().exact())
-    //             .withMatcher("postcode", new GenericPropertyMatcher().exact())
-    //             .withMatcher("parentCategoryId", new GenericPropertyMatcher().exact())
-    //             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-    //     Example<Category> example = Example.of(categoryMatch, matcher);
-
-    //     Pageable pageable = PageRequest.of(page, pageSize);
-   
-    //     // if (sortingOrder==Sort.Direction.DESC){
-    //     //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
-    //     // }
-    //     // else{
-    //     //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
-    //     // }
-        
-    //     return categoryRepository.findAll(example,pageable);
-
-    // }
-
     public Page<Category> getQueryStore(String city, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
     
         //Handling null value in order to use query
@@ -176,6 +139,15 @@ public class CategoryLocationService {
         // }
         
         // return categoryRepository.findAll(example,pageable);
+
+        return result;
+    }
+
+    public Page<ParentCategory> getQueryParentCategoriesBasedOnLocation(String city, String stateId, String regionCountryId, String postcode,int page, int pageSize){
+
+        Pageable pageable = PageRequest.of(page, pageSize);
+
+        Page<ParentCategory> result = parentCategoryRepository.getParentCategoriesBasedOnLocationQuery(stateId,city,postcode,regionCountryId,pageable);
 
         return result;
     }

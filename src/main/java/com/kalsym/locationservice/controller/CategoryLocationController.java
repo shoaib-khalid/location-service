@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.kalsym.locationservice.model.Category;
+import com.kalsym.locationservice.model.ParentCategory;
 import com.kalsym.locationservice.service.CategoryLocationService;
 import com.kalsym.locationservice.utility.HttpResponse;
 
@@ -55,15 +56,17 @@ public class CategoryLocationController {
 
     @GetMapping(path = {"/parent-category"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
-    public ResponseEntity<HttpResponse> getByQueryParentCategory(
+    public ResponseEntity<HttpResponse> getParentCategory(
         HttpServletRequest request,
         @RequestParam(required = false) String city,
         @RequestParam(required = false) String stateId,
         @RequestParam(required = false) String regionCountryId,
-        @RequestParam(required = false) String postcode
+        @RequestParam(required = false) String postcode,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        List<Object> body = categoryLocationService.getQueryParentCategories(city,stateId,regionCountryId,postcode);
+        Page<ParentCategory> body = categoryLocationService.getQueryParentCategoriesBasedOnLocation(city,stateId,regionCountryId,postcode,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
@@ -72,7 +75,24 @@ public class CategoryLocationController {
 
     }
 
-    
+    // @GetMapping(path = {"/parent-category"}, name = "store-customers-get")
+    // @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
+    // public ResponseEntity<HttpResponse> getByQueryParentCategory(
+    //     HttpServletRequest request,
+    //     @RequestParam(required = false) String city,
+    //     @RequestParam(required = false) String stateId,
+    //     @RequestParam(required = false) String regionCountryId,
+    //     @RequestParam(required = false) String postcode
+    // ) {
 
+    //     List<Object> body = categoryLocationService.getQueryParentCategories(city,stateId,regionCountryId,postcode);
+        
+    //     HttpResponse response = new HttpResponse(request.getRequestURI());
+    //     response.setData(body);
+    //     response.setStatus(HttpStatus.OK);
+    //     return ResponseEntity.status(response.getStatus()).body(response);
 
+    // }
+
+ 
 }
