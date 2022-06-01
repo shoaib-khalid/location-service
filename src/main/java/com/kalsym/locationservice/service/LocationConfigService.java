@@ -54,7 +54,8 @@ public class LocationConfigService {
         else{
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
         }
-        
+
+
         return locationConfigRepository.findAll(example,pageable);
 
     }

@@ -35,6 +35,8 @@ public class StoreConfig {
 
     private String storeId;
 
+    private Integer sequence;
+
     @OneToOne()
     @JoinColumn(name = "storeId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
     private Store storeDetails; 

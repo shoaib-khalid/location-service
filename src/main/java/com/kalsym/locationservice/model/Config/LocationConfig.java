@@ -36,6 +36,8 @@ public class LocationConfig {
 
     private Boolean isDisplay;
 
+    private Integer sequence;
+
     @OneToOne()
     @JoinColumn(name = "cityId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
     private RegionCity cityDetails;  

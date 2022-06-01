@@ -79,12 +79,9 @@ public class LandingConfigController {
                 response.setStatus(HttpStatus.OK);
 
             } catch (Throwable e) {
-                System.out.println("ERROR:::=================="+ e);
                 // response.setStatus(HttpStatus.BAD_REQUEST);
 
-            }
-
-         
+            }     
  
         return ResponseEntity.status(response.getStatus()).body(response);
 
@@ -97,6 +94,7 @@ public class LandingConfigController {
         HttpServletRequest request,
         @RequestParam(required = false) Boolean isDisplay,
         @RequestParam(required = false) String regionCountryId,
+        @RequestParam(required = false) int sequence,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize
     ) {
