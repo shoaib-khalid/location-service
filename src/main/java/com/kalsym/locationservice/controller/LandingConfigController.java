@@ -46,13 +46,14 @@ public class LandingConfigController {
         @RequestParam(required = false) String cityId,
         @RequestParam(required = false) Boolean isDisplay,
         @RequestParam(required = false) String regionCountryId,
+        @RequestParam(required = false) String cityName,
         @RequestParam(required = false, defaultValue = "cityId") String sortByCol,
         @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<LocationConfig> body = locationConfigService.getQueryLocationConfig(cityId,isDisplay,regionCountryId,sortByCol,sortingOrder,page,pageSize);
+        Page<LocationConfig> body = locationConfigService.getQueryLocationConfig(cityId,isDisplay,regionCountryId,cityName,sortByCol,sortingOrder,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

@@ -22,13 +22,14 @@ public class LocationConfigService {
     LocationConfigRepository locationConfigRepository;
     
     //Get By Query USING EXAMPLE MATCHER for 
-    public Page<LocationConfig> getQueryLocationConfig(String cityId,Boolean isDisplay, String regionCountryId, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
+    public Page<LocationConfig> getQueryLocationConfig(String cityId,Boolean isDisplay, String regionCountryId, String cityName,String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
        
         RegionCountryState regionCountryStateMatch = new RegionCountryState();
         regionCountryStateMatch.setRegionCountryId(regionCountryId);
 
         RegionCity regionCityMatch = new RegionCity();
         regionCityMatch.setRegionCountryState(regionCountryStateMatch);
+        regionCityMatch.setName(cityName);
         
         LocationConfig LocationConfigMatch = new LocationConfig();
         LocationConfigMatch.setCityId(cityId);
