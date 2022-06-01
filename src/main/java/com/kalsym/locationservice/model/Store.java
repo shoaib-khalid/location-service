@@ -33,6 +33,10 @@ public class Store implements Serializable {
 
     private String city;
 
+    @OneToOne()
+    @JoinColumn(name = "city",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
+    private RegionCity regionCityDetails; 
+
     private String storeDescription;
 
     private String domain;

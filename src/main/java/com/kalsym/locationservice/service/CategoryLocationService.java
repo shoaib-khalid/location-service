@@ -99,7 +99,7 @@ public class CategoryLocationService {
         return parentCategoriesList ;
     }
 
-    public Page<Category> getQueryStore(String city, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
+    public Page<Category> getQueryStore(String city, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
     
         //Handling null value in order to use query
         if (city == null || city.isEmpty()) {
@@ -109,6 +109,9 @@ public class CategoryLocationService {
         // if (stateId == null || stateId.isEmpty()) {
         //     stateId = "";
         // }
+        if (cityName == null || cityName.isEmpty()) {
+            cityName = "";
+        }
 
         if (regionCountryId == null || regionCountryId.isEmpty()) {
             regionCountryId = "";
@@ -129,7 +132,7 @@ public class CategoryLocationService {
         Pageable pageable = PageRequest.of(page, pageSize);
 
         //find the based on location with pageable
-        Page<Category> result = categoryRepository.getStoreBasedOnParentCategories(city,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable);
+        Page<Category> result = categoryRepository.getStoreBasedOnParentCategories(city,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable);
    
         // if (sortingOrder==Sort.Direction.DESC){
         //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());

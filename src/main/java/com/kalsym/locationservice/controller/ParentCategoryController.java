@@ -39,6 +39,7 @@ public class ParentCategoryController {
     public ResponseEntity<HttpResponse> getStores(
         HttpServletRequest request,
         @RequestParam(required = false) String city,
+        @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String stateId,
         @RequestParam(required = true) String regionCountryId,
         @RequestParam(required = false) String postcode,
@@ -49,7 +50,7 @@ public class ParentCategoryController {
     ) {
 
         //CAN SORT BY parentName
-        Page<Category> body = categoryLocationService.getQueryStore(city,stateId,regionCountryId,postcode,parentCategoryId,storeName,page,pageSize);
+        Page<Category> body = categoryLocationService.getQueryStore(city,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
