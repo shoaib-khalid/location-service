@@ -25,6 +25,12 @@ ON store (postcode);
 CREATE INDEX store_regionCountryStateId_IDX
 ON store (regionCountryStateId);
 
+ALTER TABLE symplified.region_city ADD CONSTRAINT PRIMARY PRIMARY KEY (id);
+
+* WARNING : Please update database in store table city column , make sure the city is exactly with region_city(id). Once update , can proceed with adding foreign key.
+
+ALTER TABLE symplified.store ADD CONSTRAINT store_FK FOREIGN KEY (city) REFERENCES symplified.region_city(id);
+
 ##################################################
 # location-service-1.0.2 | 27-May-2022
 ##################################################
@@ -41,22 +47,28 @@ HAVING COUNT(id) > 1 ;
 
 ALTER TABLE symplified.region_city ADD CONSTRAINT `PRIMARY` PRIMARY KEY (id);
 
+
 CREATE TABLE `location_config` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `imageUrl` varchar(300) DEFAULT NULL,
   `cityId` varchar(100) DEFAULT NULL,
   `isDisplay` tinyint DEFAULT '0',
+  `sequence` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `location_config_FK` (`cityId`),
   CONSTRAINT `location_config_FK` FOREIGN KEY (`cityId`) REFERENCES `region_city` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) 
+)
 
 CREATE TABLE `store_display_config` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `isDisplay` tinyint DEFAULT '0',
-  `storeId` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-)
+  `storeId` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `sequence` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `store_display_config_FK` (`storeId`),
+  CONSTRAINT `store_display_config_FK` FOREIGN KEY (`storeId`) REFERENCES `store` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) 
+
 ##################################################
 # location-service-1.0.1 | 27-May-2022
 ##################################################
