@@ -14,36 +14,6 @@ import org.springframework.data.repository.query.Param;
 @Repository
 public interface ProductRepository extends JpaRepository<ProductMain,String> {
     
-
-    @Query(
-            " SELECT pwd "
-            + "FROM ProductMain pwd "
-            + "WHERE pwd.status IN :status "
-            + "AND pwd.name LIKE CONCAT('%', :name ,'%') "
-            + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
-            + "AND pwd.status IN :status "
-            + "AND pwd.storeDetails.city = :city "
-            + "AND pwd.storeDetails.state LIKE CONCAT('%', :stateId ,'%') "
-            + "AND pwd.storeDetails.postcode LIKE CONCAT('%', :postcode ,'%')"
-    )
-    Page<ProductMain> getProductBasedOnLocation(
-            @Param("status") List<String> status,
-            @Param("stateId") String stateId,
-            @Param("regionCountryId") String regionCountryId,
-            @Param("city") String city,
-            @Param("postcode") String postcode,
-            @Param("name") String name,
-            Pageable pageable
-    );
-
-    
-//     " SELECT pwd "
-//     + "FROM ProductMain pwd "
-//     + "WHERE pwd.status IN :status "
-//     + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
-//     + "AND pwd.name LIKE CONCAT('%', :name ,'%') "
-//     + "OR pwd.storeDetails.city = :cityId "
-//     + "AND pwd.storeCategory.parentCategoryId = :parentCategoryId"
     @Query(
         " SELECT pwd "
         + "FROM ProductMain pwd "

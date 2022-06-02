@@ -78,24 +78,5 @@ public class CategoryLocationController {
 
     }
 
-    // @GetMapping(path = {"/parent-category"}, name = "store-customers-get")
-    // @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
-    // public ResponseEntity<HttpResponse> getByQueryParentCategory(
-    //     HttpServletRequest request,
-    //     @RequestParam(required = false) String city,
-    //     @RequestParam(required = false) String stateId,
-    //     @RequestParam(required = false) String regionCountryId,
-    //     @RequestParam(required = false) String postcode
-    // ) {
-
-    //     List<Object> body = categoryLocationService.getQueryParentCategories(city,stateId,regionCountryId,postcode);
-        
-    //     HttpResponse response = new HttpResponse(request.getRequestURI());
-    //     response.setData(body);
-    //     response.setStatus(HttpStatus.OK);
-    //     return ResponseEntity.status(response.getStatus()).body(response);
-
-    // }
-
  
 }

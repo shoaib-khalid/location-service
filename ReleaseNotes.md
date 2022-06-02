@@ -25,8 +25,6 @@ ON store (postcode);
 CREATE INDEX store_regionCountryStateId_IDX
 ON store (regionCountryStateId);
 
-ALTER TABLE symplified.region_city ADD CONSTRAINT PRIMARY PRIMARY KEY (id);
-
 * WARNING : Please update database in store table city column , make sure the city is exactly with region_city(id). Once update , can proceed with adding foreign key.
 
 ALTER TABLE symplified.store ADD CONSTRAINT store_FK FOREIGN KEY (city) REFERENCES symplified.region_city(id);
@@ -37,6 +35,8 @@ ALTER TABLE symplified.store ADD CONSTRAINT store_FK FOREIGN KEY (city) REFERENC
 
 1. Add new endpoint /config/location & /config/store
 2. Checking any duplicate id in region_city and remove the duplicate id, once you remove the duplicated keys. You may insert the data the one that you remove.
+
+-- Checking any duplicate id, then remove one of the id,
 
 SELECT id, COUNT(id)
 FROM region_city

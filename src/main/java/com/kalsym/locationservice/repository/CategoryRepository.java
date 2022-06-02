@@ -16,7 +16,8 @@ import org.springframework.data.repository.query.Param;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category,String> {
     
-    //Note that if we want to use Raw Query u need to use Model Name instad of table name
+    //Note that if we want to use Raw Query , need to specify nativeQuery = true, 
+    //if you dont specify then make sure the table name u use model name.
     @Query(
         value = 
         " SELECT "
@@ -72,24 +73,6 @@ public interface CategoryRepository extends JpaRepository<Category,String> {
         @Param("regionCountryId") String regionCountryId,
         @Param("parentCategoryId") String parentCategoryId
         );
-
-
-        // " SELECT pwd "
-        // + "FROM ProductMain pwd "
-        // + "WHERE pwd.storeDetails.regionCountryId = :regionCountryId "
-        // + "AND pwd.status IN :status "
-        // + "AND pwd.storeDetails.city = :city "
-        // + "OR pwd.storeDetails.state = :stateId "
-        // + "OR pwd.storeDetails.postcode = :postcode"
-
-        // " SELECT sc "
-        // + "FROM Category sc "
-        // + "WHERE sc.storeDetails.regionCountryId = :regionCountryId "
-        // + "AND sc.parentCategory.parentId = :parentCategoryId "
-        // + "AND pwd.storeDetails.city = :city "
-        // + "OR pwd.storeDetails.state = :stateId "
-        // + "OR pwd.storeDetails.postcode = :postcode"
-        // + "GROUP BY sc.storeDetails.id"
 
     @Query(
             " SELECT sc "

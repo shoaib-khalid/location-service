@@ -25,53 +25,27 @@ import org.springframework.data.domain.Sort;
 
 
 @RestController
-@RequestMapping("/products-location")
+@RequestMapping("")
 public class ProductController {
     
     @Autowired
     ProductService productService;
 
-    // @GetMapping(path = {"/search"}, name = "store-customers-get")
-    // @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
-    // public ResponseEntity<HttpResponse> getByQueryProduct(
-    //     HttpServletRequest request,
-    //     @RequestParam(required = false) String city,
-    //     @RequestParam(required = false) String stateId,
-    //     @RequestParam(required = false) String regionCountryId,
-    //     @RequestParam(required = false) String postcode,
-    //     @RequestParam(required = false) String status,
-    //     @RequestParam(required = false, defaultValue = "name") String sortByCol,
-    //     @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder,
-    //     @RequestParam(defaultValue = "0") int page,
-    //     @RequestParam(defaultValue = "10") int pageSize
-    // ) {
-
-    //     Page<ProductMain> body = productService.getQueryProduct(city,stateId,regionCountryId,postcode,status,sortByCol,sortingOrder,page,pageSize);
-        
-    //     HttpResponse response = new HttpResponse(request.getRequestURI());
-    //     response.setData(body);
-    //     response.setStatus(HttpStatus.OK);
-    //     return ResponseEntity.status(response.getStatus()).body(response);
-
-    // }
-
-    @GetMapping(path = {""}, name = "store-customers-get")
+    @GetMapping(path = {"/products"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
-    public ResponseEntity<HttpResponse> getByQueryProduct(
+    public ResponseEntity<HttpResponse> getProducts(
         HttpServletRequest request,
-        @RequestParam(required = false) String city,
-        @RequestParam(required = false) String stateId,
         @RequestParam(required = true) String regionCountryId,
-        @RequestParam(required = false) String postcode,
-        @RequestParam(required = false) List<String> status,
+        @RequestParam(required = false) String parentCategoryId,
+        @RequestParam(required = false) String cityId,
+        @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String name,
-        @RequestParam(required = false, defaultValue = "name") String sortByCol,
-        @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder,
+        @RequestParam(required = false) List<String> status,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<ProductMain> body = productService.getRawQueryProduct(city,stateId,regionCountryId,postcode,status,name,sortByCol,sortingOrder,page,pageSize);
+        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
@@ -79,4 +53,5 @@ public class ProductController {
         return ResponseEntity.status(response.getStatus()).body(response);
 
     }
+
 }
