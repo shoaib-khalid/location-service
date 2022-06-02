@@ -2,7 +2,6 @@ package com.kalsym.locationservice.controller;
 
 import java.util.List;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.kalsym.locationservice.model.Category;
@@ -24,8 +23,8 @@ import org.springframework.data.domain.Sort;
 
 
 @RestController
-@RequestMapping("/categories-location")
-public class CategoryLocationController {
+@RequestMapping("/categories")
+public class CategoryController {
     
     @Autowired
     CategoryLocationService categoryLocationService;
@@ -34,7 +33,7 @@ public class CategoryLocationController {
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getByQueryChildCategory(
         HttpServletRequest request,
-        @RequestParam(required = false) String city,
+        @RequestParam(required = false) String cityId,
         @RequestParam(required = false) String stateId,
         @RequestParam(required = false) String regionCountryId,
         @RequestParam(required = false) String postcode,
@@ -45,7 +44,7 @@ public class CategoryLocationController {
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<Category> body = categoryLocationService.getQueryChildCategory(city,stateId,regionCountryId,postcode,parentCategoryId,sortByCol,sortingOrder,page,pageSize);
+        Page<Category> body = categoryLocationService.getQueryChildCategory(cityId,stateId,regionCountryId,postcode,parentCategoryId,sortByCol,sortingOrder,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
@@ -58,7 +57,7 @@ public class CategoryLocationController {
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getParentCategory(
         HttpServletRequest request,
-        @RequestParam(required = false) String city,
+        @RequestParam(required = false) String cityId,
         @RequestParam(required = false) String stateId,
         @RequestParam(required = false) String regionCountryId,
         @RequestParam(required = false) String postcode,
@@ -69,7 +68,7 @@ public class CategoryLocationController {
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<ParentCategory> body = categoryLocationService.getQueryParentCategoriesBasedOnLocation(city,stateId,regionCountryId,postcode,parentCategoryId,sortByCol,sortingOrder,page,pageSize);
+        Page<ParentCategory> body = categoryLocationService.getQueryParentCategoriesBasedOnLocation(cityId,stateId,regionCountryId,postcode,parentCategoryId,sortByCol,sortingOrder,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

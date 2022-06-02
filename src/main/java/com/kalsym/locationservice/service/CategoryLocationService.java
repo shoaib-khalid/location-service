@@ -40,10 +40,10 @@ public class CategoryLocationService {
     
     //Get By Query WITH Pagination
     //Child category 
-    public Page<Category> getQueryChildCategory(String city, String stateId,String regionCountryId, String postcode, String parentCategoryId, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
+    public Page<Category> getQueryChildCategory(String cityId, String stateId,String regionCountryId, String postcode, String parentCategoryId, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
     
         Store storeMatch = new Store();
-        storeMatch.setCity(city);
+        storeMatch.setCity(cityId);
         storeMatch.setState(stateId);
         storeMatch.setRegionCountryId(regionCountryId);
         storeMatch.setPostcode(postcode);
@@ -80,30 +80,30 @@ public class CategoryLocationService {
 
     }
     
-    //parent category
-    public List<Object> getQueryParentCategories(String city, String stateId, String regionCountryId, String postcode){
+    // //parent category
+    // public List<Object> getQueryParentCategories(String city, String stateId, String regionCountryId, String postcode){
 
-        List<Object[]> result = categoryRepository.getParentCategoriesBasedOnLocation(stateId,city,postcode,regionCountryId);
-        // System.out.println("Checking result 1 :::"+result.toString());
-        List<Object> parentCategoriesList = result.stream()
-        .map(m -> {
-            // System.out.println("Checking m[0] :::"+m[2]);
-            ParentCategory parentCategoryList = new ParentCategory();
-            parentCategoryList.setParentId(m[0].toString());
-            parentCategoryList.setParentName(m[1].toString());
-            parentCategoryList.setParentThumbnailUrl(m[2]== null?"":m[2].toString());
-            return parentCategoryList;
-        })
-        .collect(Collectors.toList());
+    //     List<Object[]> result = categoryRepository.getParentCategoriesBasedOnLocation(stateId,city,postcode,regionCountryId);
+    //     // System.out.println("Checking result 1 :::"+result.toString());
+    //     List<Object> parentCategoriesList = result.stream()
+    //     .map(m -> {
+    //         // System.out.println("Checking m[0] :::"+m[2]);
+    //         ParentCategory parentCategoryList = new ParentCategory();
+    //         parentCategoryList.setParentId(m[0].toString());
+    //         parentCategoryList.setParentName(m[1].toString());
+    //         parentCategoryList.setParentThumbnailUrl(m[2]== null?"":m[2].toString());
+    //         return parentCategoryList;
+    //     })
+    //     .collect(Collectors.toList());
 
-        return parentCategoriesList ;
-    }
+    //     return parentCategoriesList ;
+    // }
 
-    public Page<Category> getQueryStore(String city, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
+    public Page<Category> getQueryStore(String cityId, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
     
         //Handling null value in order to use query
-        if (city == null || city.isEmpty()) {
-            city = "";
+        if (cityId == null || cityId.isEmpty()) {
+            cityId = "";
         }
 
         // if (stateId == null || stateId.isEmpty()) {
@@ -132,7 +132,7 @@ public class CategoryLocationService {
         Pageable pageable = PageRequest.of(page, pageSize);
 
         //find the based on location with pageable
-        Page<Category> result = categoryRepository.getStoreBasedOnParentCategories(city,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable);
+        Page<Category> result = categoryRepository.getStoreBasedOnParentCategories(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable);
    
         // if (sortingOrder==Sort.Direction.DESC){
         //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
@@ -146,7 +146,7 @@ public class CategoryLocationService {
         return result;
     }
 
-    public Page<ParentCategory> getQueryParentCategoriesBasedOnLocation(String city, String stateId, String regionCountryId, String postcode, String parentCategoryId, String sortByCol,Sort.Direction sortingOrder, int page, int pageSize){
+    public Page<ParentCategory> getQueryParentCategoriesBasedOnLocation(String cityId, String stateId, String regionCountryId, String postcode, String parentCategoryId, String sortByCol,Sort.Direction sortingOrder, int page, int pageSize){
 
         if (parentCategoryId == null || parentCategoryId.isEmpty()) {
             parentCategoryId = "";
@@ -164,7 +164,7 @@ public class CategoryLocationService {
             pageable = PageRequest.of(page, pageSize);
         }
 
-        Page<ParentCategory> result = parentCategoryRepository.getParentCategoriesBasedOnLocationQuery(stateId,city,postcode,regionCountryId,parentCategoryId,pageable);
+        Page<ParentCategory> result = parentCategoryRepository.getParentCategoriesBasedOnLocationQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId,pageable);
 
         return result;
     }

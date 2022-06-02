@@ -1,10 +1,7 @@
 package com.kalsym.locationservice.controller;
 
 import java.util.List;
-
-
 import javax.servlet.http.HttpServletRequest;
-
 import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.Config.LocationConfig;
 import com.kalsym.locationservice.model.Config.StoreConfig;
@@ -14,7 +11,6 @@ import com.kalsym.locationservice.service.LocationConfigService;
 import com.kalsym.locationservice.service.ProductService;
 import com.kalsym.locationservice.service.StoreConfigService;
 import com.kalsym.locationservice.utility.HttpResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +26,8 @@ import org.springframework.data.domain.Sort;
 
 
 @RestController
-@RequestMapping("/config")
-public class LandingConfigController {
+@RequestMapping("/featured")
+public class FeaturedController {
     
     @Autowired
     LocationConfigService locationConfigService;
@@ -44,7 +40,6 @@ public class LandingConfigController {
     public ResponseEntity<HttpResponse> getLocationConfig(
         HttpServletRequest request,
         @RequestParam(required = false) String cityId,
-        @RequestParam(required = false) Boolean isDisplay,
         @RequestParam(required = false) String regionCountryId,
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false, defaultValue = "cityId") String sortByCol,
@@ -53,7 +48,7 @@ public class LandingConfigController {
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<LocationConfig> body = locationConfigService.getQueryLocationConfig(cityId,isDisplay,regionCountryId,cityName,sortByCol,sortingOrder,page,pageSize);
+        Page<LocationConfig> body = locationConfigService.getQueryLocationConfig(cityId,regionCountryId,cityName,sortByCol,sortingOrder,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
@@ -92,16 +87,19 @@ public class LandingConfigController {
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getDisplayStoreConfig(
         HttpServletRequest request,
-        @RequestParam(required = false) Boolean isDisplay,
         @RequestParam(required = false) String regionCountryId,
+        @RequestParam(required = false) String cityId,
+        @RequestParam(required = false) String cityName,
+        @RequestParam(required = false) String parentCategoryId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
         @RequestParam(required = false) String sortByCol,
         @RequestParam(required = false) Sort.Direction sortingOrder
     ) {
 
-        Page<StoreConfig> body = storeConfigService.getQueryStoreConfig(isDisplay,regionCountryId,page,pageSize,sortByCol,sortingOrder);
-        
+        // Page<StoreConfig> body = storeConfigService.getQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,page,pageSize,sortByCol,sortingOrder);
+        Page<StoreConfig> body = storeConfigService.getRawQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,page,pageSize,sortByCol,sortingOrder);
+
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
         response.setStatus(HttpStatus.OK);

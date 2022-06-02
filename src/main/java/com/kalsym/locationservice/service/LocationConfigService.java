@@ -22,7 +22,7 @@ public class LocationConfigService {
     LocationConfigRepository locationConfigRepository;
     
     //Get By Query USING EXAMPLE MATCHER for 
-    public Page<LocationConfig> getQueryLocationConfig(String cityId,Boolean isDisplay, String regionCountryId, String cityName,String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
+    public Page<LocationConfig> getQueryLocationConfig(String cityId, String regionCountryId, String cityName,String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
        
         RegionCountryState regionCountryStateMatch = new RegionCountryState();
         regionCountryStateMatch.setRegionCountryId(regionCountryId);
@@ -34,13 +34,11 @@ public class LocationConfigService {
         LocationConfig LocationConfigMatch = new LocationConfig();
         LocationConfigMatch.setCityId(cityId);
         LocationConfigMatch.setCityDetails(regionCityMatch);
-        LocationConfigMatch.setIsDisplay(isDisplay);
         
         ExampleMatcher matcher = ExampleMatcher
                 .matchingAll()
                 .withIgnoreCase()
                 .withMatcher("cityId", new GenericPropertyMatcher().exact())
-                .withMatcher("isDisplay", new GenericPropertyMatcher().exact())
                 .withMatcher("regionCountryId", new GenericPropertyMatcher().exact())
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
 

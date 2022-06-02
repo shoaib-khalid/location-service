@@ -31,7 +31,7 @@ public class StoreController {
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getStores(
         HttpServletRequest request,
-        @RequestParam(required = false) String city,
+        @RequestParam(required = false) String cityId,
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String stateId,
         @RequestParam(required = true) String regionCountryId,
@@ -42,8 +42,7 @@ public class StoreController {
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        //CAN SORT BY parentName
-        Page<Category> body = categoryLocationService.getQueryStore(city,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,page,pageSize);
+        Page<Category> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
