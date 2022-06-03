@@ -126,7 +126,7 @@ public class FeaturedController {
     ) {
 
         Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, page, pageSize);
-
+        
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
         response.setStatus(HttpStatus.OK);
