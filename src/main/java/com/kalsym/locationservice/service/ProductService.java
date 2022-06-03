@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.kalsym.locationservice.enums.DiscountCalculationType;
 import com.kalsym.locationservice.model.RegionCountry;
@@ -157,17 +158,42 @@ public class ProductService {
         Page<ProductFeatureConfig> result = productFeaturedRepository.getQueryProductConfig(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable);
 
         //extract the result of content of pageable in order to proceed with dicount of item 
-        // List<ProductFeatureConfig> productList = result.getContent();
+        List<ProductFeatureConfig> productFeaturedList = result.getContent();
+
+        //In order to continue get item discount , extract productDetails first
+        List<ProductMain> productList = productFeaturedList.stream()
+        .map(m -> {
+            // System.out.println("Checking m ::::::::::::::::::::::::::"+m.getProductDetails());
+            ProductMain product = m.getProductDetails();
+            return product;
+        })
+        .collect(Collectors.toList());
 
         // to get discount of product
-        // ProductFeatureConfig[] productWithDetailsList = GetDiscount.getProductDiscountList(productList, regionCountry, storeDiscountRepository, storeDiscountProductRepository);
+        ProductMain[] productWithDetailsList = GetDiscount.getProductDiscountList(productList, regionCountry, storeDiscountRepository, storeDiscountProductRepository);
 
         // convert array to array list
-        // List<ProductFeatureConfig> newArrayList = new ArrayList<>(Arrays.asList(productWithDetailsList));
+        List<ProductMain> newProductDetails = new ArrayList<>(Arrays.asList(productWithDetailsList));
+
+        List<ProductFeatureConfig> listofPFC = new ArrayList<>();
+        
+        for (ProductFeatureConfig productfeaturedList : productFeaturedList) {
+
+            for(ProductMain newProducWithtDetails:newProductDetails){
+
+                if(productfeaturedList.getProductId().equals(newProducWithtDetails.getId())){
+
+                    productfeaturedList.setProductDetails(newProducWithtDetails);
+
+                }
+            }
+
+            listofPFC.add(productfeaturedList);
+        }
 
         //Page mapper
-        // Page<ProductFeatureConfig> output = new PageImpl<ProductFeatureConfig>(newArrayList,pageable,result.getTotalElements());
-        
-        return result;
+        Page<ProductFeatureConfig> output = new PageImpl<ProductFeatureConfig>(listofPFC,pageable,result.getTotalElements());
+
+        return output;
     }
 }
