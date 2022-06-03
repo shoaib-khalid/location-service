@@ -105,7 +105,7 @@ public class StoreConfigService {
         if (sortingOrder==Sort.Direction.DESC){
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
         }
-        else if (sortingOrder==Sort.Direction.DESC){
+        else if (sortingOrder==Sort.Direction.ASC){
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
         }
         else{
