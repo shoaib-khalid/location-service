@@ -12,18 +12,12 @@ import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.Config.StoreConfig;
 
 import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
-/**
- *
- * @author taufik
- */
+
 public class CategoriesSearchSpecs {
      /**
      * Accept two dates and example matcher
      *
-     * @param currentDate     
-     * @param voucherType
-     * @param storeId
-     * @param verticalCode
+     * @param parentCategoryId     
      * @param example
      * @return
      */

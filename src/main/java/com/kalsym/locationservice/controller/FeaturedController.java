@@ -4,6 +4,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.Config.LocationConfig;
+import com.kalsym.locationservice.model.Config.ProductFeatureConfig;
 import com.kalsym.locationservice.model.Config.StoreConfig;
 import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.service.CategoryLocationService;
@@ -34,6 +35,9 @@ public class FeaturedController {
 
     @Autowired
     StoreConfigService storeConfigService;
+
+    @Autowired
+    ProductService productService;
 
     @GetMapping(path = {"/location"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
@@ -106,4 +110,29 @@ public class FeaturedController {
         return ResponseEntity.status(response.getStatus()).body(response);
 
     }
+
+    @GetMapping(path = {"/product"}, name = "store-customers-get")
+    @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
+    public ResponseEntity<HttpResponse> getFeaturedProducts(
+        HttpServletRequest request,
+        @RequestParam(required = false) List<String> status,
+        @RequestParam(required = false) String regionCountryId,
+        @RequestParam(required = false) String parentCategoryId,
+        @RequestParam(required = false) String cityId,
+        @RequestParam(required = false) String cityName,
+        @RequestParam(required = false) String name,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int pageSize
+    ) {
+
+        Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, page, pageSize);
+
+        HttpResponse response = new HttpResponse(request.getRequestURI());
+        response.setData(body);
+        response.setStatus(HttpStatus.OK);
+        return ResponseEntity.status(response.getStatus()).body(response);
+
+    }
+
+    
 }

@@ -57,7 +57,7 @@ public class SwaggerConfig {
                 .description("Used to manage filtering based on location")
                 .termsOfServiceUrl("not added yet")
                 .license("not added yet")
-                .licenseUrl("").version("1.0.6").build();
+                .licenseUrl("").version("1.0.7").build();
     }
 
     public static final String DEFAULT_INCLUDE_PATTERN = "/.*";
