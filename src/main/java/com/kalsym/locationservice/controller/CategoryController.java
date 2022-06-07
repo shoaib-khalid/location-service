@@ -57,7 +57,7 @@ public class CategoryController {
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getParentCategory(
         HttpServletRequest request,
-        @RequestParam(required = false) String cityId,
+        @RequestParam(required = false) List<String> cityId,
         @RequestParam(required = false) String stateId,
         @RequestParam(required = false) String regionCountryId,
         @RequestParam(required = false) String postcode,

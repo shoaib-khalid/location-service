@@ -9,6 +9,8 @@ import com.kalsym.locationservice.repository.CategoriesSearchSpecs;
 import com.kalsym.locationservice.repository.LocationConfigRepository;
 import com.kalsym.locationservice.repository.StoreConfigRepository;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -70,12 +72,12 @@ public class StoreConfigService {
 
     }
 
-    public Page<StoreConfig> getRawQueryStoreConfig(String regionCountryId, String cityId, String cityName, String parentCategoryId, int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
+    public Page<StoreConfig> getRawQueryStoreConfig(String regionCountryId, List<String> cityId, String cityName, String parentCategoryId, int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
     
         //Handling null value in order to use query
-        if (cityId == null || cityId.isEmpty()) {
-            cityId = "";
-        }
+        // if (cityId == null || cityId.isEmpty()) {
+        //     cityId = "";
+        // }
 
         // if (stateId == null || stateId.isEmpty()) {
         //     stateId = "";

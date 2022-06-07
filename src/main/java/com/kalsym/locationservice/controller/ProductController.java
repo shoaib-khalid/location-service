@@ -37,7 +37,7 @@ public class ProductController {
         HttpServletRequest request,
         @RequestParam(required = true) String regionCountryId,
         @RequestParam(required = false) String parentCategoryId,
-        @RequestParam(required = false) String cityId,
+        @RequestParam(required = false) List<String> cityId,
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String name,
         @RequestParam(required = false) List<String> status,

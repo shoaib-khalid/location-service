@@ -1,4 +1,9 @@
 ##################################################
+# location-service-1.0.9 | 7-June-2022
+##################################################
+1. Modify query param city id in array for endpoint categories/parent-categories , featured/store, featured/product , /product , /store
+
+##################################################
 # location-service-1.0.8 | 7-June-2022
 ##################################################
 

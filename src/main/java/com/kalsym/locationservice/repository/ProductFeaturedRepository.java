@@ -37,13 +37,13 @@ public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureC
         + "AND productDetails.storeDetails.regionCountryId = :regionCountryId "
         + "AND productDetails.status IN :status "
         + "AND productDetails.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
-        + "AND productDetails.storeDetails.city LIKE CONCAT('%', :cityId ,'%')"
+        + "OR productDetails.storeDetails.city IN :cityId"
     )
     Page<ProductFeatureConfig> getQueryProductConfig(
         @Param("status") List<String> status,
         @Param("regionCountryId") String regionCountryId,
         @Param("parentCategoryId") String parentCategoryId,
-        @Param("cityId") String cityId,
+        @Param("cityId") List<String> cityId,
         @Param("cityName") String cityName,
         @Param("name") String name,
         Pageable pageable

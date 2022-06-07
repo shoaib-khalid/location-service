@@ -31,7 +31,7 @@ public class StoreController {
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getStores(
         HttpServletRequest request,
-        @RequestParam(required = false) String cityId,
+        @RequestParam(required = false) List<String> cityId,
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String stateId,
         @RequestParam(required = true) String regionCountryId,

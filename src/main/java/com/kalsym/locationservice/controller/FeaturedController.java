@@ -92,7 +92,7 @@ public class FeaturedController {
     public ResponseEntity<HttpResponse> getDisplayStoreConfig(
         HttpServletRequest request,
         @RequestParam(required = false) String regionCountryId,
-        @RequestParam(required = false) String cityId,
+        @RequestParam(required = false) List<String> cityId,
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String parentCategoryId,
         @RequestParam(defaultValue = "0") int page,
@@ -118,7 +118,7 @@ public class FeaturedController {
         @RequestParam(required = false) List<String> status,
         @RequestParam(required = false) String regionCountryId,
         @RequestParam(required = false) String parentCategoryId,
-        @RequestParam(required = false) String cityId,
+        @RequestParam(required = false) List<String> cityId,
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String name,
         @RequestParam(defaultValue = "0") int page,
@@ -127,7 +127,7 @@ public class FeaturedController {
         @RequestParam(required = false) Sort.Direction sortingOrder
     ) {
 
-        Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, page, pageSize, sortByCol, sortingOrder);
+        Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, page, pageSize, sortByCol, sortingOrder );
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

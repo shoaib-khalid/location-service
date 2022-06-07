@@ -99,12 +99,12 @@ public class CategoryLocationService {
     //     return parentCategoriesList ;
     // }
 
-    public Page<Category> getQueryStore(String cityId, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
+    public Page<Category> getQueryStore(List<String> cityId, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
     
         //Handling null value in order to use query
-        if (cityId == null || cityId.isEmpty()) {
-            cityId = "";
-        }
+        // if (cityId == null || cityId.isEmpty()) {
+        //     cityId = "";
+        // }
 
         // if (stateId == null || stateId.isEmpty()) {
         //     stateId = "";
@@ -146,7 +146,7 @@ public class CategoryLocationService {
         return result;
     }
 
-    public Page<ParentCategory> getQueryParentCategoriesBasedOnLocation(String cityId, String stateId, String regionCountryId, String postcode, String parentCategoryId, String sortByCol,Sort.Direction sortingOrder, int page, int pageSize){
+    public Page<ParentCategory> getQueryParentCategoriesBasedOnLocation(List<String> cityId, String stateId, String regionCountryId, String postcode, String parentCategoryId, String sortByCol,Sort.Direction sortingOrder, int page, int pageSize){
 
         if (parentCategoryId == null || parentCategoryId.isEmpty()) {
             parentCategoryId = "";

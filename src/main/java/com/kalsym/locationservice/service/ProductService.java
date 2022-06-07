@@ -51,16 +51,16 @@ public class ProductService {
     @Autowired
     ProductFeaturedRepository productFeaturedRepository;
 
-    public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(List<String> status,String regionCountryId,String parentCategoryId, String cityId, String cityName, String name,int page, int pageSize){
+    public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name,int page, int pageSize){
 
         //Handling null value in order to use query
         if (regionCountryId == null || regionCountryId.isEmpty()) {
             regionCountryId = "";
         }
 
-        if (cityId == null || cityId.isEmpty()) {
-            cityId = "";
-        }
+        // if (cityId == null || cityId.isEmpty()) {
+        //     cityId = "";
+        // }
 
         if (cityName == null || cityName.isEmpty()) {
             cityName = "";
@@ -112,16 +112,16 @@ public class ProductService {
 
     }
 
-    public Page<ProductFeatureConfig> getFeaturedProductWithLocationParentCategory(List<String> status,String regionCountryId,String parentCategoryId, String cityId, String cityName, String name,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
+    public Page<ProductFeatureConfig> getFeaturedProductWithLocationParentCategory(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
 
         //Handling null value in order to use query
         if (regionCountryId == null || regionCountryId.isEmpty()) {
             regionCountryId = "";
         }
 
-        if (cityId == null || cityId.isEmpty()) {
-            cityId = "";
-        }
+        // if (cityId == null || cityId.isEmpty()) {
+        //     cityId = "";
+        // }
 
         if (cityName == null || cityName.isEmpty()) {
             cityName = "";

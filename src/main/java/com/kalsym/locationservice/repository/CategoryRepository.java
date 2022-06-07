@@ -81,13 +81,13 @@ public interface CategoryRepository extends JpaRepository<Category,String> {
             + "AND sc.parentCategory.parentId LIKE CONCAT('%', :parentCategoryId ,'%') "
             + "AND sc.storeDetails.name LIKE CONCAT('%', :storeName ,'%') "
             + "AND sc.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
-            + "AND sc.storeDetails.city LIKE CONCAT('%', :city ,'%') "
+            + "AND sc.storeDetails.city IN :city "
             + "OR sc.storeDetails.state = :state "
             + "OR sc.storeDetails.postcode = :postcode "
             + "GROUP BY sc.storeDetails.id"
     )
     Page<Category> getStoreBasedOnParentCategories(
-        @Param("city") String city,
+        @Param("city") List<String> city,
         @Param("cityName") String cityName,
         @Param("state") String state,
         @Param("regionCountryId") String regionCountryId,
