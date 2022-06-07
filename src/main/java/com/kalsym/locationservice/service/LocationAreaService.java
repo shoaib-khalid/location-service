@@ -31,7 +31,6 @@ public class LocationAreaService {
         ExampleMatcher matcher = ExampleMatcher
                 .matchingAll()
                 .withIgnoreCase()
-                .withMatcher("userLocationCityId", new GenericPropertyMatcher().exact())
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         Example<LocationArea> example = Example.of(locationAreaMatch, matcher);
 

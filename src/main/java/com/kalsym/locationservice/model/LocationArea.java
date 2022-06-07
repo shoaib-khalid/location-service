@@ -26,8 +26,8 @@ import lombok.ToString;
 public class LocationArea implements Serializable {
     
     @Id
-    private String userLocationCityId;
-
     private String storeCityId;
+
+    private String userLocationCityId;
 
 }

@@ -32,13 +32,14 @@ public class LocationAreaController {
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getLocationArea(
         HttpServletRequest request,
-        @RequestParam(required = true) String userLocationCityId,
-        @RequestParam(required = false, defaultValue = "userLocationCityId") String sortByCol,
+        @RequestParam(required = false) String userLocationCityId,
+        @RequestParam(required = false, defaultValue = "storeCityId") String sortByCol,
         @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder
     ) {
 
         List<LocationArea> body = locationAreaService.getQueryLocationArea(userLocationCityId,sortByCol,sortingOrder);
         
+        System.err.println("CHECKINGGGGGGGG ::::::::::::"+body);
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
         response.setStatus(HttpStatus.OK);
