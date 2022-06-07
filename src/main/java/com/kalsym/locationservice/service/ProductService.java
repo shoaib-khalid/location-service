@@ -112,7 +112,7 @@ public class ProductService {
 
     }
 
-    public Page<ProductFeatureConfig> getFeaturedProductWithLocationParentCategory(List<String> status,String regionCountryId,String parentCategoryId, String cityId, String cityName, String name,int page, int pageSize){
+    public Page<ProductFeatureConfig> getFeaturedProductWithLocationParentCategory(List<String> status,String regionCountryId,String parentCategoryId, String cityId, String cityName, String name,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
 
         //Handling null value in order to use query
         if (regionCountryId == null || regionCountryId.isEmpty()) {
@@ -145,7 +145,18 @@ public class ProductService {
             status = statusList;
         }
 
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable;
+
+        if (sortingOrder==Sort.Direction.DESC){
+            pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+        }
+        else if (sortingOrder==Sort.Direction.ASC){
+            pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+        }
+        else{
+            pageable = PageRequest.of(page, pageSize);
+        }
+        
 
         //get reqion country for store
         RegionCountry regionCountry = null;

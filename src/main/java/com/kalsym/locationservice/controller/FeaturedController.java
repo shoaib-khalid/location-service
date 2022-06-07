@@ -122,10 +122,12 @@ public class FeaturedController {
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String name,
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int pageSize
+        @RequestParam(defaultValue = "10") int pageSize,
+        @RequestParam(required = false) String sortByCol,
+        @RequestParam(required = false) Sort.Direction sortingOrder
     ) {
 
-        Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, page, pageSize);
+        Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, page, pageSize, sortByCol, sortingOrder);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
