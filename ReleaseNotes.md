@@ -1,8 +1,63 @@
 ##################################################
+# location-service-1.0.8 | 7-June-2022
+##################################################
+
+1. Create new endpoint for /location-area
+
+##DB CHANGES :
+
+CREATE TABLE `location_area` (
+  `userLocationCityId` varchar(100) DEFAULT NULL,
+  `storeCityId` varchar(100) DEFAULT NULL,
+  KEY `userLocationCityId` (`userLocationCityId`),
+  CONSTRAINT `location_area_ibfk_1` FOREIGN KEY (`userLocationCityId`) REFERENCES `region_city` (`id`)
+);
+
+INSERT INTO `location_area` (`userLocationCityId`,`storeCityId`) VALUES
+('SubangJaya','SubangJaya'),
+('Sunway','SubangJaya'),
+('BatuCaves','SelayangJaya'),
+('Selayang','SelayangJaya'),
+('SriGombak','SelayangJaya'),
+('BatuCaves','Selayang'),
+('Selayang','Selayang'),
+('SriGombak','Selayang'),
+('Puchong','Puchong'),
+('SubangJaya','Puchong'),
+('Sunway','Puchong'),
+('PetalingJaya','PetalingJaya'),
+('Puchong','PetalingJaya'),
+('Sunway','PetalingJaya'),
+('Kajang','Kajang'),
+('Bangi','Kajang'),
+('Bangi','Dengkil'),
+('Putrajaya','Dengkil'),
+('Cyberjaya','Dengkil'),
+('Bangi','Cyberjaya'),
+('Putrajaya','Cyberjaya'),
+('Cyberjaya','Cyberjaya'),
+('BatuCaves','BatuCaves'),
+('Selayang','BatuCaves'),
+('SriGombak','BatuCaves'),
+('Bangi','BandarSeriPutra'),
+('Kajang','BandarSeriPutra'),
+('Putrajaya','BandarSeriPutra'),
+('Cyberjaya','BandarSeriPutra'),
+('Bangi','Bangi'),
+('Kajang','Bangi'),
+('Putrajaya','Bangi'),
+('Cyberjaya','Bangi'),
+('Bangi','BandarBaruBangi'),
+('Kajang','BandarBaruBangi'),
+('Putrajaya','BandarBaruBangi'),
+('Cyberjaya','BandarBaruBangi');
+
+##################################################
 # location-service-1.0.7 | 3-June-2022
 ##################################################
 
 1. Add new endpoint featured/product
+
 
 ##################################################
 # location-service-1.0.6 | 2-June-2022
@@ -80,7 +135,22 @@ CREATE TABLE `store_display_config` (
   PRIMARY KEY (`id`),
   KEY `store_display_config_FK` (`storeId`),
   CONSTRAINT `store_display_config_FK` FOREIGN KEY (`storeId`) REFERENCES `store` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) 
+)
+
+NOTE : Please change imageUrl for production
+
+INSERT INTO location_config (imageUrl, cityId, isDisplay, `sequence`) VALUES
+('https://symplified.it/store-assets/Subang_Jaya_320x208.png', 'SubangJaya', 1, 8),
+('https://symplified.it/store-assets/Petalin%20Jaya_320x208.png', 'PetalingJaya', 1, 7),
+('https://symplified.it/store-assets/Putrajaya_320x208.png', 'Putrajaya', 1, 2),
+('https://symplified.it/store-assets/Bangi_320x208.png', 'BandarBaruBangi', 1, 1),
+('https://symplified.it/store-assets/Batu_Caves_320x208.png', 'BatuCaves', 1, 5),
+('https://symplified.it/store-assets/Cyberjaya_320x208.png', 'Cyberjaya', 1, 3),
+('https://symplified.it/store-assets/Selayang_320x208.png', 'Selayang', 1, 4),
+('https://symplified.it/store-assets/Sri_Gombak_320x208.png', 'SriGombak', 1, 6),
+('https://symplified.it/store-assets/Sunway_320x208.png', 'Sunway', 1, 9),
+('https://symplified.it/store-assets/Puchong_320x208.png', 'Puchong', 1, 10),
+('https://symplified.it/store-assets/Kajang_320x208.png', 'Kajang', 1, 11);
 
 ##################################################
 # location-service-1.0.1 | 27-May-2022
