@@ -97,10 +97,7 @@ public class StoreConfigService {
         }
 
 
-        Pageable pageable = PageRequest.of(page, pageSize);
-
-        //find the based on location with pageable
-        Page<StoreConfig> result = storeConfigRepository.getQueryStoreConfigRaw(cityId,cityName,regionCountryId,parentCategoryId,pageable);
+        Pageable pageable;
    
         if (sortingOrder==Sort.Direction.DESC){
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
@@ -111,6 +108,10 @@ public class StoreConfigService {
         else{
             pageable = PageRequest.of(page, pageSize);
         }
+
+        //find the based on location with pageable
+        Page<StoreConfig> result = storeConfigRepository.getQueryStoreConfigRaw(cityId,cityName,regionCountryId,parentCategoryId,pageable);
+
         
         // return categoryRepository.findAll(example,pageable);
 
