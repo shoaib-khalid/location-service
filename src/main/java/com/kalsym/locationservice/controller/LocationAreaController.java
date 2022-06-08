@@ -1,5 +1,6 @@
 package com.kalsym.locationservice.controller;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -32,14 +33,11 @@ public class LocationAreaController {
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getLocationArea(
         HttpServletRequest request,
-        @RequestParam(required = false) String userLocationCityId,
-        @RequestParam(required = false, defaultValue = "storeCityId") String sortByCol,
-        @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder
+        @RequestParam(required = false) String userLocationCityId
     ) {
 
-        List<LocationArea> body = locationAreaService.getQueryLocationArea(userLocationCityId,sortByCol,sortingOrder);
+        List<LocationArea> body = locationAreaService.getQueryLocationArea(userLocationCityId);
         
-        System.err.println("CHECKINGGGGGGGG ::::::::::::"+body);
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
         response.setStatus(HttpStatus.OK);

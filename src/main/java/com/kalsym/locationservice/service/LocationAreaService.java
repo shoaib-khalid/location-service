@@ -5,15 +5,11 @@ import com.kalsym.locationservice.model.LocationArea;
 import com.kalsym.locationservice.repository.LocationAreaRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Example;
-
-import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatcher;
-
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -23,28 +19,15 @@ public class LocationAreaService {
     LocationAreaRepository locationAreaRepository;
     
 
-    public List<LocationArea> getQueryLocationArea(String userLocationCityId,String sortByCol, Sort.Direction sortingOrder){
-    
-        LocationArea locationAreaMatch = new LocationArea();
-        locationAreaMatch.setUserLocationCityId(userLocationCityId);
+    public List<LocationArea> getQueryLocationArea(String userLocationCityId){
+     
+        Collection<LocationArea> result = locationAreaRepository.getLocationAreaQuery(userLocationCityId);
 
-        ExampleMatcher matcher = ExampleMatcher
-                .matchingAll()
-                .withIgnoreCase()
-                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-        Example<LocationArea> example = Example.of(locationAreaMatch, matcher);
+        List<LocationArea> output = new ArrayList<LocationArea>(result);
 
-        Sort sort;
+        return output;
 
-        if (sortingOrder==Sort.Direction.DESC){
-            sort = Sort.by(sortByCol).descending();
-        }
-        else{
-            sort = Sort.by(sortByCol).ascending();//Default ascending
-        }
-        
-        return locationAreaRepository.findAll(example,sort);
-
+ 
     }
     
      
