@@ -132,7 +132,8 @@ public class CategoryLocationService {
         Pageable pageable = PageRequest.of(page, pageSize);
 
         //find the based on location with pageable
-        Page<Category> result = categoryRepository.getStoreBasedOnParentCategories(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable);
+        Page<Category> result = cityId == null? categoryRepository.getStoreBasedOnParentCategories(cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable)
+                                            : categoryRepository.getStoreBasedOnParentCategoriesWithCityId(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable);
    
         // if (sortingOrder==Sort.Direction.DESC){
         //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
@@ -164,7 +165,10 @@ public class CategoryLocationService {
             pageable = PageRequest.of(page, pageSize);
         }
 
-        Page<ParentCategory> result = parentCategoryRepository.getParentCategoriesBasedOnLocationQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId,pageable);
+        // Page<ParentCategory> result = parentCategoryRepository.getParentCategoriesBasedOnLocationQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId,pageable);
+
+        Page<ParentCategory> result = cityId == null?parentCategoryRepository.getParentCategoriesBasedOnLocationQuery(stateId,postcode,regionCountryId,parentCategoryId,pageable)
+                                                :parentCategoryRepository.getParentCategoriesBasedOnLocationWithCityIdQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId,pageable) ;
 
         return result;
     }

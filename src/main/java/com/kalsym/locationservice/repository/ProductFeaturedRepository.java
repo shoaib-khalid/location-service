@@ -17,16 +17,24 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureConfig,Integer> {
     
-
-    // " SELECT pwd "
-    // + "FROM ProductMain pwd "
-    // + "WHERE pwd.status IN :status "
-    // + "AND pwd.storeCategory.parentCategoryId LIKE CONCAT('%', :parentCategoryId ,'%') "
-    // + "AND pwd.name LIKE CONCAT('%', :name ,'%') "
-    // + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
-    // + "AND pwd.status IN :status "
-    // + "AND pwd.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
-    // + "AND pwd.storeDetails.city LIKE CONCAT('%', :cityId ,'%')"
+    @Query(
+        " SELECT pfc "
+        + "FROM ProductFeatureConfig pfc "
+        + "WHERE productDetails.status IN :status "
+        + "AND productDetails.storeCategory.parentCategoryId LIKE CONCAT('%', :parentCategoryId ,'%') "
+        + "AND productDetails.name LIKE CONCAT('%', :name ,'%') "
+        + "AND productDetails.storeDetails.regionCountryId = :regionCountryId "
+        + "AND productDetails.status IN :status "
+        + "AND productDetails.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%')"
+    )
+    Page<ProductFeatureConfig> getQueryProductConfig(
+        @Param("status") List<String> status,
+        @Param("regionCountryId") String regionCountryId,
+        @Param("parentCategoryId") String parentCategoryId,
+        @Param("cityName") String cityName,
+        @Param("name") String name,
+        Pageable pageable
+    );
 
     @Query(
         " SELECT pfc "
@@ -37,9 +45,9 @@ public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureC
         + "AND productDetails.storeDetails.regionCountryId = :regionCountryId "
         + "AND productDetails.status IN :status "
         + "AND productDetails.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
-        + "OR productDetails.storeDetails.city IN :cityId"
+        + "AND productDetails.storeDetails.city IN :cityId"
     )
-    Page<ProductFeatureConfig> getQueryProductConfig(
+    Page<ProductFeatureConfig> getQueryProductConfigWithCityId(
         @Param("status") List<String> status,
         @Param("regionCountryId") String regionCountryId,
         @Param("parentCategoryId") String parentCategoryId,

@@ -24,11 +24,30 @@ public interface StoreConfigRepository extends JpaRepository<StoreConfig,Integer
         + "INNER JOIN Category sc on sc.storeId = sdc.storeId "
         + "WHERE s.regionCountryId LIKE CONCAT('%', :regionCountryId ,'%') "
         + "AND sc.parentCategoryId LIKE CONCAT('%', :parentCategoryId ,'%') "
-        + "OR s.city IN :cityId "
         + "AND s.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
         + "GROUP BY sdc.id"
     )
+
     Page<StoreConfig> getQueryStoreConfigRaw(
+        @Param("cityName") String cityName,
+        @Param("regionCountryId") String regionCountryId,
+        @Param("parentCategoryId") String parentCategoryId,
+        Pageable pageable
+    );
+
+    @Query(
+        " SELECT sdc "
+        + "FROM StoreConfig sdc "
+        + "INNER JOIN Store s on sdc.storeId = s.id "
+        + "INNER JOIN Category sc on sc.storeId = sdc.storeId "
+        + "WHERE s.regionCountryId LIKE CONCAT('%', :regionCountryId ,'%') "
+        + "AND sc.parentCategoryId LIKE CONCAT('%', :parentCategoryId ,'%') "
+        + "AND s.city IN :cityId "
+        + "AND s.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
+        + "GROUP BY sdc.id"
+    )
+
+    Page<StoreConfig> getQueryStoreConfigRawWithCityId(
         @Param("cityId") List<String> cityId,
         @Param("cityName") String cityName,
         @Param("regionCountryId") String regionCountryId,

@@ -22,10 +22,29 @@ public interface ProductRepository extends JpaRepository<ProductMain,String> {
         + "AND pwd.name LIKE CONCAT('%', :name ,'%') "
         + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
         + "AND pwd.status IN :status "
+        + "AND pwd.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%')"
+    )
+    Page<ProductMain> getProductByParentCategoryIdAndLocation(
+            @Param("status") List<String> status,
+            @Param("regionCountryId") String regionCountryId,
+            @Param("parentCategoryId") String parentCategoryId,
+            @Param("cityName") String cityName,
+            @Param("name") String name,
+            Pageable pageable
+    );
+
+    @Query(
+        " SELECT pwd "
+        + "FROM ProductMain pwd "
+        + "WHERE pwd.status IN :status "
+        + "AND pwd.storeCategory.parentCategoryId LIKE CONCAT('%', :parentCategoryId ,'%') "
+        + "AND pwd.name LIKE CONCAT('%', :name ,'%') "
+        + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
+        + "AND pwd.status IN :status "
         + "AND pwd.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
         + "AND pwd.storeDetails.city IN :cityId"
     )
-    Page<ProductMain> getProductByParentCategoryIdAndLocation(
+    Page<ProductMain> getProductByParentCategoryIdAndLocationWithCityId(
             @Param("status") List<String> status,
             @Param("regionCountryId") String regionCountryId,
             @Param("parentCategoryId") String parentCategoryId,

@@ -75,10 +75,6 @@ public class StoreConfigService {
     public Page<StoreConfig> getRawQueryStoreConfig(String regionCountryId, List<String> cityId, String cityName, String parentCategoryId, int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
     
         //Handling null value in order to use query
-        // if (cityId == null || cityId.isEmpty()) {
-        //     cityId = "";
-        // }
-
         // if (stateId == null || stateId.isEmpty()) {
         //     stateId = "";
         // }
@@ -111,10 +107,11 @@ public class StoreConfigService {
             pageable = PageRequest.of(page, pageSize);
         }
 
-        //find the based on location with pageable
-        Page<StoreConfig> result = storeConfigRepository.getQueryStoreConfigRaw(cityId,cityName,regionCountryId,parentCategoryId,pageable);
 
-        
+        //find the based on location with pageable
+        Page<StoreConfig> result = cityId == null?storeConfigRepository.getQueryStoreConfigRaw(cityName,regionCountryId,parentCategoryId,pageable)
+                                                :storeConfigRepository.getQueryStoreConfigRawWithCityId(cityId, cityName, regionCountryId, parentCategoryId, pageable) ;
+     
         // return categoryRepository.findAll(example,pageable);
 
         return result;

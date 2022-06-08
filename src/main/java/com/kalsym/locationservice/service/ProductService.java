@@ -94,7 +94,8 @@ public class ProductService {
         }
 
         //find the based on location with pageable
-        Page<ProductMain> result = productRepository.getProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable);
+        Page<ProductMain> result = cityId == null? productRepository.getProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityName,name,pageable)
+                                                : productRepository.getProductByParentCategoryIdAndLocationWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable) ;
 
         //extract the result of content of pageable in order to proceed with dicount of item 
         List<ProductMain> productList = result.getContent();
@@ -166,7 +167,8 @@ public class ProductService {
         }
 
         //find the based on location with pageable
-        Page<ProductFeatureConfig> result = productFeaturedRepository.getQueryProductConfig(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable);
+        Page<ProductFeatureConfig> result = cityId == null?productFeaturedRepository.getQueryProductConfig(status,regionCountryId,parentCategoryId,cityName,name,pageable)
+        :productFeaturedRepository.getQueryProductConfigWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable) ;
 
         //extract the result of content of pageable in order to proceed with dicount of item 
         List<ProductFeatureConfig> productFeaturedList = result.getContent();
