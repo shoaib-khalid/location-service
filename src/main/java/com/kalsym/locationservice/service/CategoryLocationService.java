@@ -1,6 +1,7 @@
 package com.kalsym.locationservice.service;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.kalsym.locationservice.model.Category;
@@ -165,10 +166,38 @@ public class CategoryLocationService {
             pageable = PageRequest.of(page, pageSize);
         }
 
-        // Page<ParentCategory> result = parentCategoryRepository.getParentCategoriesBasedOnLocationQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId,pageable);
 
-        Page<ParentCategory> result = cityId == null?parentCategoryRepository.getParentCategoriesBasedOnLocationQuery(stateId,postcode,regionCountryId,parentCategoryId,pageable)
-                                                :parentCategoryRepository.getParentCategoriesBasedOnLocationWithCityIdQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId,pageable) ;
+        //If query param only regiOn country we will display all the parent category based on vertical code
+        List<String> verticalCode = new ArrayList<>();
+        
+        Page<ParentCategory> result;
+
+        if(cityId == null){
+            switch (regionCountryId){
+
+                case "PAK":
+    
+                    verticalCode.add("FnB_PK");
+                    verticalCode.add("ECommerce_PK");
+    
+                    result = parentCategoryRepository.getAllParentCategoriesBasedOnCountry(verticalCode,parentCategoryId,pageable);
+    
+                break;
+    
+                default:
+    
+                    verticalCode.add("FnB");
+                    verticalCode.add("E-Commerce");
+    
+                    result = parentCategoryRepository.getAllParentCategoriesBasedOnCountry(verticalCode,parentCategoryId,pageable);
+    
+            }
+
+        } else{
+            
+            result = parentCategoryRepository.getParentCategoriesBasedOnLocationWithCityIdQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId,pageable);
+        }
+    
 
         return result;
     }

@@ -18,25 +18,6 @@ import org.springframework.data.repository.query.Param;
 public interface ParentCategoryRepository extends JpaRepository<ParentCategory,String> {
     
     @Query(
-            " SELECT pc "
-            +"FROM ParentCategory pc "
-            +"INNER JOIN Category category ON category.parentCategoryId  = pc.id "
-            +"INNER JOIN Store storeLocation on storeLocation.id = category.storeId "
-            +"WHERE storeLocation.regionCountryId LIKE CONCAT('%', :regionCountryId ,'%') "
-            +"AND pc.parentId LIKE CONCAT('%', :parentCategoryId ,'%') "
-            +"OR storeLocation.state LIKE CONCAT('%', :state ,'%') "
-            +"OR storeLocation.postcode LIKE CONCAT('%', :postcode ,'%') "
-            +"GROUP BY pc.parentId"
-    )
-    Page<ParentCategory> getParentCategoriesBasedOnLocationQuery(
-        @Param("state") String state,
-        @Param("postcode") String postcode,
-        @Param("regionCountryId") String regionCountryId,
-        @Param("parentCategoryId") String parentCategoryId,
-        Pageable pageable
-    );
-
-    @Query(
         " SELECT pc "
         +"FROM ParentCategory pc "
         +"INNER JOIN Category category ON category.parentCategoryId  = pc.id "
@@ -53,6 +34,18 @@ public interface ParentCategoryRepository extends JpaRepository<ParentCategory,S
         @Param("city") List<String> city,
         @Param("postcode") String postcode,
         @Param("regionCountryId") String regionCountryId,
+        @Param("parentCategoryId") String parentCategoryId,
+        Pageable pageable
+    );
+
+    @Query(
+        " SELECT pc "
+        +"FROM ParentCategory pc "
+        +"WHERE pc.verticalCode IN :verticalCode "
+        +"AND pc.parentId LIKE CONCAT('%', :parentCategoryId ,'%')"
+    )
+    Page<ParentCategory> getAllParentCategoriesBasedOnCountry(
+        @Param("verticalCode") List<String> verticalCode,
         @Param("parentCategoryId") String parentCategoryId,
         Pageable pageable
     );

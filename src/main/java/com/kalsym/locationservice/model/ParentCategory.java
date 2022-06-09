@@ -34,5 +34,9 @@ public class ParentCategory implements Serializable {
     @Column(name="thumbnailUrl")
     private String parentThumbnailUrl;
 
+    private String verticalCode;
+
+    private int displaySequence;
+
 
 }
