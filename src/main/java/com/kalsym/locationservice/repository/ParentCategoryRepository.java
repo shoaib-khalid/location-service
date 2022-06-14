@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Sort;
 
 
 
@@ -42,7 +43,8 @@ public interface ParentCategoryRepository extends JpaRepository<ParentCategory,S
         " SELECT pc "
         +"FROM ParentCategory pc "
         +"WHERE pc.verticalCode IN :verticalCode "
-        +"AND pc.parentId LIKE CONCAT('%', :parentCategoryId ,'%')"
+        +"AND pc.parentId LIKE CONCAT('%', :parentCategoryId ,'%') "
+        +"ORDER BY displaySequence ASC NULLS LAST"
     )
     Page<ParentCategory> getAllParentCategoriesBasedOnCountry(
         @Param("verticalCode") List<String> verticalCode,
