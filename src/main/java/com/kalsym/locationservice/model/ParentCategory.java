@@ -36,7 +36,7 @@ public class ParentCategory implements Serializable {
 
     private String verticalCode;
 
-    private int displaySequence;
+    private Integer displaySequence;
 
 
 }
