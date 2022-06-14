@@ -19,43 +19,35 @@ CREATE TABLE `location_area` (
 );
 
 INSERT INTO `location_area` (`userLocationCityId`,`storeCityId`) VALUES
-('SubangJaya','SubangJaya'),
 ('Sunway','SubangJaya'),
+('Bangi','BandarBaruBangi'),
+('Kajang','BandarBaruBangi'),
+('Putrajaya','BandarBaruBangi'),
+('Cyberjaya','BandarBaruBangi'),
 ('BatuCaves','SelayangJaya'),
 ('Selayang','SelayangJaya'),
 ('SriGombak','SelayangJaya'),
 ('BatuCaves','Selayang'),
-('Selayang','Selayang'),
 ('SriGombak','Selayang'),
-('Puchong','Puchong'),
 ('SubangJaya','Puchong'),
 ('Sunway','Puchong'),
-('PetalingJaya','PetalingJaya'),
 ('Puchong','PetalingJaya'),
 ('Sunway','PetalingJaya'),
-('Kajang','Kajang'),
 ('Bangi','Kajang'),
 ('Bangi','Dengkil'),
 ('Putrajaya','Dengkil'),
 ('Cyberjaya','Dengkil'),
 ('Bangi','Cyberjaya'),
 ('Putrajaya','Cyberjaya'),
-('Cyberjaya','Cyberjaya'),
-('BatuCaves','BatuCaves'),
 ('Selayang','BatuCaves'),
 ('SriGombak','BatuCaves'),
 ('Bangi','BandarSeriPutra'),
 ('Kajang','BandarSeriPutra'),
 ('Putrajaya','BandarSeriPutra'),
 ('Cyberjaya','BandarSeriPutra'),
-('Bangi','Bangi'),
 ('Kajang','Bangi'),
 ('Putrajaya','Bangi'),
-('Cyberjaya','Bangi'),
-('Bangi','BandarBaruBangi'),
-('Kajang','BandarBaruBangi'),
-('Putrajaya','BandarBaruBangi'),
-('Cyberjaya','BandarBaruBangi');
+('Cyberjaya','Bangi');
 
 ##################################################
 # location-service-1.0.7 | 3-June-2022
