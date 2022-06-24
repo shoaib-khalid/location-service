@@ -22,7 +22,10 @@ public interface ProductRepository extends JpaRepository<ProductMain,String> {
         + "AND pwd.name LIKE CONCAT('%', :name ,'%') "
         + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
         + "AND pwd.status IN :status "
-        + "AND pwd.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%')"
+        + "AND pwd.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
+        + "ORDER BY pwd.thumbnailUrl ASC NULLS LAST"
+
+        
     )
     Page<ProductMain> getProductByParentCategoryIdAndLocation(
             @Param("status") List<String> status,
@@ -42,7 +45,9 @@ public interface ProductRepository extends JpaRepository<ProductMain,String> {
         + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
         + "AND pwd.status IN :status "
         + "AND pwd.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
-        + "AND pwd.storeDetails.city IN :cityId"
+        + "AND pwd.storeDetails.city IN :cityId "
+        + "ORDER BY pwd.thumbnailUrl ASC NULLS LAST"
+
     )
     Page<ProductMain> getProductByParentCategoryIdAndLocationWithCityId(
             @Param("status") List<String> status,
