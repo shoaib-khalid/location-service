@@ -1,4 +1,9 @@
 ##################################################
+# location-service-1.0.10 | 24-June-2022
+##################################################
+1. Products endpoint shows product that have picture first
+
+##################################################
 # location-service-1.0.9 | 7-June-2022
 ##################################################
 1. Modify query param city id in array for endpoint categories/parent-categories , featured/store, featured/product , /product , /store
