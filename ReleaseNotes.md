@@ -1,7 +1,19 @@
 ##################################################
+# location-service-1.0.12 | 27-June-2022
+##################################################
+1. New endpoint for product trending
+
+##DB CHANGES :
+
+    CREATE INDEX product_seoName_IDX USING BTREE ON symplified.product (seoName);
+    
+##################################################
 # location-service-1.0.11 | 24-June-2022
 ##################################################
 1. Code refactoring
+
+
+
 
 ##################################################
 # location-service-1.0.10 | 24-June-2022
