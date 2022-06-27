@@ -58,6 +58,19 @@ public interface ProductRepository extends JpaRepository<ProductMain,String> {
             @Param("name") String name,
             Pageable pageable
     );
+
+    @Query(
+        " SELECT pwd "
+        + "FROM ProductMain pwd "
+        + "WHERE pwd.seoName IN :seoName "
+        + "AND pwd.storeDetails.regionCountryId = :regionCountryId"
+
+    )
+    List<ProductMain> getProductBySeoName(
+            @Param("seoName") List<String> seoName,
+            @Param("regionCountryId") String regionCountryId
+
+    );
     
 
 }

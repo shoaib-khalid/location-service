@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.kalsym.locationservice.model.Category;
+import com.kalsym.locationservice.model.CustomerActivitiesSummary;
 import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.service.CategoryLocationService;
 import com.kalsym.locationservice.service.ProductService;
@@ -46,6 +47,23 @@ public class ProductController {
     ) {
 
         Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,page,pageSize);
+        
+        HttpResponse response = new HttpResponse(request.getRequestURI());
+        response.setData(body);
+        response.setStatus(HttpStatus.OK);
+        return ResponseEntity.status(response.getStatus()).body(response);
+
+    }
+
+    @GetMapping(path = {"/trending-products"}, name = "store-customers-get")
+    @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
+    public ResponseEntity<HttpResponse> getTrendingProducts(
+        HttpServletRequest request,
+        @RequestParam(required = true) String regionCountryId
+     
+    ) {
+
+        List<ProductMain> body = productService.getCustomerActivities(regionCountryId);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

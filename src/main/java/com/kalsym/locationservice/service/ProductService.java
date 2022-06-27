@@ -2,11 +2,13 @@ package com.kalsym.locationservice.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.kalsym.locationservice.enums.DiscountCalculationType;
+import com.kalsym.locationservice.model.CustomerActivitiesSummary;
 import com.kalsym.locationservice.model.RegionCountry;
 import com.kalsym.locationservice.model.Store;
 import com.kalsym.locationservice.model.Config.ProductFeatureConfig;
@@ -14,6 +16,7 @@ import com.kalsym.locationservice.model.Discount.StoreDiscountProduct;
 import com.kalsym.locationservice.model.Product.ItemDiscount;
 import com.kalsym.locationservice.model.Product.ProductInventoryWithDetails;
 import com.kalsym.locationservice.model.Product.ProductMain;
+import com.kalsym.locationservice.repository.CustomerActivitiesSummaryRepository;
 import com.kalsym.locationservice.repository.GetDiscount;
 import com.kalsym.locationservice.repository.ProductFeaturedRepository;
 import com.kalsym.locationservice.repository.ProductRepository;
@@ -50,6 +53,9 @@ public class ProductService {
 
     @Autowired
     ProductFeaturedRepository productFeaturedRepository;
+
+    @Autowired
+    CustomerActivitiesSummaryRepository customerActivitiesSummaryRepository;
 
     public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name,int page, int pageSize){
 
@@ -208,5 +214,51 @@ public class ProductService {
         Page<ProductFeatureConfig> output = new PageImpl<ProductFeatureConfig>(listofPFC,pageable,result.getTotalElements());
 
         return output;
+    }
+
+    public List<ProductMain> getCustomerActivities(String regionCountryId){
+
+        // List<CustomerActivitiesSummary> customerActivity = customerActivitiesSummaryRepository.findByStoreId(storeId);
+        // List<CustomerActivitiesSummary> customerActivity = customerActivitiesSummaryRepository.getTrendingProducts();
+
+
+        // Collection<CustomerActivitiesSummary> customerActivity = customerActivitiesSummaryRepository.getTrendingProducts(regionCountryId);
+        // List<CustomerActivitiesSummary> output = new ArrayList<CustomerActivitiesSummary>(customerActivity);
+
+        List<Object[]> vals = customerActivitiesSummaryRepository.getTrendingProductsObject(regionCountryId);
+
+        List<String> seoNames = new ArrayList<>();
+
+        for (Object[] row : vals) {
+
+            // casting
+            String seoName = (String)row[3].toString();
+            seoNames.add(seoName);
+
+        }
+
+        // System.out.println("Checking seoNames ::::::::::::::::::::::::::"+seoNames);
+
+        List<ProductMain> listOfProduct = productRepository.getProductBySeoName(seoNames,regionCountryId);
+        // System.out.println("Checking listOfProduct ::::::::::::::::::::::::::"+listOfProduct);
+
+        //get reqion country for store
+        RegionCountry regionCountry = null;
+        Optional<RegionCountry> optRegion = regionCountriesRepository.findById(regionCountryId);
+        if (optRegion.isPresent()) {
+            regionCountry = optRegion.get();
+        }
+
+        // to get discount of product
+        ProductMain[] productWithDetailsList = GetDiscount.getProductDiscountList(listOfProduct, regionCountry, storeDiscountRepository, storeDiscountProductRepository);
+
+        // convert array to array list
+        List<ProductMain> newArrayList = new ArrayList<>(Arrays.asList(productWithDetailsList));
+
+        //Page mapper
+        // Page<ProductMain> output = new PageImpl<ProductMain>(newArrayList,pageable,result.getTotalElements());
+        
+
+        return newArrayList;
     }
 }

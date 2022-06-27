@@ -40,6 +40,8 @@ public class ProductMain implements Serializable {
 
     private String seoUrl;
 
+    private String seoName;
+
     private String status;
 
     @OneToOne()
