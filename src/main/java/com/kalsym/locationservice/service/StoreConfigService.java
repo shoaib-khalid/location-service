@@ -9,6 +9,7 @@ import com.kalsym.locationservice.repository.CategoriesSearchSpecs;
 import com.kalsym.locationservice.repository.LocationConfigRepository;
 import com.kalsym.locationservice.repository.StoreConfigRepository;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,6 +114,25 @@ public class StoreConfigService {
                                                 :storeConfigRepository.getQueryStoreConfigRawWithCityId(cityId, cityName, regionCountryId, parentCategoryId, pageable) ;
      
         // return categoryRepository.findAll(example,pageable);
+        // System.out.println("Checking current time ::::::"+Calendar.getInstance().getTime());
+        //to return store snooze
+        for(StoreConfig sc : result.getContent()){
+            
+
+            if (sc.getStoreDetails().getSnoozeStartTime()!=null && sc.getStoreDetails().getSnoozeEndTime()!=null) {
+                int resultSnooze = sc.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
+                if (resultSnooze < 0) {
+                    sc.getStoreDetails().setIsSnooze(false);
+                } else {
+            
+                    sc.getStoreDetails().setIsSnooze(true);
+         
+                }
+            } else {
+                sc.getStoreDetails().setIsSnooze(false);
+            }
+
+        }
 
         return result;
     }

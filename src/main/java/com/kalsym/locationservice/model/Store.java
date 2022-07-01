@@ -19,6 +19,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
+
 
 
 @Entity
@@ -60,5 +67,18 @@ public class Store implements Serializable {
             fetch = FetchType.LAZY)
     @JoinColumn(name = "storeId", insertable = false, updatable = false, nullable = true)
     private List<StoreAssets> storeAssets;
+
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date snoozeStartTime;
+    
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date snoozeEndTime;
+    
+    private String snoozeReason;
+
+    @Transient
+    Boolean isSnooze;
 
 }
