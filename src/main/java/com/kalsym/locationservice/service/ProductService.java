@@ -2,6 +2,7 @@ package com.kalsym.locationservice.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -114,6 +115,23 @@ public class ProductService {
 
         //Page mapper
         Page<ProductMain> output = new PageImpl<ProductMain>(newArrayList,pageable,result.getTotalElements());
+
+        //to set snooze
+        for(ProductMain p : output){
+
+            if (p.getStoreDetails().getSnoozeStartTime()!=null && p.getStoreDetails().getSnoozeEndTime()!=null) {
+                int resultSnooze = p.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
+                if (resultSnooze < 0) {
+                    p.getStoreDetails().setIsSnooze(false);
+                } else {
+            
+                    p.getStoreDetails().setIsSnooze(true);
+         
+                }
+            } else {
+                p.getStoreDetails().setIsSnooze(false);
+            }        
+        }
         
         return output;
 
@@ -213,6 +231,23 @@ public class ProductService {
         //Page mapper
         Page<ProductFeatureConfig> output = new PageImpl<ProductFeatureConfig>(listofPFC,pageable,result.getTotalElements());
 
+        //to set store snooze
+        for(ProductFeatureConfig pfc : result){
+
+            if ( pfc.getProductDetails().getStoreDetails().getSnoozeStartTime()!=null &&  pfc.getProductDetails().getStoreDetails().getSnoozeEndTime()!=null) {
+                int resultSnooze = pfc.getProductDetails().getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
+                if (resultSnooze < 0) {
+                    pfc.getProductDetails().getStoreDetails().setIsSnooze(false);
+                } else {
+            
+                    pfc.getProductDetails().getStoreDetails().setIsSnooze(true);
+         
+                }
+            } else {
+                pfc.getProductDetails().getStoreDetails().setIsSnooze(false);
+            }
+        }
+
         return output;
     }
 
@@ -257,6 +292,21 @@ public class ProductService {
 
         //Page mapper
         // Page<ProductMain> output = new PageImpl<ProductMain>(newArrayList,pageable,result.getTotalElements());
+        for(ProductMain p : newArrayList){
+
+            if (p.getStoreDetails().getSnoozeStartTime()!=null && p.getStoreDetails().getSnoozeEndTime()!=null) {
+                int resultSnooze = p.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
+                if (resultSnooze < 0) {
+                    p.getStoreDetails().setIsSnooze(false);
+                } else {
+            
+                    p.getStoreDetails().setIsSnooze(true);
+         
+                }
+            } else {
+                p.getStoreDetails().setIsSnooze(false);
+            }        
+        }
         
 
         return newArrayList;

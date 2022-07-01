@@ -62,11 +62,16 @@ public class Store implements Serializable {
     // @OneToOne()
     // @JoinColumn(name = "id",referencedColumnName="storeId", insertable = false, updatable = false, nullable = true)
     // private StoreAsset storeAsset;
-
+    
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
     @JoinColumn(name = "storeId", insertable = false, updatable = false, nullable = true)
     private List<StoreAssets> storeAssets;
+
+    @OneToMany(cascade = CascadeType.ALL,
+    fetch = FetchType.EAGER)
+    @JoinColumn(name = "storeId", insertable = false, updatable = false, nullable = true)
+    private List<StoreTiming> storeTiming;
 
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -80,5 +85,7 @@ public class Store implements Serializable {
 
     @Transient
     Boolean isSnooze;
+
+
 
 }

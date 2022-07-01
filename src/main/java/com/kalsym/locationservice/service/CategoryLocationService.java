@@ -2,6 +2,7 @@ package com.kalsym.locationservice.service;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.kalsym.locationservice.model.Category;
@@ -144,6 +145,22 @@ public class CategoryLocationService {
         // }
         
         // return categoryRepository.findAll(example,pageable);
+
+        for(Category c : result){
+
+            if (c.getStoreDetails().getSnoozeStartTime()!=null && c.getStoreDetails().getSnoozeEndTime()!=null) {
+                int resultSnooze = c.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
+                if (resultSnooze < 0) {
+                    c.getStoreDetails().setIsSnooze(false);
+                } else {
+            
+                    c.getStoreDetails().setIsSnooze(true);
+         
+                }
+            } else {
+                c.getStoreDetails().setIsSnooze(false);
+            }
+        }
 
         return result;
     }
