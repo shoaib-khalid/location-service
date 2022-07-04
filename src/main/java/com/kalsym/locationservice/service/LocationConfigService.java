@@ -6,6 +6,7 @@ import com.kalsym.locationservice.model.Config.LocationConfig;
 import com.kalsym.locationservice.repository.LocationConfigRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,9 @@ public class LocationConfigService {
     
     @Autowired
     LocationConfigRepository locationConfigRepository;
+
+    @Value("${asset.service.url}")
+    private String assetServiceUrl;
     
     //Get By Query USING EXAMPLE MATCHER for 
     public Page<LocationConfig> getQueryLocationConfig(String cityId, String regionCountryId, String cityName,String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
@@ -53,7 +57,10 @@ public class LocationConfigService {
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
         }
 
-
+        Page<LocationConfig> result = locationConfigRepository.findAll(example,pageable);
+        for(LocationConfig lc : result){
+            lc.setImageUrl(assetServiceUrl+lc.getImageUrl());
+        }
         return locationConfigRepository.findAll(example,pageable);
 
     }

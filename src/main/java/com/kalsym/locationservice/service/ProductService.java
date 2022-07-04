@@ -27,6 +27,7 @@ import com.kalsym.locationservice.repository.StoreDiscountRepository;
 import com.kalsym.locationservice.utility.ProductDiscount;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -57,6 +58,9 @@ public class ProductService {
 
     @Autowired
     CustomerActivitiesSummaryRepository customerActivitiesSummaryRepository;
+
+    @Value("${asset.service.url}")
+    private String assetServiceUrl;
 
     public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name,int page, int pageSize){
 
@@ -130,13 +134,29 @@ public class ProductService {
                 }
             } else {
                 p.getStoreDetails().setIsSnooze(false);
-            }        
+            }
+            
+            //to concat with assetervice url
+            p.setThumbnailUrl(assetServiceUrl+p.getThumbnailUrl());
         }
         
         return output;
 
     }
 
+    /**
+     * @param status
+     * @param regionCountryId
+     * @param parentCategoryId
+     * @param cityId
+     * @param cityName
+     * @param name
+     * @param page
+     * @param pageSize
+     * @param sortByCol
+     * @param sortingOrder
+     * @return
+     */
     public Page<ProductFeatureConfig> getFeaturedProductWithLocationParentCategory(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
 
         //Handling null value in order to use query
@@ -246,6 +266,9 @@ public class ProductService {
             } else {
                 pfc.getProductDetails().getStoreDetails().setIsSnooze(false);
             }
+
+            //to concat with asseteservice
+            pfc.getProductDetails().setThumbnailUrl(assetServiceUrl+pfc.getProductDetails().getThumbnailUrl());
         }
 
         return output;
@@ -306,7 +329,11 @@ public class ProductService {
             } else {
                 p.getStoreDetails().setIsSnooze(false);
             }        
+            
+            //to concat with asseteservice
+            p.setThumbnailUrl(assetServiceUrl+p.getThumbnailUrl());
         }
+
         
 
         return newArrayList;

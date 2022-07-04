@@ -8,6 +8,7 @@ import java.util.List;
 import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.ParentCategory;
 import com.kalsym.locationservice.model.Store;
+import com.kalsym.locationservice.model.StoreAssets;
 // import com.kalsym.locationservice.model.CategoryLocation;
 // import com.kalsym.locationservice.model.LocationCategory;
 // import com.kalsym.locationservice.repository.CategoryLocationRepository;
@@ -16,6 +17,7 @@ import com.kalsym.locationservice.repository.CategoryRepository;
 import com.kalsym.locationservice.repository.ParentCategoryRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +38,9 @@ public class CategoryLocationService {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Value("${asset.service.url}")
+    private String assetServiceUrl;
 
     @Autowired
     ParentCategoryRepository parentCategoryRepository;
@@ -78,7 +83,35 @@ public class CategoryLocationService {
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
         }
         
-        return categoryRepository.findAll(example,pageable);
+        Page<Category> result = categoryRepository.findAll(example,pageable);
+
+        //to concat store asset url for response data 
+        for (Category c : result){
+
+            System.out.println("Checking"+c.getStoreId());
+            //Since we join table one to one relation : this will avoid replicate string of storeassetservice url
+            ParentCategory pc = new ParentCategory();
+            pc.setParentId(c.getParentCategory().getParentId());
+            pc.setParentName(c.getParentCategory().getParentName());
+            pc.setVerticalCode(c.getParentCategory().getVerticalCode());
+            pc.setDisplaySequence(c.getParentCategory().getDisplaySequence());
+            pc.setParentThumbnailUrl(assetServiceUrl+c.getParentCategory().getParentThumbnailUrl());
+            c.setParentCategory(pc);
+
+            List<StoreAssets>  listOfAssets = new ArrayList<>();
+
+            for(StoreAssets sa:c.getStoreDetails().getStoreAssets()){
+
+                sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+                listOfAssets.add(sa);
+            }
+        
+            // Store store = new Store();
+            // store.setStoreAssets(listOfAssets);
+
+        }
+
+        return result;
 
     }
     
@@ -160,6 +193,15 @@ public class CategoryLocationService {
             } else {
                 c.getStoreDetails().setIsSnooze(false);
             }
+
+            List<StoreAssets>  listOfAssets = new ArrayList<>();
+
+            for(StoreAssets sa:c.getStoreDetails().getStoreAssets()){
+
+                sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+                listOfAssets.add(sa);
+            }
+        
         }
 
         return result;
@@ -214,7 +256,11 @@ public class CategoryLocationService {
             
             result = parentCategoryRepository.getParentCategoriesBasedOnLocationWithCityIdQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId,pageable);
         }
-    
+                        
+        //to concat store asset url for response data
+        for (ParentCategory pc : result){
+            pc.setParentThumbnailUrl(assetServiceUrl+pc.getParentThumbnailUrl());
+        }
 
         return result;
     }

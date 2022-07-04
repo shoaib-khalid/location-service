@@ -3,16 +3,19 @@ package com.kalsym.locationservice.service;
 import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.RegionCity;
 import com.kalsym.locationservice.model.Store;
+import com.kalsym.locationservice.model.StoreAssets;
 import com.kalsym.locationservice.model.Config.LocationConfig;
 import com.kalsym.locationservice.model.Config.StoreConfig;
 import com.kalsym.locationservice.repository.CategoriesSearchSpecs;
 import com.kalsym.locationservice.repository.LocationConfigRepository;
 import com.kalsym.locationservice.repository.StoreConfigRepository;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +31,9 @@ public class StoreConfigService {
     
     @Autowired
     StoreConfigRepository storeConfigRepository;
+
+    @Value("${asset.service.url}")
+    private String assetServiceUrl;
     
     //Get By Query USING EXAMPLE MATCHER for 
     public Page<StoreConfig> getQueryStoreConfig(String regionCountryId, String cityId, String cityName, String parentCategoryId, int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
@@ -116,7 +122,7 @@ public class StoreConfigService {
         // return categoryRepository.findAll(example,pageable);
         // System.out.println("Checking current time ::::::"+Calendar.getInstance().getTime());
         //to return store snooze
-        for(StoreConfig sc : result.getContent()){
+        for(StoreConfig sc : result){
             
 
             if (sc.getStoreDetails().getSnoozeStartTime()!=null && sc.getStoreDetails().getSnoozeEndTime()!=null) {
@@ -131,6 +137,17 @@ public class StoreConfigService {
             } else {
                 sc.getStoreDetails().setIsSnooze(false);
             }
+
+            List<StoreAssets> listOfStoreAssets = new ArrayList<>();
+
+            for(StoreAssets sa:sc.getStoreDetails().getStoreAssets()){
+
+                sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+                listOfStoreAssets.add(sa);
+            }
+        
+            // Store store = new Store();
+            // store.setStoreAssets(listOfStoreAssets);
 
         }
 
