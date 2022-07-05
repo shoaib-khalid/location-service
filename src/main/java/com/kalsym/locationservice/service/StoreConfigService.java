@@ -179,7 +179,13 @@ public class StoreConfigService {
 
             for(StoreAssets sa:sc.getStoreDetails().getStoreAssets()){
 
-                sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+                if(sa.getAssetUrl() != null){
+                    sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+
+                } else{
+                    sa.setAssetUrl(null);
+
+                }
                 listOfStoreAssets.add(sa);
             }
         

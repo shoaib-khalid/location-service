@@ -59,7 +59,14 @@ public class LocationConfigService {
 
         Page<LocationConfig> result = locationConfigRepository.findAll(example,pageable);
         for(LocationConfig lc : result){
-            lc.setImageUrl(assetServiceUrl+lc.getImageUrl());
+            //handle null
+            if(lc.getImageUrl() != null){
+                lc.setImageUrl(assetServiceUrl+lc.getImageUrl());
+
+            } else{
+                lc.setImageUrl(null);
+
+            }
         }
         return locationConfigRepository.findAll(example,pageable);
 

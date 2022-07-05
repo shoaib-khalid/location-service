@@ -105,14 +105,30 @@ public class CategoryLocationService {
             pc.setParentName(c.getParentCategory().getParentName());
             pc.setVerticalCode(c.getParentCategory().getVerticalCode());
             pc.setDisplaySequence(c.getParentCategory().getDisplaySequence());
-            pc.setParentThumbnailUrl(assetServiceUrl+c.getParentCategory().getParentThumbnailUrl());
+            //handle null
+            if(c.getParentCategory().getParentThumbnailUrl() != null){
+                pc.setParentThumbnailUrl(assetServiceUrl+c.getParentCategory().getParentThumbnailUrl());
+
+            } else{
+                pc.setParentThumbnailUrl(null);
+
+            }
+
             c.setParentCategory(pc);
 
             List<StoreAssets>  listOfAssets = new ArrayList<>();
 
             for(StoreAssets sa:c.getStoreDetails().getStoreAssets()){
 
-                sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+                //handle null
+                if(sa.getAssetUrl() != null){
+                    sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+
+                } else{
+                    sa.setAssetUrl(null);
+
+                }
+
                 listOfAssets.add(sa);
             }
         
@@ -237,7 +253,14 @@ public class CategoryLocationService {
 
             for(StoreAssets sa:c.getStoreDetails().getStoreAssets()){
 
-                sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+                //handle null
+                if(sa.getAssetUrl() != null){
+                    sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+
+                } else{
+                    sa.setAssetUrl(null);
+
+                }
                 listOfAssets.add(sa);
             }
         
@@ -298,7 +321,14 @@ public class CategoryLocationService {
                         
         //to concat store asset url for response data
         for (ParentCategory pc : result){
-            pc.setParentThumbnailUrl(assetServiceUrl+pc.getParentThumbnailUrl());
+            //handle null
+            if(pc.getParentThumbnailUrl() != null){
+                pc.setParentThumbnailUrl(assetServiceUrl+pc.getParentThumbnailUrl());
+
+            } else{
+                pc.setParentThumbnailUrl(null);
+
+            }
         }
 
         return result;

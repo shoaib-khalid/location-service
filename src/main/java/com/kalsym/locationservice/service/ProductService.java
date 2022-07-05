@@ -172,7 +172,14 @@ public class ProductService {
             }
             
             //to concat with assetervice url
-            p.setThumbnailUrl(assetServiceUrl+p.getThumbnailUrl());
+            //handle null
+            if(p.getThumbnailUrl() != null){
+                p.setThumbnailUrl(assetServiceUrl+p.getThumbnailUrl());
+
+            } else {
+                p.setThumbnailUrl(null);
+
+            }
         }
         
         return output;
@@ -332,7 +339,14 @@ public class ProductService {
             }
 
             //to concat with asseteservice
-            pfc.getProductDetails().setThumbnailUrl(assetServiceUrl+pfc.getProductDetails().getThumbnailUrl());
+            //handle null
+            if(pfc.getProductDetails().getThumbnailUrl() != null){
+                pfc.getProductDetails().setThumbnailUrl(assetServiceUrl+pfc.getProductDetails().getThumbnailUrl());
+
+            } else {
+                pfc.getProductDetails().setThumbnailUrl(null);
+
+            }
         }
 
         return output;
@@ -413,7 +427,7 @@ public class ProductService {
          
                 }
             } else {
-                
+
                 p.getStoreDetails().setIsSnooze(false);
                 
                 st.snoozeStartTime = null;
@@ -425,7 +439,14 @@ public class ProductService {
             }        
             
             //to concat with asseteservice
-            p.setThumbnailUrl(assetServiceUrl+p.getThumbnailUrl());
+
+            if(p.getThumbnailUrl() != null){
+                p.setThumbnailUrl(assetServiceUrl+p.getThumbnailUrl());
+
+            } else{
+                p.setThumbnailUrl(null);
+
+            }
         }
 
         
