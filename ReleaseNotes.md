@@ -3,6 +3,16 @@
 ##################################################
 1. set asset service url
 
+##DB CHANGES :
+
+	UPDATE location_config 
+	SET imageUrl = REPLACE(imageUrl, 'https://symplified.it', '') 
+	WHERE imageUrl LIKE '%https://symplified.it%';
+
+  UPDATE location_config 
+	SET imageUrl = REPLACE(imageUrl, 'https://symplified.biz', '') 
+	WHERE imageUrl LIKE '%https://symplified.biz%';
+
 ##################################################
 # location-service-1.0.14 | 1-July-2022
 ##################################################
