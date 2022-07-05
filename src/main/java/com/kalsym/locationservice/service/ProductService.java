@@ -1,5 +1,7 @@
 package com.kalsym.locationservice.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -12,6 +14,7 @@ import com.kalsym.locationservice.enums.DiscountCalculationType;
 import com.kalsym.locationservice.model.CustomerActivitiesSummary;
 import com.kalsym.locationservice.model.RegionCountry;
 import com.kalsym.locationservice.model.Store;
+import com.kalsym.locationservice.model.StoreSnooze;
 import com.kalsym.locationservice.model.Config.ProductFeatureConfig;
 import com.kalsym.locationservice.model.Discount.StoreDiscountProduct;
 import com.kalsym.locationservice.model.Product.ItemDiscount;
@@ -24,6 +27,7 @@ import com.kalsym.locationservice.repository.ProductRepository;
 import com.kalsym.locationservice.repository.RegionCountriesRepository;
 import com.kalsym.locationservice.repository.StoreDiscountProductRepository;
 import com.kalsym.locationservice.repository.StoreDiscountRepository;
+import com.kalsym.locationservice.utility.DateTimeUtil;
 import com.kalsym.locationservice.utility.ProductDiscount;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,6 +134,20 @@ public class ProductService {
                 } else {
             
                     p.getStoreDetails().setIsSnooze(true);
+
+                    Optional<RegionCountry> t = regionCountriesRepository.findById(p.getStoreDetails().getRegionCountryId());
+
+                    if(p.getStoreDetails().getStoreSnooze()== null && t.isPresent()){
+                        LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(p.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
+                        LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(p.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
+                        StoreSnooze st = new StoreSnooze();
+                        st.snoozeStartTime = startTime;
+                        st.snoozeEndTime = endTime;
+                        st.isSnooze = true;
+                        st.snoozeReason = p.getStoreDetails().getSnoozeReason();
+
+                        p.getStoreDetails().setStoreSnooze(st);
+                    }
          
                 }
             } else {
@@ -261,6 +279,20 @@ public class ProductService {
                 } else {
             
                     pfc.getProductDetails().getStoreDetails().setIsSnooze(true);
+
+                    Optional<RegionCountry> t = regionCountriesRepository.findById(pfc.getProductDetails().getStoreDetails().getRegionCountryId());
+
+                    if(pfc.getProductDetails().getStoreDetails().getStoreSnooze()== null && t.isPresent()){
+                        LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(pfc.getProductDetails().getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
+                        LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(pfc.getProductDetails().getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
+                        StoreSnooze st = new StoreSnooze();
+                        st.snoozeStartTime = startTime;
+                        st.snoozeEndTime = endTime;
+                        st.isSnooze = true;
+                        st.snoozeReason = pfc.getProductDetails().getStoreDetails().getSnoozeReason();
+
+                        pfc.getProductDetails().getStoreDetails().setStoreSnooze(st);
+                    }
          
                 }
             } else {
@@ -324,6 +356,20 @@ public class ProductService {
                 } else {
             
                     p.getStoreDetails().setIsSnooze(true);
+
+                    Optional<RegionCountry> t = regionCountriesRepository.findById(p.getStoreDetails().getRegionCountryId());
+
+                    if(p.getStoreDetails().getStoreSnooze()== null && t.isPresent()){
+                        LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(p.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
+                        LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(p.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
+                        StoreSnooze st = new StoreSnooze();
+                        st.snoozeStartTime = startTime;
+                        st.snoozeEndTime = endTime;
+                        st.isSnooze = true;
+                        st.snoozeReason = p.getStoreDetails().getSnoozeReason();
+
+                        p.getStoreDetails().setStoreSnooze(st);
+                    }
          
                 }
             } else {

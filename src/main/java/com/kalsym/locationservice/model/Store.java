@@ -86,6 +86,9 @@ public class Store implements Serializable {
     @Transient
     Boolean isSnooze;
 
+    @Transient
+    StoreSnooze storeSnooze;
+
 
 
 }

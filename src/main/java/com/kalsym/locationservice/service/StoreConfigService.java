@@ -2,17 +2,24 @@ package com.kalsym.locationservice.service;
 
 import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.RegionCity;
+import com.kalsym.locationservice.model.RegionCountry;
 import com.kalsym.locationservice.model.Store;
 import com.kalsym.locationservice.model.StoreAssets;
+import com.kalsym.locationservice.model.StoreSnooze;
 import com.kalsym.locationservice.model.Config.LocationConfig;
 import com.kalsym.locationservice.model.Config.StoreConfig;
 import com.kalsym.locationservice.repository.CategoriesSearchSpecs;
 import com.kalsym.locationservice.repository.LocationConfigRepository;
+import com.kalsym.locationservice.repository.RegionCountriesRepository;
 import com.kalsym.locationservice.repository.StoreConfigRepository;
+import com.kalsym.locationservice.utility.DateTimeUtil;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +38,9 @@ public class StoreConfigService {
     
     @Autowired
     StoreConfigRepository storeConfigRepository;
+
+    @Autowired
+    RegionCountriesRepository regionCountriesRepository;
 
     @Value("${asset.service.url}")
     private String assetServiceUrl;
@@ -132,6 +142,20 @@ public class StoreConfigService {
                 } else {
             
                     sc.getStoreDetails().setIsSnooze(true);
+
+                    Optional<RegionCountry> t = regionCountriesRepository.findById(sc.getStoreDetails().getRegionCountryId());
+
+                    if(sc.getStoreDetails().getStoreSnooze()== null && t.isPresent()){
+                        LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(sc.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
+                        LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(sc.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
+                        StoreSnooze st = new StoreSnooze();
+                        st.snoozeStartTime = startTime;
+                        st.snoozeEndTime = endTime;
+                        st.isSnooze = true;
+                        st.snoozeReason = sc.getStoreDetails().getSnoozeReason();
+
+                        sc.getStoreDetails().setStoreSnooze(st);
+                    }
          
                 }
             } else {
