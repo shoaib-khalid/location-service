@@ -15,7 +15,6 @@ import com.kalsym.locationservice.repository.StoreConfigRepository;
 import com.kalsym.locationservice.utility.DateTimeUtil;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -134,21 +133,28 @@ public class StoreConfigService {
         //to return store snooze
         for(StoreConfig sc : result){
             
+            StoreSnooze st = new StoreSnooze();
 
             if (sc.getStoreDetails().getSnoozeStartTime()!=null && sc.getStoreDetails().getSnoozeEndTime()!=null) {
                 int resultSnooze = sc.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
                 if (resultSnooze < 0) {
                     sc.getStoreDetails().setIsSnooze(false);
+
+                    st.snoozeStartTime = null;
+                    st.snoozeEndTime = null;
+                    st.isSnooze = false;
+                    st.snoozeReason = null;
+                    sc.getStoreDetails().setStoreSnooze(st);
+
                 } else {
             
                     sc.getStoreDetails().setIsSnooze(true);
 
                     Optional<RegionCountry> t = regionCountriesRepository.findById(sc.getStoreDetails().getRegionCountryId());
 
-                    if(sc.getStoreDetails().getStoreSnooze()== null && t.isPresent()){
+                    if(t.isPresent()){
                         LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(sc.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
                         LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(sc.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
-                        StoreSnooze st = new StoreSnooze();
                         st.snoozeStartTime = startTime;
                         st.snoozeEndTime = endTime;
                         st.isSnooze = true;
@@ -160,6 +166,12 @@ public class StoreConfigService {
                 }
             } else {
                 sc.getStoreDetails().setIsSnooze(false);
+
+                st.snoozeStartTime = null;
+                st.snoozeEndTime = null;
+                st.isSnooze = false;
+                st.snoozeReason = null;
+                sc.getStoreDetails().setStoreSnooze(st);
             }
 
             List<StoreAssets> listOfStoreAssets = new ArrayList<>();

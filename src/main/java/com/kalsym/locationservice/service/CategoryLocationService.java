@@ -191,20 +191,29 @@ public class CategoryLocationService {
 
         for(Category c : result){
 
+            StoreSnooze st = new StoreSnooze();
+
             if (c.getStoreDetails().getSnoozeStartTime()!=null && c.getStoreDetails().getSnoozeEndTime()!=null) {
                 int resultSnooze = c.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
                 if (resultSnooze < 0) {
                     c.getStoreDetails().setIsSnooze(false);
+
+                    st.snoozeStartTime = null;
+                    st.snoozeEndTime = null;
+                    st.isSnooze = false;
+                    st.snoozeReason = null;
+                    c.getStoreDetails().setStoreSnooze(st);
+
                 } else {
             
                     c.getStoreDetails().setIsSnooze(true);
 
                     Optional<RegionCountry> t = regionCountriesRepository.findById(c.getStoreDetails().getRegionCountryId());
 
-                    if(c.getStoreDetails().getStoreSnooze()== null && t.isPresent()){
+                    if(t.isPresent()){
                         LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(c.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
                         LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(c.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
-                        StoreSnooze st = new StoreSnooze();
+                        
                         st.snoozeStartTime = startTime;
                         st.snoozeEndTime = endTime;
                         st.isSnooze = true;
@@ -216,6 +225,12 @@ public class CategoryLocationService {
                 }
             } else {
                 c.getStoreDetails().setIsSnooze(false);
+
+                st.snoozeStartTime = null;
+                st.snoozeEndTime = null;
+                st.isSnooze = false;
+                st.snoozeReason = null;
+                c.getStoreDetails().setStoreSnooze(st);
             }
 
             List<StoreAssets>  listOfAssets = new ArrayList<>();

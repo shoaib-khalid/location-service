@@ -127,20 +127,29 @@ public class ProductService {
         //to set snooze
         for(ProductMain p : output){
 
+            StoreSnooze st = new StoreSnooze();
+
             if (p.getStoreDetails().getSnoozeStartTime()!=null && p.getStoreDetails().getSnoozeEndTime()!=null) {
                 int resultSnooze = p.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
                 if (resultSnooze < 0) {
                     p.getStoreDetails().setIsSnooze(false);
+
+                    st.snoozeStartTime = null;
+                    st.snoozeEndTime = null;
+                    st.isSnooze = false;
+                    st.snoozeReason = null;
+                    p.getStoreDetails().setStoreSnooze(st);
+
                 } else {
             
                     p.getStoreDetails().setIsSnooze(true);
 
                     Optional<RegionCountry> t = regionCountriesRepository.findById(p.getStoreDetails().getRegionCountryId());
 
-                    if(p.getStoreDetails().getStoreSnooze()== null && t.isPresent()){
+                    if(t.isPresent()){
                         LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(p.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
                         LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(p.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
-                        StoreSnooze st = new StoreSnooze();
+                        
                         st.snoozeStartTime = startTime;
                         st.snoozeEndTime = endTime;
                         st.isSnooze = true;
@@ -152,6 +161,14 @@ public class ProductService {
                 }
             } else {
                 p.getStoreDetails().setIsSnooze(false);
+
+                
+                st.snoozeStartTime = null;
+                st.snoozeEndTime = null;
+                st.isSnooze = false;
+                st.snoozeReason = null;
+                p.getStoreDetails().setStoreSnooze(st);
+
             }
             
             //to concat with assetervice url
@@ -272,20 +289,29 @@ public class ProductService {
         //to set store snooze
         for(ProductFeatureConfig pfc : result){
 
+            StoreSnooze st = new StoreSnooze();
+
             if ( pfc.getProductDetails().getStoreDetails().getSnoozeStartTime()!=null &&  pfc.getProductDetails().getStoreDetails().getSnoozeEndTime()!=null) {
                 int resultSnooze = pfc.getProductDetails().getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
                 if (resultSnooze < 0) {
                     pfc.getProductDetails().getStoreDetails().setIsSnooze(false);
+
+                    st.snoozeStartTime = null;
+                    st.snoozeEndTime = null;
+                    st.isSnooze = false;
+                    st.snoozeReason = null;
+                    pfc.getProductDetails().getStoreDetails().setStoreSnooze(st);
+
                 } else {
             
                     pfc.getProductDetails().getStoreDetails().setIsSnooze(true);
 
                     Optional<RegionCountry> t = regionCountriesRepository.findById(pfc.getProductDetails().getStoreDetails().getRegionCountryId());
 
-                    if(pfc.getProductDetails().getStoreDetails().getStoreSnooze()== null && t.isPresent()){
+                    if(t.isPresent()){
                         LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(pfc.getProductDetails().getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
                         LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(pfc.getProductDetails().getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
-                        StoreSnooze st = new StoreSnooze();
+                        
                         st.snoozeStartTime = startTime;
                         st.snoozeEndTime = endTime;
                         st.isSnooze = true;
@@ -297,6 +323,12 @@ public class ProductService {
                 }
             } else {
                 pfc.getProductDetails().getStoreDetails().setIsSnooze(false);
+
+                st.snoozeStartTime = null;
+                st.snoozeEndTime = null;
+                st.isSnooze = false;
+                st.snoozeReason = null;
+                pfc.getProductDetails().getStoreDetails().setStoreSnooze(st);
             }
 
             //to concat with asseteservice
@@ -349,10 +381,19 @@ public class ProductService {
         // Page<ProductMain> output = new PageImpl<ProductMain>(newArrayList,pageable,result.getTotalElements());
         for(ProductMain p : newArrayList){
 
+            StoreSnooze st = new StoreSnooze();
+
             if (p.getStoreDetails().getSnoozeStartTime()!=null && p.getStoreDetails().getSnoozeEndTime()!=null) {
                 int resultSnooze = p.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
                 if (resultSnooze < 0) {
                     p.getStoreDetails().setIsSnooze(false);
+
+                    st.snoozeStartTime = null;
+                    st.snoozeEndTime = null;
+                    st.isSnooze = false;
+                    st.snoozeReason = null;
+                    p.getStoreDetails().setStoreSnooze(st);
+
                 } else {
             
                     p.getStoreDetails().setIsSnooze(true);
@@ -362,7 +403,6 @@ public class ProductService {
                     if(p.getStoreDetails().getStoreSnooze()== null && t.isPresent()){
                         LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(p.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
                         LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(p.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
-                        StoreSnooze st = new StoreSnooze();
                         st.snoozeStartTime = startTime;
                         st.snoozeEndTime = endTime;
                         st.isSnooze = true;
@@ -373,7 +413,15 @@ public class ProductService {
          
                 }
             } else {
+                
                 p.getStoreDetails().setIsSnooze(false);
+                
+                st.snoozeStartTime = null;
+                st.snoozeEndTime = null;
+                st.isSnooze = false;
+                st.snoozeReason = null;
+                p.getStoreDetails().setStoreSnooze(st);
+
             }        
             
             //to concat with asseteservice
