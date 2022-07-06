@@ -100,21 +100,21 @@ public class CategoryLocationService {
 
             System.out.println("Checking"+c.getStoreId());
             //Since we join table one to one relation : this will avoid replicate string of storeassetservice url
-            ParentCategory pc = new ParentCategory();
-            pc.setParentId(c.getParentCategory().getParentId());
-            pc.setParentName(c.getParentCategory().getParentName());
-            pc.setVerticalCode(c.getParentCategory().getVerticalCode());
-            pc.setDisplaySequence(c.getParentCategory().getDisplaySequence());
+            // ParentCategory pc = new ParentCategory();
+            // pc.setParentId(c.getParentCategory().getParentId());
+            // pc.setParentName(c.getParentCategory().getParentName());
+            // pc.setVerticalCode(c.getParentCategory().getVerticalCode());
+            // pc.setDisplaySequence(c.getParentCategory().getDisplaySequence());
             //handle null
-            if(c.getParentCategory().getParentThumbnailUrl() != null){
-                pc.setParentThumbnailUrl(assetServiceUrl+c.getParentCategory().getParentThumbnailUrl());
+            // if(c.getParentCategory().getParentThumbnailUrl() != null){
+            //     pc.setParentThumbnailUrl(assetServiceUrl+c.getParentCategory().getParentThumbnailUrl());
 
-            } else{
-                pc.setParentThumbnailUrl(null);
+            // } else{
+            //     pc.setParentThumbnailUrl(null);
 
-            }
+            // }
 
-            c.setParentCategory(pc);
+            // c.setParentCategory(pc);
 
             List<StoreAssets>  listOfAssets = new ArrayList<>();
 
@@ -320,16 +320,16 @@ public class CategoryLocationService {
         }
                         
         //to concat store asset url for response data
-        for (ParentCategory pc : result){
-            //handle null
-            if(pc.getParentThumbnailUrl() != null){
-                pc.setParentThumbnailUrl(assetServiceUrl+pc.getParentThumbnailUrl());
+        // for (ParentCategory pc : result){
+        //     //handle null
+        //     if(pc.getParentThumbnailUrl() != null){
+        //         pc.setParentThumbnailUrl(assetServiceUrl+pc.getParentThumbnailUrl());
 
-            } else{
-                pc.setParentThumbnailUrl(null);
+        //     } else{
+        //         pc.setParentThumbnailUrl(null);
 
-            }
-        }
+        //     }
+        // }
 
         return result;
     }
