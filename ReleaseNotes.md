@@ -6,6 +6,10 @@
 # location-service-1.0.15 | 5-July-2022
 ##################################################
 1. set asset service url
+2. change config 
+
+##Config changes 
+asset.service.url = https://assets.symplified.it //inject production asset service url
 
 ##DB CHANGES :
 
