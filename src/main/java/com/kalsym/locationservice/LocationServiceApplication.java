@@ -1,6 +1,7 @@
 package com.kalsym.locationservice;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,8 @@ import java.awt.image.BufferedImage;
 import com.kalsym.locationservice.repository.CustomRepositoryImpl;
 
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
+import org.springframework.context.ApplicationContext;
+import org.springframework.boot.CommandLineRunner;
 
 
 @SpringBootApplication
@@ -20,6 +23,8 @@ import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 public class LocationServiceApplication {
 
 	public static String VERSION;
+    public static String ASSETURL ;
+
 
     static {
         System.setProperty("spring.jpa.hibernate.naming.physical-strategy", "org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl");
@@ -29,6 +34,17 @@ public class LocationServiceApplication {
 		SpringApplication.run(LocationServiceApplication.class, args);
 		System.out.println("LOCATION SERVICE IS RUNNING :::::");
 	}
+
+    @Value("${asset.service.url}")
+    private String assetServiceUrl;
+
+    @Bean
+    CommandLineRunner lookup(ApplicationContext context) {
+        return args -> {
+            ASSETURL = assetServiceUrl;
+            
+        };
+    }
 
 	@Bean
     public RestTemplate getRestTemplate() {

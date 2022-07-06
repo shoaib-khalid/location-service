@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kalsym.locationservice.LocationServiceApplication;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,5 +39,11 @@ public class ParentCategory implements Serializable {
 
     private Integer displaySequence;
 
+    public String getParentThumbnailUrl() {
+        if (parentThumbnailUrl==null)
+            return null;
+        else
+            return LocationServiceApplication.ASSETURL+ parentThumbnailUrl;
+    }
 
 }
