@@ -17,6 +17,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kalsym.locationservice.LocationServiceApplication;
 import com.kalsym.locationservice.enums.StoreAssetType;
 
 /**
@@ -40,5 +41,12 @@ public class StoreAssets implements Serializable {
     
     @Enumerated(EnumType.STRING)
     private StoreAssetType assetType;
+
+    public String getAssetUrl() {
+        if (assetUrl==null)
+            return null;
+        else
+            return LocationServiceApplication.ASSETURL+ assetUrl;
+    }
     
 }

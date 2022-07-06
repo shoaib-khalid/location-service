@@ -175,19 +175,19 @@ public class StoreConfigService {
                 sc.getStoreDetails().setStoreSnooze(st);
             }
 
-            List<StoreAssets> listOfStoreAssets = new ArrayList<>();
+            // List<StoreAssets> listOfStoreAssets = new ArrayList<>();
 
-            for(StoreAssets sa:sc.getStoreDetails().getStoreAssets()){
+            // for(StoreAssets sa:sc.getStoreDetails().getStoreAssets()){
 
-                if(sa.getAssetUrl() != null){
-                    sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+            //     if(sa.getAssetUrl() != null){
+            //         sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
 
-                } else{
-                    sa.setAssetUrl(null);
+            //     } else{
+            //         sa.setAssetUrl(null);
 
-                }
-                listOfStoreAssets.add(sa);
-            }
+            //     }
+            //     listOfStoreAssets.add(sa);
+            // }
         
             // Store store = new Store();
             // store.setStoreAssets(listOfStoreAssets);

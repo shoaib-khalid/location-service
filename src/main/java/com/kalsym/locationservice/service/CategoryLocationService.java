@@ -96,46 +96,46 @@ public class CategoryLocationService {
         Page<Category> result = categoryRepository.findAll(example,pageable);
 
         //to concat store asset url for response data 
-        for (Category c : result){
+        // for (Category c : result){
 
-            System.out.println("Checking"+c.getStoreId());
-            //Since we join table one to one relation : this will avoid replicate string of storeassetservice url
-            // ParentCategory pc = new ParentCategory();
-            // pc.setParentId(c.getParentCategory().getParentId());
-            // pc.setParentName(c.getParentCategory().getParentName());
-            // pc.setVerticalCode(c.getParentCategory().getVerticalCode());
-            // pc.setDisplaySequence(c.getParentCategory().getDisplaySequence());
-            //handle null
-            // if(c.getParentCategory().getParentThumbnailUrl() != null){
-            //     pc.setParentThumbnailUrl(assetServiceUrl+c.getParentCategory().getParentThumbnailUrl());
+        //     System.out.println("Checking"+c.getStoreId());
+        //     //Since we join table one to one relation : this will avoid replicate string of storeassetservice url
+        //     // ParentCategory pc = new ParentCategory();
+        //     // pc.setParentId(c.getParentCategory().getParentId());
+        //     // pc.setParentName(c.getParentCategory().getParentName());
+        //     // pc.setVerticalCode(c.getParentCategory().getVerticalCode());
+        //     // pc.setDisplaySequence(c.getParentCategory().getDisplaySequence());
+        //     //handle null
+        //     // if(c.getParentCategory().getParentThumbnailUrl() != null){
+        //     //     pc.setParentThumbnailUrl(assetServiceUrl+c.getParentCategory().getParentThumbnailUrl());
 
-            // } else{
-            //     pc.setParentThumbnailUrl(null);
+        //     // } else{
+        //     //     pc.setParentThumbnailUrl(null);
 
-            // }
+        //     // }
 
-            // c.setParentCategory(pc);
+        //     // c.setParentCategory(pc);
 
-            List<StoreAssets>  listOfAssets = new ArrayList<>();
+        //     // List<StoreAssets>  listOfAssets = new ArrayList<>();
 
-            for(StoreAssets sa:c.getStoreDetails().getStoreAssets()){
+        //     // for(StoreAssets sa:c.getStoreDetails().getStoreAssets()){
 
-                //handle null
-                if(sa.getAssetUrl() != null){
-                    sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+        //     //     //handle null
+        //     //     if(sa.getAssetUrl() != null){
+        //     //         sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
 
-                } else{
-                    sa.setAssetUrl(null);
+        //     //     } else{
+        //     //         sa.setAssetUrl(null);
 
-                }
+        //     //     }
 
-                listOfAssets.add(sa);
-            }
+        //     //     listOfAssets.add(sa);
+        //     // }
         
-            // Store store = new Store();
-            // store.setStoreAssets(listOfAssets);
+        //     // Store store = new Store();
+        //     // store.setStoreAssets(listOfAssets);
 
-        }
+        // }
 
         return result;
 
@@ -249,20 +249,20 @@ public class CategoryLocationService {
                 c.getStoreDetails().setStoreSnooze(st);
             }
 
-            List<StoreAssets>  listOfAssets = new ArrayList<>();
+            // List<StoreAssets>  listOfAssets = new ArrayList<>();
 
-            for(StoreAssets sa:c.getStoreDetails().getStoreAssets()){
+            // for(StoreAssets sa:c.getStoreDetails().getStoreAssets()){
 
-                //handle null
-                if(sa.getAssetUrl() != null){
-                    sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
+            //     //handle null
+            //     if(sa.getAssetUrl() != null){
+            //         sa.setAssetUrl(assetServiceUrl+sa.getAssetUrl());
 
-                } else{
-                    sa.setAssetUrl(null);
+            //     } else{
+            //         sa.setAssetUrl(null);
 
-                }
-                listOfAssets.add(sa);
-            }
+            //     }
+            //     listOfAssets.add(sa);
+            // }
         
         }
 
