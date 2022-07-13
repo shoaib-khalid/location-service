@@ -2,7 +2,6 @@ package com.kalsym.locationservice.repository;
 
 import java.util.List;
 
-import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.ParentCategory;
 
 import org.springframework.data.domain.Page;
@@ -21,7 +20,7 @@ public interface ParentCategoryRepository extends JpaRepository<ParentCategory,S
     @Query(
         " SELECT pc "
         +"FROM ParentCategory pc "
-        +"INNER JOIN Category category ON category.parentCategoryId  = pc.id "
+        +"INNER JOIN StoreCategory category ON category.parentCategoryId  = pc.id "
         +"INNER JOIN Store storeLocation on storeLocation.id = category.storeId "
         +"WHERE storeLocation.regionCountryId LIKE CONCAT('%', :regionCountryId ,'%') "
         +"AND pc.parentId LIKE CONCAT('%', :parentCategoryId ,'%') "

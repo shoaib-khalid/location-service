@@ -31,7 +31,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
-public class Category implements Serializable {
+public class StoreCategory implements Serializable {
     
     @Id
     private String id;

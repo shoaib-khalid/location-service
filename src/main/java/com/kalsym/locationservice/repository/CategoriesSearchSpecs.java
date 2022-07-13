@@ -8,7 +8,7 @@ import javax.persistence.criteria.Predicate;
 import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.domain.Specification;
 
-import com.kalsym.locationservice.model.Category;
+import com.kalsym.locationservice.model.StoreCategory;
 import com.kalsym.locationservice.model.Config.StoreConfig;
 
 import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
@@ -27,7 +27,7 @@ public class CategoriesSearchSpecs {
 
         return (Specification<StoreConfig>) (root, query, builder) -> {
             final List<Predicate> predicates = new ArrayList<>();
-            Join<StoreConfig, Category> category = root.join("categories");
+            Join<StoreConfig, StoreCategory> category = root.join("categories");
             
             if (parentCategoryId!=null) {
                 predicates.add(builder.equal(category.get("parentCategoryId"), parentCategoryId));

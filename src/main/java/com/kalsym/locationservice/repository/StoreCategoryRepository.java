@@ -2,19 +2,20 @@ package com.kalsym.locationservice.repository;
 
 import java.util.List;
 
-import com.kalsym.locationservice.model.Category;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import com.kalsym.locationservice.model.StoreCategory;
+
 import org.springframework.data.repository.query.Param;
 
 
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category,String> {
+public interface StoreCategoryRepository extends JpaRepository<StoreCategory,String> {
     
     //Note that if we want to use Raw Query , need to specify nativeQuery = true, 
     //if you dont specify then make sure the table name u use model name.
@@ -76,7 +77,7 @@ public interface CategoryRepository extends JpaRepository<Category,String> {
 
     @Query(
             " SELECT sc "
-            + "FROM Category sc "
+            + "FROM StoreCategory sc "
             + "WHERE sc.storeDetails.regionCountryId = :regionCountryId "
             + "AND sc.parentCategory.parentId LIKE CONCAT('%', :parentCategoryId ,'%') "
             + "AND sc.storeDetails.name LIKE CONCAT('%', :storeName ,'%') "
@@ -85,7 +86,7 @@ public interface CategoryRepository extends JpaRepository<Category,String> {
             + "OR sc.storeDetails.postcode = :postcode "
             + "GROUP BY sc.storeDetails.id"
     )
-    Page<Category> getStoreBasedOnParentCategories(
+    Page<StoreCategory> getStoreBasedOnParentCategories(
         @Param("cityName") String cityName,
         @Param("state") String state,
         @Param("regionCountryId") String regionCountryId,
@@ -97,7 +98,7 @@ public interface CategoryRepository extends JpaRepository<Category,String> {
 
     @Query(
         " SELECT sc "
-        + "FROM Category sc "
+        + "FROM StoreCategory sc "
         + "WHERE sc.storeDetails.regionCountryId = :regionCountryId "
         + "AND sc.parentCategory.parentId LIKE CONCAT('%', :parentCategoryId ,'%') "
         + "AND sc.storeDetails.name LIKE CONCAT('%', :storeName ,'%') "
@@ -107,7 +108,7 @@ public interface CategoryRepository extends JpaRepository<Category,String> {
         + "OR sc.storeDetails.postcode = :postcode "
         + "GROUP BY sc.storeDetails.id"
     )
-    Page<Category> getStoreBasedOnParentCategoriesWithCityId(
+    Page<StoreCategory> getStoreBasedOnParentCategoriesWithCityId(
         @Param("city") List<String> city,
         @Param("cityName") String cityName,
         @Param("state") String state,

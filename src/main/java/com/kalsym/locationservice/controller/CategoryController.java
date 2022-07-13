@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.ParentCategory;
+import com.kalsym.locationservice.model.StoreCategory;
 import com.kalsym.locationservice.service.CategoryLocationService;
 import com.kalsym.locationservice.utility.HttpResponse;
 
@@ -44,7 +44,7 @@ public class CategoryController {
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<Category> body = categoryLocationService.getQueryChildCategory(cityId,stateId,regionCountryId,postcode,parentCategoryId,sortByCol,sortingOrder,page,pageSize);
+        Page<StoreCategory> body = categoryLocationService.getQueryChildCategory(cityId,stateId,regionCountryId,postcode,parentCategoryId,sortByCol,sortingOrder,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

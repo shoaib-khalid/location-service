@@ -8,17 +8,17 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
-import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.ParentCategory;
 import com.kalsym.locationservice.model.RegionCountry;
 import com.kalsym.locationservice.model.Store;
 import com.kalsym.locationservice.model.StoreAssets;
+import com.kalsym.locationservice.model.StoreCategory;
 import com.kalsym.locationservice.model.StoreSnooze;
 // import com.kalsym.locationservice.model.CategoryLocation;
 // import com.kalsym.locationservice.model.LocationCategory;
 // import com.kalsym.locationservice.repository.CategoryLocationRepository;
 // import com.kalsym.locationservice.repository.LocationCategoryRepository;
-import com.kalsym.locationservice.repository.CategoryRepository;
+import com.kalsym.locationservice.repository.StoreCategoryRepository;
 import com.kalsym.locationservice.repository.ParentCategoryRepository;
 import com.kalsym.locationservice.repository.RegionCountriesRepository;
 import com.kalsym.locationservice.utility.DateTimeUtil;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 public class CategoryLocationService {
 
     @Autowired
-    CategoryRepository categoryRepository;
+    StoreCategoryRepository categoryRepository;
 
     @Value("${asset.service.url}")
     private String assetServiceUrl;
@@ -57,7 +57,7 @@ public class CategoryLocationService {
     
     //Get By Query WITH Pagination
     //Child category 
-    public Page<Category> getQueryChildCategory(String cityId, String stateId,String regionCountryId, String postcode, String parentCategoryId, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
+    public Page<StoreCategory> getQueryChildCategory(String cityId, String stateId,String regionCountryId, String postcode, String parentCategoryId, String sortByCol, Sort.Direction sortingOrder,int page, int pageSize){
     
         Store storeMatch = new Store();
         storeMatch.setCity(cityId);
@@ -69,7 +69,7 @@ public class CategoryLocationService {
         ParentCategory parentCategoryMatch = new ParentCategory();
         parentCategoryMatch.setParentId(parentCategoryId);
        
-        Category categoryMatch = new Category();
+        StoreCategory categoryMatch = new StoreCategory();
         categoryMatch.setStoreDetails(storeMatch);
         categoryMatch.setParentCategory(parentCategoryMatch);
 
@@ -82,7 +82,7 @@ public class CategoryLocationService {
                 .withMatcher("postcode", new GenericPropertyMatcher().exact())
                 .withMatcher("parentCategoryId", new GenericPropertyMatcher().exact())
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-        Example<Category> example = Example.of(categoryMatch, matcher);
+        Example<StoreCategory> example = Example.of(categoryMatch, matcher);
 
         Pageable pageable;
    
@@ -93,7 +93,7 @@ public class CategoryLocationService {
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
         }
         
-        Page<Category> result = categoryRepository.findAll(example,pageable);
+        Page<StoreCategory> result = categoryRepository.findAll(example,pageable);
 
         //to concat store asset url for response data 
         // for (Category c : result){
@@ -160,7 +160,7 @@ public class CategoryLocationService {
     //     return parentCategoriesList ;
     // }
 
-    public Page<Category> getQueryStore(List<String> cityId, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
+    public Page<StoreCategory> getQueryStore(List<String> cityId, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
     
         //Handling null value in order to use query
         // if (cityId == null || cityId.isEmpty()) {
@@ -193,7 +193,7 @@ public class CategoryLocationService {
         Pageable pageable = PageRequest.of(page, pageSize);
 
         //find the based on location with pageable
-        Page<Category> result = cityId == null? categoryRepository.getStoreBasedOnParentCategories(cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable)
+        Page<StoreCategory> result = cityId == null? categoryRepository.getStoreBasedOnParentCategories(cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable)
                                             : categoryRepository.getStoreBasedOnParentCategoriesWithCityId(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable);
    
         // if (sortingOrder==Sort.Direction.DESC){
@@ -205,7 +205,7 @@ public class CategoryLocationService {
         
         // return categoryRepository.findAll(example,pageable);
 
-        for(Category c : result){
+        for(StoreCategory c : result){
 
             StoreSnooze st = new StoreSnooze();
 

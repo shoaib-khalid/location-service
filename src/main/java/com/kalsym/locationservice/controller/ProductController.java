@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.CustomerActivitiesSummary;
 import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.service.CategoryLocationService;

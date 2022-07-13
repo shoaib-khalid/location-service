@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.kalsym.locationservice.model.Category;
+import com.kalsym.locationservice.model.StoreCategory;
 import com.kalsym.locationservice.service.CategoryLocationService;
 import com.kalsym.locationservice.utility.HttpResponse;
 
@@ -42,7 +42,7 @@ public class StoreController {
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<Category> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,page,pageSize);
+        Page<StoreCategory> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

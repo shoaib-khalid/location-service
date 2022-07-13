@@ -2,7 +2,6 @@ package com.kalsym.locationservice.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.Config.LocationConfig;
 import com.kalsym.locationservice.model.Config.ProductFeatureConfig;
 import com.kalsym.locationservice.model.Config.StoreConfig;

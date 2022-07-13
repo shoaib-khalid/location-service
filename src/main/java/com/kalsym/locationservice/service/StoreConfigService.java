@@ -1,10 +1,10 @@
 package com.kalsym.locationservice.service;
 
-import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.RegionCity;
 import com.kalsym.locationservice.model.RegionCountry;
 import com.kalsym.locationservice.model.Store;
 import com.kalsym.locationservice.model.StoreAssets;
+import com.kalsym.locationservice.model.StoreCategory;
 import com.kalsym.locationservice.model.StoreSnooze;
 import com.kalsym.locationservice.model.Config.LocationConfig;
 import com.kalsym.locationservice.model.Config.StoreConfig;
@@ -51,7 +51,7 @@ public class StoreConfigService {
         RegionCity regionCityMatch = new RegionCity();
         regionCityMatch.setName(cityName);
 
-        Category categoryMatch = new Category();
+        StoreCategory categoryMatch = new StoreCategory();
         categoryMatch.setParentCategoryId(parentCategoryId);
     
         Store storeMatch = new Store();

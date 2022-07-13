@@ -4,7 +4,6 @@ package com.kalsym.locationservice.repository;
 import java.util.Collection;
 import java.util.List;
 
-import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.CustomerActivitiesSummary;
 
 import org.springframework.data.domain.Page;

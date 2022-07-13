@@ -16,7 +16,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.RegionCity;
 import com.kalsym.locationservice.model.Store;
 
