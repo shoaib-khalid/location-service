@@ -173,13 +173,13 @@ public class ProductService {
             
             //to concat with assetervice url
             //handle null
-            if(p.getThumbnailUrl() != null){
-                p.setThumbnailUrl(assetServiceUrl+p.getThumbnailUrl());
+            // if(p.getThumbnailUrl() != null){
+            //     p.setThumbnailUrl(assetServiceUrl+p.getThumbnailUrl());
 
-            } else {
-                p.setThumbnailUrl(null);
+            // } else {
+            //     p.setThumbnailUrl(null);
 
-            }
+            // }
         }
         
         return output;
@@ -340,13 +340,13 @@ public class ProductService {
 
             //to concat with asseteservice
             //handle null
-            if(pfc.getProductDetails().getThumbnailUrl() != null){
-                pfc.getProductDetails().setThumbnailUrl(assetServiceUrl+pfc.getProductDetails().getThumbnailUrl());
+            // if(pfc.getProductDetails().getThumbnailUrl() != null){
+            //     pfc.getProductDetails().setThumbnailUrl(assetServiceUrl+pfc.getProductDetails().getThumbnailUrl());
 
-            } else {
-                pfc.getProductDetails().setThumbnailUrl(null);
+            // } else {
+            //     pfc.getProductDetails().setThumbnailUrl(null);
 
-            }
+            // }
         }
 
         return output;
@@ -440,13 +440,13 @@ public class ProductService {
             
             //to concat with asseteservice
 
-            if(p.getThumbnailUrl() != null){
-                p.setThumbnailUrl(assetServiceUrl+p.getThumbnailUrl());
+            // if(p.getThumbnailUrl() != null){
+            //     p.setThumbnailUrl(assetServiceUrl+p.getThumbnailUrl());
 
-            } else{
-                p.setThumbnailUrl(null);
+            // } else{
+            //     p.setThumbnailUrl(null);
 
-            }
+            // }
         }
 
         

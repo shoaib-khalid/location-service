@@ -9,6 +9,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kalsym.locationservice.LocationServiceApplication;
 import com.kalsym.locationservice.model.RegionCity;
 
 import lombok.Getter;
@@ -40,7 +41,14 @@ public class LocationConfig {
 
     @OneToOne()
     @JoinColumn(name = "cityId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
-    private RegionCity cityDetails;  
+    private RegionCity cityDetails; 
+    
+    public String getImageUrl() {
+        if (imageUrl==null)
+            return null;
+        else
+            return LocationServiceApplication.ASSETURL+ imageUrl;
+    }
 
 
 }

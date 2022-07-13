@@ -57,17 +57,17 @@ public class LocationConfigService {
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
         }
 
-        Page<LocationConfig> result = locationConfigRepository.findAll(example,pageable);
-        for(LocationConfig lc : result){
-            //handle null
-            if(lc.getImageUrl() != null){
-                lc.setImageUrl(assetServiceUrl+lc.getImageUrl());
+        // Page<LocationConfig> result = locationConfigRepository.findAll(example,pageable);
+        // for(LocationConfig lc : result){
+        //     //handle null
+        //     if(lc.getImageUrl() != null){
+        //         lc.setImageUrl(assetServiceUrl+lc.getImageUrl());
 
-            } else{
-                lc.setImageUrl(null);
+        //     } else{
+        //         lc.setImageUrl(null);
 
-            }
-        }
+        //     }
+        // }
         return locationConfigRepository.findAll(example,pageable);
 
     }
