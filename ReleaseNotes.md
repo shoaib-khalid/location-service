@@ -1,4 +1,8 @@
 ##################################################
+# location-service-1.0.18 | 13-July-2022
+##################################################
+1. Code refactoring and chnage query for trending products
+##################################################
 # location-service-1.0.17 | 6-July-2022
 ##################################################
 1. Fix parent category asset url
