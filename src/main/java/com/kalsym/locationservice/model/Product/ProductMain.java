@@ -14,8 +14,8 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kalsym.locationservice.LocationServiceApplication;
+import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.Store;
-import com.kalsym.locationservice.model.StoreCategory;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -61,7 +61,7 @@ public class ProductMain implements Serializable {
 
     @OneToOne()
     @JoinColumn(name = "categoryId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
-    private StoreCategory storeCategory;  
+    private Category storeCategory;  
 
     public String getThumbnailUrl() {
         if (thumbnailUrl==null)
