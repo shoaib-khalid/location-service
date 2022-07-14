@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kalsym.locationservice.LocationServiceApplication;
@@ -63,10 +64,20 @@ public class ProductMain implements Serializable {
     @JoinColumn(name = "categoryId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
     private Category storeCategory;  
 
+    @Transient 
+    String seoUrlMarketPlace;
+
     public String getThumbnailUrl() {
         if (thumbnailUrl==null)
             return null;
         else
             return LocationServiceApplication.ASSETURL+ thumbnailUrl;
     }
+
+    public String getSeoUrlMarketPlace() {
+      
+            return LocationServiceApplication.MARKETPLACEURL+"/"+seoName+"?productId="+id;
+    }
+
+
 }
