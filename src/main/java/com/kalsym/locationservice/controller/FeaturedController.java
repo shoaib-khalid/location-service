@@ -120,13 +120,14 @@ public class FeaturedController {
         @RequestParam(required = false) List<String> cityId,
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String name,
+        @RequestParam(required = false) Boolean isMainLevel,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
         @RequestParam(required = false) String sortByCol,
         @RequestParam(required = false) Sort.Direction sortingOrder
     ) {
 
-        Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, page, pageSize, sortByCol, sortingOrder );
+        Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, isMainLevel,page, pageSize, sortByCol, sortingOrder );
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

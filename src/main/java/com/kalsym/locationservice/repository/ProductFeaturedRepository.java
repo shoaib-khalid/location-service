@@ -21,6 +21,7 @@ public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureC
         " SELECT pfc "
         + "FROM ProductFeatureConfig pfc "
         + "WHERE productDetails.status IN :status "
+        + "AND isMainLevel = :isMainLevel "
         + "AND productDetails.storeCategory.parentCategoryId LIKE CONCAT('%', :parentCategoryId ,'%') "
         + "AND productDetails.name LIKE CONCAT('%', :name ,'%') "
         + "AND productDetails.storeDetails.regionCountryId = :regionCountryId "
@@ -33,6 +34,7 @@ public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureC
         @Param("parentCategoryId") String parentCategoryId,
         @Param("cityName") String cityName,
         @Param("name") String name,
+        @Param("isMainLevel") Boolean isMainLevel,
         Pageable pageable
     );
 
@@ -40,6 +42,7 @@ public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureC
         " SELECT pfc "
         + "FROM ProductFeatureConfig pfc "
         + "WHERE productDetails.status IN :status "
+        + "AND isMainLevel = :isMainLevel "
         + "AND productDetails.storeCategory.parentCategoryId LIKE CONCAT('%', :parentCategoryId ,'%') "
         + "AND productDetails.name LIKE CONCAT('%', :name ,'%') "
         + "AND productDetails.storeDetails.regionCountryId = :regionCountryId "
@@ -54,6 +57,7 @@ public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureC
         @Param("cityId") List<String> cityId,
         @Param("cityName") String cityName,
         @Param("name") String name,
+        @Param("isMainLevel") Boolean isMainLevel,
         Pageable pageable
     );
 }

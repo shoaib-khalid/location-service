@@ -199,7 +199,7 @@ public class ProductService {
      * @param sortingOrder
      * @return
      */
-    public Page<ProductFeatureConfig> getFeaturedProductWithLocationParentCategory(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
+    public Page<ProductFeatureConfig> getFeaturedProductWithLocationParentCategory(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name, Boolean isMainLevel,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
 
         //Handling null value in order to use query
         if (regionCountryId == null || regionCountryId.isEmpty()) {
@@ -232,6 +232,11 @@ public class ProductService {
             status = statusList;
         }
 
+        if (isMainLevel == null) {
+
+            isMainLevel = true;
+        }
+
         Pageable pageable;
 
         if (sortingOrder==Sort.Direction.DESC){
@@ -253,8 +258,8 @@ public class ProductService {
         }
 
         //find the based on location with pageable
-        Page<ProductFeatureConfig> result = cityId == null?productFeaturedRepository.getQueryProductConfig(status,regionCountryId,parentCategoryId,cityName,name,pageable)
-        :productFeaturedRepository.getQueryProductConfigWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable) ;
+        Page<ProductFeatureConfig> result = cityId == null?productFeaturedRepository.getQueryProductConfig(status,regionCountryId,parentCategoryId,cityName,name,isMainLevel,pageable)
+        :productFeaturedRepository.getQueryProductConfigWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,isMainLevel,pageable) ;
 
         //extract the result of content of pageable in order to proceed with dicount of item 
         List<ProductFeatureConfig> productFeaturedList = result.getContent();

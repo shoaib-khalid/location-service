@@ -39,6 +39,8 @@ public class ProductFeatureConfig {
 
     private Integer sequence;
 
+    private Boolean isMainLevel;
+
     @OneToOne()
     @JoinColumn(name = "productId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
     private ProductMain productDetails;

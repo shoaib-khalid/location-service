@@ -1,4 +1,8 @@
 ##################################################
+# location-service-1.0.19 | 19-July-2022
+##################################################
+1. Add request param isMainLevel for get featured product
+##################################################
 # location-service-1.0.18 | 13-July-2022
 ##################################################
 1. Code refactoring and chnage query for trending products
