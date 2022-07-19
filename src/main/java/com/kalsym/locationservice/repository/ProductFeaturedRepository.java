@@ -42,6 +42,25 @@ public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureC
         " SELECT pfc "
         + "FROM ProductFeatureConfig pfc "
         + "WHERE productDetails.status IN :status "
+        + "AND productDetails.storeCategory.parentCategoryId LIKE CONCAT('%', :parentCategoryId ,'%') "
+        + "AND productDetails.name LIKE CONCAT('%', :name ,'%') "
+        + "AND productDetails.storeDetails.regionCountryId = :regionCountryId "
+        + "AND productDetails.status IN :status "
+        + "AND productDetails.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%')"
+    )
+    Page<ProductFeatureConfig> getAllQueryProductConfig(
+        @Param("status") List<String> status,
+        @Param("regionCountryId") String regionCountryId,
+        @Param("parentCategoryId") String parentCategoryId,
+        @Param("cityName") String cityName,
+        @Param("name") String name,
+        Pageable pageable
+    );
+
+    @Query(
+        " SELECT pfc "
+        + "FROM ProductFeatureConfig pfc "
+        + "WHERE productDetails.status IN :status "
         + "AND isMainLevel = :isMainLevel "
         + "AND productDetails.storeCategory.parentCategoryId LIKE CONCAT('%', :parentCategoryId ,'%') "
         + "AND productDetails.name LIKE CONCAT('%', :name ,'%') "
@@ -58,6 +77,27 @@ public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureC
         @Param("cityName") String cityName,
         @Param("name") String name,
         @Param("isMainLevel") Boolean isMainLevel,
+        Pageable pageable
+    );
+
+    @Query(
+        " SELECT pfc "
+        + "FROM ProductFeatureConfig pfc "
+        + "WHERE productDetails.status IN :status "
+        + "AND productDetails.storeCategory.parentCategoryId LIKE CONCAT('%', :parentCategoryId ,'%') "
+        + "AND productDetails.name LIKE CONCAT('%', :name ,'%') "
+        + "AND productDetails.storeDetails.regionCountryId = :regionCountryId "
+        + "AND productDetails.status IN :status "
+        + "AND productDetails.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
+        + "AND productDetails.storeDetails.city IN :cityId"
+    )
+    Page<ProductFeatureConfig> getAllQueryProductConfigWithCityId(
+        @Param("status") List<String> status,
+        @Param("regionCountryId") String regionCountryId,
+        @Param("parentCategoryId") String parentCategoryId,
+        @Param("cityId") List<String> cityId,
+        @Param("cityName") String cityName,
+        @Param("name") String name,
         Pageable pageable
     );
 }

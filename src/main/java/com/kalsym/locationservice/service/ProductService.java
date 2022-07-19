@@ -232,10 +232,10 @@ public class ProductService {
             status = statusList;
         }
 
-        if (isMainLevel == null) {
+        // if (isMainLevel == null) {
 
-            isMainLevel = true;
-        }
+        //     isMainLevel = true;
+        // }
 
         Pageable pageable;
 
@@ -257,9 +257,17 @@ public class ProductService {
             regionCountry = optRegion.get();
         }
 
-        //find the based on location with pageable
-        Page<ProductFeatureConfig> result = cityId == null?productFeaturedRepository.getQueryProductConfig(status,regionCountryId,parentCategoryId,cityName,name,isMainLevel,pageable)
-        :productFeaturedRepository.getQueryProductConfigWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,isMainLevel,pageable) ;
+        Page<ProductFeatureConfig> result;
+        if(isMainLevel != null){
+            //find the based on location with pageable
+            result = cityId == null?productFeaturedRepository.getQueryProductConfig(status,regionCountryId,parentCategoryId,cityName,name,isMainLevel,pageable)
+            :productFeaturedRepository.getQueryProductConfigWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,isMainLevel,pageable) ;
+
+        } else{
+            //find the based on location with pageable
+            result = cityId == null?productFeaturedRepository.getAllQueryProductConfig(status,regionCountryId,parentCategoryId,cityName,name,pageable)
+            :productFeaturedRepository.getAllQueryProductConfigWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable) ;
+        }
 
         //extract the result of content of pageable in order to proceed with dicount of item 
         List<ProductFeatureConfig> productFeaturedList = result.getContent();
