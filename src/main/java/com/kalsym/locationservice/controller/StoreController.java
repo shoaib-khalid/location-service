@@ -5,7 +5,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.kalsym.locationservice.model.StoreCategory;
+import com.kalsym.locationservice.model.TagStoreDetails;
 import com.kalsym.locationservice.service.CategoryLocationService;
+import com.kalsym.locationservice.service.StoreService;
 import com.kalsym.locationservice.utility.HttpResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class StoreController {
     @Autowired
     CategoryLocationService categoryLocationService;
 
+    @Autowired
+    StoreService storeService;
+
     @GetMapping(path = {"/stores"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getStores(
@@ -43,6 +48,24 @@ public class StoreController {
     ) {
 
         Page<StoreCategory> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,page,pageSize);
+        
+        HttpResponse response = new HttpResponse(request.getRequestURI());
+        response.setData(body);
+        response.setStatus(HttpStatus.OK);
+        return ResponseEntity.status(response.getStatus()).body(response);
+
+    }
+
+    @GetMapping(path = {"/stores/tag"}, name = "store-customers-get")
+    @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
+    public ResponseEntity<HttpResponse> getStoresTag(
+        HttpServletRequest request,
+        @RequestParam(required = false) String keyword,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int pageSize
+    ) {
+
+        Page<TagStoreDetails> body = storeService.getQueryStoreTag(keyword,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
