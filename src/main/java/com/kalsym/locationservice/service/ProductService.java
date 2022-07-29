@@ -99,18 +99,8 @@ public class ProductService {
                 .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<ProductMain> example = Example.of(productMatch, matcher);
         
-        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityName, name, latitude, longitude, example );
-        Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);
-       
-        //find the based on location with pageable
-        /*Page<ProductMain> result = null;
-        if (latitude != null || longitude != null) {
-            result = productRepository.getProductByParentCategoryIdAndDistance(status,regionCountryId,parentCategoryId,cityName,name,latitude,longitude,pageable);
-        } else if (cityId != null) {
-            result = productRepository.getProductByParentCategoryIdAndLocationWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable) ;
-        } else {
-            result = productRepository.getProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityName,name,pageable);
-        }*/
+        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, example );
+        Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);       
         
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, "", "getQueryProductByParentCategoryIdAndLocation() result : "+result.toString());
         
@@ -474,6 +464,7 @@ public class ProductService {
             List<String> statusList, 
             String regionCountryId, 
             String parentCategoryId, 
+            List<String> cityIdList, 
             String cityName, 
             String productName, 
             String latitude, 
@@ -509,8 +500,18 @@ public class ProductService {
                     Predicate predicateForProductStatus = builder.equal(root.get("status"), statusList.get(i));                                        
                     statusPredicatesList.add(predicateForProductStatus);                    
                 }
-
                 Predicate finalPredicate = builder.or(statusPredicatesList.toArray(new Predicate[statusCount]));
+                predicates.add(finalPredicate);
+            }
+            
+            if (cityIdList!=null) {
+                int cityCount = cityIdList.size();
+                List<Predicate> cityPredicatesList = new ArrayList<>();
+                for (int i=0;i<cityIdList.size();i++) {
+                    Predicate predicateForCity = builder.equal(store.get("city"), cityIdList.get(i));                                        
+                    cityPredicatesList.add(predicateForCity);                    
+                }
+                Predicate finalPredicate = builder.or(cityPredicatesList.toArray(new Predicate[cityCount]));
                 predicates.add(finalPredicate);
             }
                          
