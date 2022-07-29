@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.kalsym.locationservice.model.ParentCategory;
+import com.kalsym.locationservice.model.RegionCity;
 import com.kalsym.locationservice.model.RegionCountry;
+import com.kalsym.locationservice.model.RegionCountryState;
 import com.kalsym.locationservice.model.Store;
 import com.kalsym.locationservice.model.StoreAssets;
 import com.kalsym.locationservice.model.StoreCategory;
@@ -35,8 +37,14 @@ import org.springframework.data.domain.Example;
 // import org.springframework.data.domain.Pageable;
 // import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatcher;
+import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
+
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
 
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
 
@@ -162,49 +170,20 @@ public class CategoryLocationService {
 
     public Page<StoreCategory> getQueryStore(List<String> cityId, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
     
-        //Handling null value in order to use query
-        // if (cityId == null || cityId.isEmpty()) {
-        //     cityId = "";
-        // }
-
-        // if (stateId == null || stateId.isEmpty()) {
-        //     stateId = "";
-        // }
-        if (cityName == null || cityName.isEmpty()) {
-            cityName = "";
-        }
-
-        if (regionCountryId == null || regionCountryId.isEmpty()) {
-            regionCountryId = "";
-        }
-
-        // if (postcode == null || postcode.isEmpty()) {
-        //     postcode = "";
-        // }
-
-        if (parentCategoryId == null || parentCategoryId.isEmpty()) {
-            parentCategoryId = "";
-        }
-
-        if (storeName == null || storeName.isEmpty()) {
-            storeName = "";
-        }
-
+        StoreCategory storeCategoryMatch = new StoreCategory();
+  
         Pageable pageable = PageRequest.of(page, pageSize);
 
-        //find the based on location with pageable
-        Page<StoreCategory> result = cityId == null? categoryRepository.getStoreBasedOnParentCategories(cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable)
-                                            : categoryRepository.getStoreBasedOnParentCategoriesWithCityId(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,pageable);
-   
-        // if (sortingOrder==Sort.Direction.DESC){
-        //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
-        // }
-        // else{
-        //     pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
-        // }
-        
-        // return categoryRepository.findAll(example,pageable);
+        ExampleMatcher matcher = ExampleMatcher
+        .matchingAll()
+        .withIgnoreCase()
+        .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
+        Example<StoreCategory> example = Example.of(storeCategoryMatch, matcher);
 
+        Specification<StoreCategory> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName, example);
+        Page<StoreCategory> result = categoryRepository.findAll(storeCategorySpecs, pageable);       
+
+   
         for(StoreCategory c : result){
 
             StoreSnooze st = new StoreSnooze();
@@ -332,6 +311,69 @@ public class CategoryLocationService {
         // }
 
         return result;
+    }
+
+    public static Specification<StoreCategory> searchStoreCategorySpecs(
+        List<String> cityIdList,
+        String cityName, 
+        String stateId,
+        String regionCountryId,
+        String postcode, 
+        String parentCategoryId,
+        String storeName, 
+        Example<StoreCategory> example) {
+
+        return (Specification<StoreCategory>) (root, query, builder) -> {
+            final List<Predicate> predicates = new ArrayList<>();
+            Join<StoreCategory, ParentCategory> storeParentCategory = root.join("parentCategory");
+            Join<StoreCategory, Store> storeDetails = root.join("storeDetails");
+            Join<Store,RegionCity> storeRegionCity = storeDetails.join("regionCityDetails");
+
+            
+            if (cityIdList!=null) {
+                int cityCount = cityIdList.size();
+                List<Predicate> cityPredicatesList = new ArrayList<>();
+                for (int i=0;i<cityIdList.size();i++) {
+                    Predicate predicateForCity = builder.equal(storeDetails.get("city"), cityIdList.get(i));                                        
+                    cityPredicatesList.add(predicateForCity);                    
+                }
+                Predicate finalPredicate = builder.or(cityPredicatesList.toArray(new Predicate[cityCount]));
+                predicates.add(finalPredicate);
+            }
+
+            
+            if (cityName != null && !cityName.isEmpty()) {
+                predicates.add(builder.equal(storeRegionCity.get("name"), cityName));
+            }
+
+            if (stateId != null && !stateId.isEmpty()) {
+                predicates.add(builder.equal(storeDetails.get("state"), stateId));
+            }
+
+            if (regionCountryId != null && !regionCountryId.isEmpty()) {
+                predicates.add(builder.equal(storeDetails.get("regionCountryId"), regionCountryId));
+            }
+
+            if (postcode != null && !postcode.isEmpty()) {
+                predicates.add(builder.equal(storeDetails.get("postcode"), postcode));
+            }
+
+            if (parentCategoryId != null && !parentCategoryId.isEmpty()) {                
+                predicates.add(builder.equal(storeParentCategory.get("parentId"), parentCategoryId));
+            }     
+            
+            if (storeName != null && !storeName.isEmpty()) {                
+                predicates.add(builder.equal(storeDetails.get("name"), storeName));
+            }
+
+
+            //use this if you want to group
+            query.groupBy(storeDetails.get("id"));
+                    
+            predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
+
+            return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
     }
 
      
