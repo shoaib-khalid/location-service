@@ -43,11 +43,12 @@ public class StoreController {
         @RequestParam(required = false) String postcode,
         @RequestParam(required = false) String storeName,
         @RequestParam(required = false) String parentCategoryId,
+        @RequestParam(required = false) String tagKeyword,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<StoreCategory> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,page,pageSize);
+        Page<StoreCategory> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,tagKeyword,page,pageSize);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
@@ -56,22 +57,22 @@ public class StoreController {
 
     }
 
-    @GetMapping(path = {"/stores/tag"}, name = "store-customers-get")
-    @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
-    public ResponseEntity<HttpResponse> getStoresTag(
-        HttpServletRequest request,
-        @RequestParam(required = false) String keyword,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int pageSize
-    ) {
+    // @GetMapping(path = {"/stores/tag"}, name = "store-customers-get")
+    // @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
+    // public ResponseEntity<HttpResponse> getStoresTag(
+    //     HttpServletRequest request,
+    //     @RequestParam(required = false) String keyword,
+    //     @RequestParam(defaultValue = "0") int page,
+    //     @RequestParam(defaultValue = "10") int pageSize
+    // ) {
 
-        Page<TagStoreDetails> body = storeService.getQueryStoreTag(keyword,page,pageSize);
+    //     Page<TagStoreDetails> body = storeService.getQueryStoreTag(keyword,page,pageSize);
         
-        HttpResponse response = new HttpResponse(request.getRequestURI());
-        response.setData(body);
-        response.setStatus(HttpStatus.OK);
-        return ResponseEntity.status(response.getStatus()).body(response);
+    //     HttpResponse response = new HttpResponse(request.getRequestURI());
+    //     response.setData(body);
+    //     response.setStatus(HttpStatus.OK);
+    //     return ResponseEntity.status(response.getStatus()).body(response);
 
-    }
+    // }
 
 }

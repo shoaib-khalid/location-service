@@ -16,6 +16,8 @@ import com.kalsym.locationservice.model.Store;
 import com.kalsym.locationservice.model.StoreAssets;
 import com.kalsym.locationservice.model.StoreCategory;
 import com.kalsym.locationservice.model.StoreSnooze;
+import com.kalsym.locationservice.model.TagKeyword;
+import com.kalsym.locationservice.model.TagStoreDetails;
 // import com.kalsym.locationservice.model.CategoryLocation;
 // import com.kalsym.locationservice.model.LocationCategory;
 // import com.kalsym.locationservice.repository.CategoryLocationRepository;
@@ -168,7 +170,7 @@ public class CategoryLocationService {
     //     return parentCategoriesList ;
     // }
 
-    public Page<StoreCategory> getQueryStore(List<String> cityId, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName, int page, int pageSize){
+    public Page<StoreCategory> getQueryStore(List<String> cityId, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName,String tagKeyword, int page, int pageSize){
     
         StoreCategory storeCategoryMatch = new StoreCategory();
   
@@ -180,7 +182,7 @@ public class CategoryLocationService {
         .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<StoreCategory> example = Example.of(storeCategoryMatch, matcher);
 
-        Specification<StoreCategory> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName, example);
+        Specification<StoreCategory> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,example);
         Page<StoreCategory> result = categoryRepository.findAll(storeCategorySpecs, pageable);       
 
    
@@ -320,7 +322,8 @@ public class CategoryLocationService {
         String regionCountryId,
         String postcode, 
         String parentCategoryId,
-        String storeName, 
+        String storeName,
+        String keyword, 
         Example<StoreCategory> example) {
 
         return (Specification<StoreCategory>) (root, query, builder) -> {
@@ -328,6 +331,8 @@ public class CategoryLocationService {
             Join<StoreCategory, ParentCategory> storeParentCategory = root.join("parentCategory");
             Join<StoreCategory, Store> storeDetails = root.join("storeDetails");
             Join<Store,RegionCity> storeRegionCity = storeDetails.join("regionCityDetails");
+            Join<Store,TagStoreDetails> storeTagDetails = storeDetails.join("storeTag");
+            Join<TagStoreDetails,TagKeyword> storeTagKeyword = storeTagDetails.join("tagKeyword");
 
             
             if (cityIdList!=null) {
@@ -364,6 +369,11 @@ public class CategoryLocationService {
             
             if (storeName != null && !storeName.isEmpty()) {                
                 predicates.add(builder.equal(storeDetails.get("name"), storeName));
+            }
+
+                    
+            if (keyword != null && !keyword.isEmpty()) {                
+                predicates.add(builder.equal(storeTagKeyword.get("keyword"), keyword));
             }
 
 

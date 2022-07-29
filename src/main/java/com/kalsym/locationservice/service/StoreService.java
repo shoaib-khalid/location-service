@@ -31,77 +31,77 @@ public class StoreService {
     @Autowired
     RegionCountriesRepository regionCountriesRepository;
 
-    public Page<TagStoreDetails> getQueryStoreTag(String keyword,int page, int pageSize){
+    // public Page<TagStoreDetails> getQueryStoreTag(String keyword,int page, int pageSize){
 
-        TagKeyword tagKeyword = new TagKeyword();
-        tagKeyword.setKeyword(keyword);
+    //     TagKeyword tagKeyword = new TagKeyword();
+    //     tagKeyword.setKeyword(keyword);
 
-        TagStoreDetails tagStoreDetailsMatch = new TagStoreDetails();
-        tagStoreDetailsMatch.setTagKeyword(tagKeyword);
+    //     TagStoreDetails tagStoreDetailsMatch = new TagStoreDetails();
+    //     tagStoreDetailsMatch.setTagKeyword(tagKeyword);
       
-        ExampleMatcher matcher = ExampleMatcher
-                .matchingAll()
-                .withIgnoreCase()
-                .withMatcher("keyword", new GenericPropertyMatcher().exact())
-                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-        Example<TagStoreDetails> example = Example.of(tagStoreDetailsMatch, matcher);
+    //     ExampleMatcher matcher = ExampleMatcher
+    //             .matchingAll()
+    //             .withIgnoreCase()
+    //             .withMatcher("keyword", new GenericPropertyMatcher().exact())
+    //             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+    //     Example<TagStoreDetails> example = Example.of(tagStoreDetailsMatch, matcher);
 
-        Pageable pageable= PageRequest.of(page, pageSize);
+    //     Pageable pageable= PageRequest.of(page, pageSize);
    
 
-        Page<TagStoreDetails> result = tagStoreDetailsRepository.findAll(example,pageable);
+    //     Page<TagStoreDetails> result = tagStoreDetailsRepository.findAll(example,pageable);
 
-        //to set snooze
-        for(TagStoreDetails tagStore : result){
+    //     //to set snooze
+    //     for(TagStoreDetails tagStore : result){
 
-            StoreSnooze st = new StoreSnooze();
+    //         StoreSnooze st = new StoreSnooze();
 
-            if (tagStore.getStoreDetails().getSnoozeStartTime()!=null && tagStore.getStoreDetails().getSnoozeEndTime()!=null) {
-                int resultSnooze = tagStore.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
-                if (resultSnooze < 0) {
-                    tagStore.getStoreDetails().setIsSnooze(false);
+    //         if (tagStore.getStoreDetails().getSnoozeStartTime()!=null && tagStore.getStoreDetails().getSnoozeEndTime()!=null) {
+    //             int resultSnooze = tagStore.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
+    //             if (resultSnooze < 0) {
+    //                 tagStore.getStoreDetails().setIsSnooze(false);
 
-                    st.snoozeStartTime = null;
-                    st.snoozeEndTime = null;
-                    st.isSnooze = false;
-                    st.snoozeReason = null;
-                    tagStore.getStoreDetails().setStoreSnooze(st);
+    //                 st.snoozeStartTime = null;
+    //                 st.snoozeEndTime = null;
+    //                 st.isSnooze = false;
+    //                 st.snoozeReason = null;
+    //                 tagStore.getStoreDetails().setStoreSnooze(st);
 
-                } else {
+    //             } else {
             
-                    tagStore.getStoreDetails().setIsSnooze(true);
+    //                 tagStore.getStoreDetails().setIsSnooze(true);
 
-                    Optional<RegionCountry> t = regionCountriesRepository.findById(tagStore.getStoreDetails().getRegionCountryId());
+    //                 Optional<RegionCountry> t = regionCountriesRepository.findById(tagStore.getStoreDetails().getRegionCountryId());
 
-                    if(t.isPresent()){
-                        LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(tagStore.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
-                        LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(tagStore.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
+    //                 if(t.isPresent()){
+    //                     LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(tagStore.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
+    //                     LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(tagStore.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
                         
-                        st.snoozeStartTime = startTime;
-                        st.snoozeEndTime = endTime;
-                        st.isSnooze = true;
-                        st.snoozeReason = tagStore.getStoreDetails().getSnoozeReason();
+    //                     st.snoozeStartTime = startTime;
+    //                     st.snoozeEndTime = endTime;
+    //                     st.isSnooze = true;
+    //                     st.snoozeReason = tagStore.getStoreDetails().getSnoozeReason();
 
-                        tagStore.getStoreDetails().setStoreSnooze(st);
-                    }
+    //                     tagStore.getStoreDetails().setStoreSnooze(st);
+    //                 }
          
-                }
-            } else {
-                tagStore.getStoreDetails().setIsSnooze(false);
+    //             }
+    //         } else {
+    //             tagStore.getStoreDetails().setIsSnooze(false);
 
                 
-                st.snoozeStartTime = null;
-                st.snoozeEndTime = null;
-                st.isSnooze = false;
-                st.snoozeReason = null;
-                tagStore.getStoreDetails().setStoreSnooze(st);
+    //             st.snoozeStartTime = null;
+    //             st.snoozeEndTime = null;
+    //             st.isSnooze = false;
+    //             st.snoozeReason = null;
+    //             tagStore.getStoreDetails().setStoreSnooze(st);
 
-            }
+    //         }
             
-        }
+    //     }
 
-        return result;
+    //     return result;
 
-    }
+    // }
     
 }

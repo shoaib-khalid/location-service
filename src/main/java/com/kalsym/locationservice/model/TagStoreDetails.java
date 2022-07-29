@@ -37,8 +37,8 @@ public class TagStoreDetails {
     @JoinColumn(name = "tagId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
     private TagKeyword tagKeyword; 
 
-    @OneToOne()
-    @JoinColumn(name = "storeId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
-    private Store storeDetails; 
+    // @OneToOne()
+    // @JoinColumn(name = "storeId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
+    // private Store storeDetails; 
 
 }
