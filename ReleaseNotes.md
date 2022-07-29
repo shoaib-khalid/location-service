@@ -1,4 +1,9 @@
 ##################################################
+# location-service-1.0.21 | 29-July-2022
+##################################################
+Change product search sql using predicate
+
+##################################################
 # location-service-1.0.19 | 19-July-2022
 ##################################################
 1. Add request param isMainLevel for get featured product

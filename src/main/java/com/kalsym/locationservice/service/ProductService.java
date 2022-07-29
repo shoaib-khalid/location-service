@@ -1,5 +1,6 @@
 package com.kalsym.locationservice.service;
 
+import com.kalsym.locationservice.LocationServiceApplication;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ import com.kalsym.locationservice.model.Discount.StoreDiscountProduct;
 import com.kalsym.locationservice.model.Product.ItemDiscount;
 import com.kalsym.locationservice.model.Product.ProductInventoryWithDetails;
 import com.kalsym.locationservice.model.Product.ProductMain;
+import com.kalsym.locationservice.model.RegionCity;
+import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.repository.CustomerActivitiesSummaryRepository;
 import com.kalsym.locationservice.repository.GetDiscount;
 import com.kalsym.locationservice.repository.ProductFeaturedRepository;
@@ -28,7 +31,13 @@ import com.kalsym.locationservice.repository.RegionCountriesRepository;
 import com.kalsym.locationservice.repository.StoreDiscountProductRepository;
 import com.kalsym.locationservice.repository.StoreDiscountRepository;
 import com.kalsym.locationservice.utility.DateTimeUtil;
+import com.kalsym.locationservice.utility.Logger;
 import com.kalsym.locationservice.utility.ProductDiscount;
+import java.util.Date;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +49,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatcher;
+import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -66,40 +77,11 @@ public class ProductService {
     @Value("${asset.service.url}")
     private String assetServiceUrl;
 
-    public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name,int page, int pageSize){
-
-        //Handling null value in order to use query
-        if (regionCountryId == null || regionCountryId.isEmpty()) {
-            regionCountryId = "";
-        }
-
-        // if (cityId == null || cityId.isEmpty()) {
-        //     cityId = "";
-        // }
-
-        if (cityName == null || cityName.isEmpty()) {
-            cityName = "";
-        }
-
-        if (name == null || name.isEmpty()) {
-            name = "";
-        }
-
-        if (parentCategoryId == null || parentCategoryId.isEmpty()) {
-            parentCategoryId = "";
-        }
-
-        if (status == null) {
-
-            List<String> statusList = new ArrayList<>();
-            statusList.add("ACTIVE");
-            statusList.add("INACTIVE");
-            statusList.add("OUTOFSTOCK");
-
-            status = statusList;
-        }
-
-        Pageable pageable = PageRequest.of(page, pageSize);
+    public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(
+            List<String> status,String regionCountryId,String parentCategoryId, 
+            List<String> cityId, String cityName, String name, 
+            String latitude, String longitude, 
+            int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){           
 
         //get reqion country for store
         RegionCountry regionCountry = null;
@@ -107,11 +89,31 @@ public class ProductService {
         if (optRegion.isPresent()) {
             regionCountry = optRegion.get();
         }
-
+        
+        ProductMain productMatch = new ProductMain();
+      
+        Pageable pageable = PageRequest.of(page, pageSize);
+        ExampleMatcher matcher = ExampleMatcher
+                .matchingAll()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
+        Example<ProductMain> example = Example.of(productMatch, matcher);
+        
+        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityName, name, latitude, longitude, example );
+        Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);
+       
         //find the based on location with pageable
-        Page<ProductMain> result = cityId == null? productRepository.getProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityName,name,pageable)
-                                                : productRepository.getProductByParentCategoryIdAndLocationWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable) ;
-
+        /*Page<ProductMain> result = null;
+        if (latitude != null || longitude != null) {
+            result = productRepository.getProductByParentCategoryIdAndDistance(status,regionCountryId,parentCategoryId,cityName,name,latitude,longitude,pageable);
+        } else if (cityId != null) {
+            result = productRepository.getProductByParentCategoryIdAndLocationWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable) ;
+        } else {
+            result = productRepository.getProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityName,name,pageable);
+        }*/
+        
+        Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, "", "getQueryProductByParentCategoryIdAndLocation() result : "+result.toString());
+        
         //extract the result of content of pageable in order to proceed with dicount of item 
         List<ProductMain> productList = result.getContent();
 
@@ -465,5 +467,56 @@ public class ProductService {
         
 
         return newArrayList;
+    }
+    
+    
+    public static Specification<ProductMain> searchProductSpecs(
+            List<String> statusList, 
+            String regionCountryId, 
+            String parentCategoryId, 
+            String cityName, 
+            String productName, 
+            String latitude, 
+            String longitude,
+            Example<ProductMain> example) {
+
+        return (Specification<ProductMain>) (root, query, builder) -> {
+            final List<Predicate> predicates = new ArrayList<>();
+            Join<ProductMain, Store> store = root.join("storeDetails");
+            Join<ProductMain, Category> storeCategory = root.join("storeCategory");
+            Join<Store, RegionCity> regionCity = store.join("regionCityDetails");
+            
+            if (regionCountryId != null && !regionCountryId.isEmpty()) {
+                predicates.add(builder.equal(store.get("regionCountryId"), regionCountryId));
+            }
+
+            if (cityName != null && !cityName.isEmpty()) {
+                predicates.add(builder.equal(regionCity.get("name"), cityName));
+            }
+
+            if (productName != null && !productName.isEmpty()) {
+                predicates.add(builder.equal(root.get("name"), productName));
+            }
+
+            if (parentCategoryId != null && !parentCategoryId.isEmpty()) {                
+                predicates.add(builder.equal(storeCategory.get("parentCategoryId"), parentCategoryId));
+            }          
+            
+            if (statusList!=null) {
+                int statusCount = statusList.size();
+                List<Predicate> statusPredicatesList = new ArrayList<>();
+                for (int i=0;i<statusList.size();i++) {
+                    Predicate predicateForProductStatus = builder.equal(root.get("status"), statusList.get(i));                                        
+                    statusPredicatesList.add(predicateForProductStatus);                    
+                }
+
+                Predicate finalPredicate = builder.or(statusPredicatesList.toArray(new Predicate[statusCount]));
+                predicates.add(finalPredicate);
+            }
+                         
+            predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
+
+            return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
     }
 }

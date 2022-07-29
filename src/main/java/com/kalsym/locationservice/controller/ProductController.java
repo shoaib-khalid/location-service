@@ -8,8 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import com.kalsym.locationservice.model.CustomerActivitiesSummary;
 import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.service.CategoryLocationService;
+import com.kalsym.locationservice.LocationServiceApplication;
 import com.kalsym.locationservice.service.ProductService;
 import com.kalsym.locationservice.utility.HttpResponse;
+import com.kalsym.locationservice.utility.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+
 
 
 @RestController
@@ -41,12 +44,21 @@ public class ProductController {
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String name,
         @RequestParam(required = false) List<String> status,
+        @RequestParam(required = false) String latitude,
+        @RequestParam(required = false) String longitude,
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int pageSize
+        @RequestParam(defaultValue = "10") int pageSize,
+        @RequestParam(required = false, defaultValue = "created") String sortByCol,
+        @RequestParam(required = false, defaultValue = "DESC") Sort.Direction sortingOrder
     ) {
-
-        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,page,pageSize);
         
+        String logprefix = "getProducts()";
+        Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products request...");
+        
+        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,page,pageSize,sortByCol,sortingOrder);
+        
+        Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products result : "+body.toString());
+       
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
         response.setStatus(HttpStatus.OK);
