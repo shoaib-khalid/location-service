@@ -31,7 +31,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
-public class StoreCategory implements Serializable {
+public class StoreCategory implements Serializable, Comparable< StoreCategory >  { 
     
     @Id
     private String id;
@@ -57,5 +57,10 @@ public class StoreCategory implements Serializable {
             return null;
         else
             return LocationServiceApplication.ASSETURL+ thumbnailUrl;
+    }
+    
+    @Override
+    public int compareTo(StoreCategory o) {
+        return this.getStoreDetails().getDistanceInMeter().compareTo(o.getStoreDetails().getDistanceInMeter());
     }
 }

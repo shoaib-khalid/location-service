@@ -1,6 +1,7 @@
 package com.kalsym.locationservice.service;
 
 
+import com.kalsym.locationservice.LocationServiceApplication;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.kalsym.locationservice.model.ParentCategory;
+import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.model.RegionCity;
 import com.kalsym.locationservice.model.RegionCountry;
 import com.kalsym.locationservice.model.RegionCountryState;
@@ -26,6 +28,10 @@ import com.kalsym.locationservice.repository.StoreCategoryRepository;
 import com.kalsym.locationservice.repository.ParentCategoryRepository;
 import com.kalsym.locationservice.repository.RegionCountriesRepository;
 import com.kalsym.locationservice.utility.DateTimeUtil;
+import com.kalsym.locationservice.utility.Location;
+import com.kalsym.locationservice.utility.Logger;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +55,12 @@ import javax.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
+import javax.persistence.criteria.Expression;
+import org.hibernate.spatial.predicate.SpatialPredicates;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.PageImpl;
 
 @Service
 public class CategoryLocationService {
@@ -170,23 +182,63 @@ public class CategoryLocationService {
     //     return parentCategoriesList ;
     // }
 
-    public Page<StoreCategory> getQueryStore(List<String> cityId, String cityName, String stateId,String regionCountryId, String postcode, String parentCategoryId, String storeName,String tagKeyword, int page, int pageSize){
+    public Page<StoreCategory> getQueryStore(List<String> cityId, String cityName, String stateId,
+            String regionCountryId, String postcode, String parentCategoryId, 
+            String storeName,String tagKeyword, int page, int pageSize,
+            String latitude, String longitude, double searchRadius, String sortByCol, Sort.Direction sortingOrder){
     
         StoreCategory storeCategoryMatch = new StoreCategory();
   
         Pageable pageable = PageRequest.of(page, pageSize);
-
+        
+        if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
+            if (sortingOrder==Sort.Direction.ASC)
+                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+            else if (sortingOrder==Sort.Direction.DESC)
+                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+        } else {
+            pageable = PageRequest.of(page, pageSize);
+        }
+        
         ExampleMatcher matcher = ExampleMatcher
         .matchingAll()
         .withIgnoreCase()
         .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<StoreCategory> example = Example.of(storeCategoryMatch, matcher);
 
-        Specification<StoreCategory> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,example);
+        Specification<StoreCategory> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,latitude,longitude,searchRadius,example);
         Page<StoreCategory> result = categoryRepository.findAll(storeCategorySpecs, pageable);       
-
-   
-        for(StoreCategory c : result){
+        
+        List<StoreCategory> tempStoreList = result.getContent(); 
+        List<StoreCategory> newArrayList = new ArrayList<>(tempStoreList);
+        
+        //set store distance
+        if (sortByCol.equalsIgnoreCase("distanceInMeter") && newArrayList.size()>0) {
+            for (int i=0;i<newArrayList.size();i++) {
+                Store s = newArrayList.get(i).getStoreDetails();
+                if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
+                    //set store distance
+                    double storeLat = Double.parseDouble(s.getLatitude());
+                    double storeLong = Double.parseDouble(s.getLongitude());
+                    double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
+                    s.setDistanceInMeter(distance);
+                } else {
+                    s.setDistanceInMeter(0.00);
+                }
+            }     
+            Collections.sort(newArrayList);  
+            
+            String logprefix="CategoryLocationService()";
+            Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "After Sort:");
+            for (int x=0;x<newArrayList.size();x++) {
+                Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product store distance:"+newArrayList.get(x).getStoreDetails().getDistanceInMeter());
+            }            
+        }
+        
+        //Page mapper
+        Page<StoreCategory> output = new PageImpl<StoreCategory>(newArrayList,pageable,result.getTotalElements());
+        
+        for(StoreCategory c : output){
 
             StoreSnooze st = new StoreSnooze();
 
@@ -247,7 +299,7 @@ public class CategoryLocationService {
         
         }
 
-        return result;
+        return output;
     }
 
     public Page<ParentCategory> getQueryParentCategoriesBasedOnLocation(List<String> cityId, String stateId, String regionCountryId, String postcode, String parentCategoryId, String sortByCol,Sort.Direction sortingOrder, int page, int pageSize){
@@ -324,6 +376,9 @@ public class CategoryLocationService {
         String parentCategoryId,
         String storeName,
         String keyword, 
+        String latitude, 
+        String longitude,
+        double radius,
         Example<StoreCategory> example) {
 
         return (Specification<StoreCategory>) (root, query, builder) -> {
@@ -376,7 +431,17 @@ public class CategoryLocationService {
                 predicates.add(builder.equal(storeTagKeyword.get("keyword"), keyword));
             }
 
-
+            if (latitude!=null && longitude!=null) {
+                Expression<Point> point1 = builder.function("point", Point.class, storeDetails.get("longitude"), storeDetails.get("latitude"));
+                GeometryFactory factory = new GeometryFactory();
+                Point comparisonPoint = factory.createPoint(new Coordinate(Double.parseDouble(longitude), Double.parseDouble(latitude))); 
+                Predicate spatialPredicates = SpatialPredicates.distanceWithin(builder, point1, comparisonPoint, radius);
+                predicates.add(spatialPredicates);
+                
+                predicates.add(builder.isNotNull(storeDetails.get("longitude")));
+                predicates.add(builder.isNotNull(storeDetails.get("latitude")));
+            }
+            
             //use this if you want to group
             query.groupBy(storeDetails.get("id"));
                     

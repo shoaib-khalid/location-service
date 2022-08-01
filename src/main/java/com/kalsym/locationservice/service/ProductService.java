@@ -147,7 +147,7 @@ public class ProductService {
         List<ProductMain> newArrayList = new ArrayList<>(Arrays.asList(productWithDetailsList));
         
         //set store distance
-        if (sortByCol.equalsIgnoreCase("distanceInMeter")) {
+        if (sortByCol.equalsIgnoreCase("distanceInMeter") && newArrayList.size()>0) {
             for (int i=0;i<newArrayList.size();i++) {
                 Store s = newArrayList.get(i).getStoreDetails();
                 if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
