@@ -14,6 +14,7 @@ import com.kalsym.locationservice.utility.HttpResponse;
 import com.kalsym.locationservice.utility.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,7 +34,10 @@ public class ProductController {
     
     @Autowired
     ProductService productService;
-
+    
+    @Value("${product.search.radius:20000}")
+    private Double searchRadius;
+    
     @GetMapping(path = {"/products"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getProducts(
@@ -48,14 +52,14 @@ public class ProductController {
         @RequestParam(required = false) String longitude,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
-        @RequestParam(required = false, defaultValue = "created") String sortByCol,
-        @RequestParam(required = false, defaultValue = "DESC") Sort.Direction sortingOrder
+        @RequestParam(required = false, defaultValue = "name") String sortByCol,
+        @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder
     ) {
         
         String logprefix = "getProducts()";
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products request...");
         
-        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,page,pageSize,sortByCol,sortingOrder);
+        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,searchRadius,page,pageSize,sortByCol,sortingOrder);
         
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products result : "+body.toString());
        

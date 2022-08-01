@@ -30,7 +30,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.ALWAYS)
 
-public class ProductMain implements Serializable {
+public class ProductMain implements Serializable, Comparable< ProductMain >  {
     
     @Id
     private String id;
@@ -68,5 +68,10 @@ public class ProductMain implements Serializable {
             return null;
         else
             return LocationServiceApplication.ASSETURL+ thumbnailUrl;
+    }
+    
+     @Override
+    public int compareTo(ProductMain o) {
+        return this.getStoreDetails().getDistanceInMeter().compareTo(o.getStoreDetails().getDistanceInMeter());
     }
 }

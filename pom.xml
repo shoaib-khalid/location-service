@@ -113,6 +113,23 @@
             <version>3.3.0</version>
         </dependency>
        
+       <!---!spatial!-->
+       <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-spatial</artifactId>
+            <version>5.4.23.Final</version>            
+        </dependency>
+        <dependency>
+            <groupId>org.geolatte</groupId>
+            <artifactId>geolatte-geom</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+         <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <version>1.13</version>
+        </dependency>
+        
     </dependencies>
 
 	<build>

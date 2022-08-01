@@ -58,6 +58,10 @@ public class Store implements Serializable {
     private String postcode;
 
     private String regionCountryId;
+     
+    private String longitude;
+    
+    private String latitude;
     
     // @OneToOne()
     // @JoinColumn(name = "id",referencedColumnName="storeId", insertable = false, updatable = false, nullable = true)
@@ -88,6 +92,9 @@ public class Store implements Serializable {
 
     @Transient
     StoreSnooze storeSnooze;
+    
+    @Transient
+    private Double distanceInMeter;
 
 
 

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.persistence.criteria.Expression;
 
 import com.kalsym.locationservice.enums.DiscountCalculationType;
 import com.kalsym.locationservice.model.CustomerActivitiesSummary;
@@ -31,13 +32,18 @@ import com.kalsym.locationservice.repository.RegionCountriesRepository;
 import com.kalsym.locationservice.repository.StoreDiscountProductRepository;
 import com.kalsym.locationservice.repository.StoreDiscountRepository;
 import com.kalsym.locationservice.utility.DateTimeUtil;
+import com.kalsym.locationservice.utility.Location;
 import com.kalsym.locationservice.utility.Logger;
 import com.kalsym.locationservice.utility.ProductDiscount;
+import java.util.Collections;
 import java.util.Date;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +58,22 @@ import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatcher;
 import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+//import com.vividsolutions.jts.geom.Coordinate;
+//import com.vividsolutions.jts.geom.Geometry;
+//import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Geometry;
+
+/*import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.Point;*/
+import org.hibernate.spatial.predicate.SpatialPredicates;
 
 @Service
 public class ProductService {
@@ -80,7 +102,7 @@ public class ProductService {
     public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(
             List<String> status,String regionCountryId,String parentCategoryId, 
             List<String> cityId, String cityName, String name, 
-            String latitude, String longitude, 
+            String latitude, String longitude, double radius,
             int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){           
 
         //get reqion country for store
@@ -92,27 +114,61 @@ public class ProductService {
         
         ProductMain productMatch = new ProductMain();
       
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable = null;
+        
+        if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
+            if (sortingOrder==Sort.Direction.ASC)
+                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+            else if (sortingOrder==Sort.Direction.DESC)
+                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+        } else {
+            pageable = PageRequest.of(page, pageSize);
+        }
+        
         ExampleMatcher matcher = ExampleMatcher
                 .matchingAll()
                 .withIgnoreCase()
                 .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<ProductMain> example = Example.of(productMatch, matcher);
         
-        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, example );
+        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius, example );
+        
         Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);       
         
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, "", "getQueryProductByParentCategoryIdAndLocation() result : "+result.toString());
         
         //extract the result of content of pageable in order to proceed with dicount of item 
-        List<ProductMain> productList = result.getContent();
-
+        List<ProductMain> productList = result.getContent();                
+        
         // to get discount of product
         ProductMain[] productWithDetailsList = GetDiscount.getProductDiscountList(productList, regionCountry, storeDiscountRepository, storeDiscountProductRepository);
 
         // convert array to array list
         List<ProductMain> newArrayList = new ArrayList<>(Arrays.asList(productWithDetailsList));
-
+        
+        //set store distance
+        if (sortByCol.equalsIgnoreCase("distanceInMeter")) {
+            for (int i=0;i<newArrayList.size();i++) {
+                Store s = newArrayList.get(i).getStoreDetails();
+                if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
+                    //set store distance
+                    double storeLat = Double.parseDouble(s.getLatitude());
+                    double storeLong = Double.parseDouble(s.getLongitude());
+                    double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
+                    s.setDistanceInMeter(distance);
+                } else {
+                    s.setDistanceInMeter(0.00);
+                }
+            }     
+            Collections.sort(newArrayList);  
+            
+            String logprefix="ProductService()";
+            Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "After Sort:");
+            for (int x=0;x<newArrayList.size();x++) {
+                Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product store distance:"+newArrayList.get(x).getStoreDetails().getDistanceInMeter());
+            }
+        }
+        
         //Page mapper
         Page<ProductMain> output = new PageImpl<ProductMain>(newArrayList,pageable,result.getTotalElements());
 
@@ -120,7 +176,17 @@ public class ProductService {
         for(ProductMain p : output){
 
             StoreSnooze st = new StoreSnooze();
-
+            
+            if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
+                if (latitude!=null && longitude!=null && p.getStoreDetails().getLatitude()!=null && p.getStoreDetails().getLongitude()!=null) {
+                    //set store distance
+                    double storeLat = Double.parseDouble(p.getStoreDetails().getLatitude());
+                    double storeLong = Double.parseDouble(p.getStoreDetails().getLongitude());
+                    double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
+                    p.getStoreDetails().setDistanceInMeter(distance);
+                }
+            }
+            
             if (p.getStoreDetails().getSnoozeStartTime()!=null && p.getStoreDetails().getSnoozeEndTime()!=null) {
                 int resultSnooze = p.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
                 if (resultSnooze < 0) {
@@ -173,7 +239,7 @@ public class ProductService {
 
             // }
         }
-        
+
         return output;
 
     }
@@ -469,6 +535,7 @@ public class ProductService {
             String productName, 
             String latitude, 
             String longitude,
+            double radius,
             Example<ProductMain> example) {
 
         return (Specification<ProductMain>) (root, query, builder) -> {
@@ -486,7 +553,7 @@ public class ProductService {
             }
 
             if (productName != null && !productName.isEmpty()) {
-                predicates.add(builder.equal(root.get("name"), productName));
+                predicates.add(builder.like(root.get("name"), "%"+productName+"%"));
             }
 
             if (parentCategoryId != null && !parentCategoryId.isEmpty()) {                
@@ -514,10 +581,76 @@ public class ProductService {
                 Predicate finalPredicate = builder.or(cityPredicatesList.toArray(new Predicate[cityCount]));
                 predicates.add(finalPredicate);
             }
-                         
+            
+            if (latitude!=null && longitude!=null) {
+                 //Join<ProductMain, Store> store = root.join("storeDetails");
+                
+                /*
+                //calculate using radius 
+                double radius=20000; 
+                Expression<Point> point1 = builder.function("point", Point.class, store.get("longitude"), store.get("latitude"));
+                GeometryFactory factory = new GeometryFactory();
+                Point comparisonPoint = factory.createPoint(new Coordinate(Double.parseDouble(latitude), Double.parseDouble(longitude)));           
+                Predicate spatialPredicates = SpatialPredicates.distanceWithin(builder, point1, comparisonPoint, radius);
+                predicates.add(spatialPredicates);
+                */
+                
+                //calculate using polygon
+                //create polygon based on user coordinate                
+                /*String polygonPoint = "polygon((101.427 3.107 , 101.593 3.095, 101.654 2.999, 101.433 2.991, 101.427 3.107))";                
+                Expression<Point> geo1 = builder.function("point", Point.class, store.get("longitude"), store.get("latitude"));
+                Expression<Polygon> geo2 = builder.function("ST_GEOMFROMTEXT", Polygon.class, builder.literal(polygonPoint));                                
+                Predicate spatialPredicates = SpatialPredicates.within(builder, geo1, geo2);
+                predicates.add(spatialPredicates);
+                */
+                
+                Expression<Point> point1 = builder.function("point", Point.class, store.get("longitude"), store.get("latitude"));
+                GeometryFactory factory = new GeometryFactory();
+                Point comparisonPoint = factory.createPoint(new Coordinate(Double.parseDouble(longitude), Double.parseDouble(latitude))); 
+                Predicate spatialPredicates = SpatialPredicates.distanceWithin(builder, point1, comparisonPoint, radius);
+                predicates.add(spatialPredicates);
+                
+                predicates.add(builder.isNotNull(store.get("longitude")));
+                predicates.add(builder.isNotNull(store.get("latitude")));
+            }
+            
             predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
 
             return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
+    }
+    
+    /*
+    org.hibernate.spatial.predicate.SpatialPredicates.distanceWithin
+    (javax.persistence.criteria.CriteriaBuilder,
+        javax.persistence.criteria.Expression<? extends org.locationtech.jts.geom.Geometry>,
+        javax.persistence.criteria.Expression<? extends org.locationtech.jts.geom.Geometry>,
+        javax.persistence.criteria.Expression<java.lang.Double>) 
+    */
+    public static Specification<ProductMain> filterWithinRadius(double longitude, double latitude, double radius) {
+        return new Specification<ProductMain>() {
+            @Override
+            public Predicate toPredicate(Root<ProductMain> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+                String polygonPoint = "polygon((101.427 3.107 , 101.593 3.095, 101.654 2.999, 101.433 2.991, 101.427 3.107))";                
+                Join<ProductMain, Store> store = root.join("storeDetails");
+                Expression<Point> geo1 = builder.function("point", Point.class, store.get("longitude"), store.get("latitude"));
+                Expression<Polygon> geo2 = builder.function("ST_GEOMFROMTEXT", Polygon.class, builder.literal(polygonPoint));                                
+                return SpatialPredicates.within(builder, geo1, geo2);
+            }
+        };
+    }
+    
+  
+    public static Specification<ProductMain> filterCalculateRange(double longitude, double latitude, double radius) {
+        return new Specification<ProductMain>() {
+            @Override
+            public Predicate toPredicate(Root<ProductMain> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+                Join<ProductMain, Store> store = root.join("storeDetails");
+                Expression<Point> point1 = builder.function("point", Point.class, store.get("longitude"), store.get("latitude"));
+                GeometryFactory factory = new GeometryFactory();
+                Point comparisonPoint = factory.createPoint(new Coordinate(latitude, longitude));           
+                return SpatialPredicates.distanceWithin(builder, point1, comparisonPoint, radius);
+            }
         };
     }
 }
