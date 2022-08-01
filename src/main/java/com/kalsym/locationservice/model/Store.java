@@ -73,6 +73,11 @@ public class Store implements Serializable {
     private List<StoreAssets> storeAssets;
 
     @OneToMany(cascade = CascadeType.ALL,
+    fetch = FetchType.LAZY)
+    @JoinColumn(name = "storeId", insertable = false, updatable = false, nullable = true)
+    private List<TagStoreDetails> storeTag;
+
+    @OneToMany(cascade = CascadeType.ALL,
     fetch = FetchType.EAGER)
     @JoinColumn(name = "storeId", insertable = false, updatable = false, nullable = true)
     private List<StoreTiming> storeTiming;

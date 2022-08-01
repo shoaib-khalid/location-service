@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,7 @@ import org.springframework.data.repository.query.Param;
 
 
 @Repository
-public interface StoreCategoryRepository extends JpaRepository<StoreCategory,String> {
+public interface StoreCategoryRepository extends JpaRepository<StoreCategory,String> , JpaSpecificationExecutor<StoreCategory>{
     
     //Note that if we want to use Raw Query , need to specify nativeQuery = true, 
     //if you dont specify then make sure the table name u use model name.
