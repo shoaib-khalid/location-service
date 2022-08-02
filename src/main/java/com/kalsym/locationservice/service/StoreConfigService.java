@@ -21,6 +21,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.spatial.predicate.SpatialPredicates;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.ExampleMatcher;
@@ -34,6 +38,7 @@ import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 
@@ -94,30 +99,28 @@ public class StoreConfigService {
 
     }
 
-    public Page<StoreConfig> getRawQueryStoreConfig(String regionCountryId, List<String> cityId, String cityName, String parentCategoryId, int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
+    public Page<StoreConfig> getRawQueryStoreConfig(String regionCountryId, List<String> cityId, String cityName, String parentCategoryId,String latitude,String longitude,double searchRadius,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
     
         StoreConfig storeConfigMatch = new StoreConfig();
 
-        Pageable pageable;
-   
-        if (sortingOrder==Sort.Direction.DESC){
-            pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
-        }
-        else if (sortingOrder==Sort.Direction.ASC){
-            pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
-        }
-        else{
+        Pageable pageable =null;
+
+        if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
+            if (sortingOrder==Sort.Direction.ASC)
+                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+            else if (sortingOrder==Sort.Direction.DESC)
+                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+        } else {
             pageable = PageRequest.of(page, pageSize);
         }
-
-
+   
         ExampleMatcher matcher = ExampleMatcher
         .matchingAll()
         .withIgnoreCase()
         .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<StoreConfig> example = Example.of(storeConfigMatch, matcher);
 
-        Specification<StoreConfig> storeConfigSpecs = searchStoreConfigSpecs(regionCountryId,cityId, cityName, parentCategoryId,example);
+        Specification<StoreConfig> storeConfigSpecs = searchStoreConfigSpecs(regionCountryId,cityId, cityName, parentCategoryId,latitude,longitude,searchRadius,example);
         Page<StoreConfig> result = storeConfigRepository.findAll(storeConfigSpecs, pageable);  
 
         //find the based on location with pageable
@@ -190,7 +193,9 @@ public class StoreConfigService {
     }
 
     public static Specification<StoreConfig> searchStoreConfigSpecs(
-        String regionCountryId, List<String> cityIdList, String cityName, String parentCategoryId,
+        String regionCountryId, List<String> cityIdList, String cityName, String parentCategoryId, String latitude, 
+        String longitude,
+        double radius,
         Example<StoreConfig> example) {
 
         return (Specification<StoreConfig>) (root, query, builder) -> {
@@ -222,7 +227,18 @@ public class StoreConfigService {
 
             if (parentCategoryId != null && !parentCategoryId.isEmpty()) {                
                 predicates.add(builder.equal(storeCategory.get("parentCategoryId"), parentCategoryId));
-            }    
+            }
+            
+            if (latitude!=null && longitude!=null) {
+                Expression<Point> point1 = builder.function("point", Point.class, storeDetails.get("longitude"), storeDetails.get("latitude"));
+                GeometryFactory factory = new GeometryFactory();
+                Point comparisonPoint = factory.createPoint(new Coordinate(Double.parseDouble(longitude), Double.parseDouble(latitude))); 
+                Predicate spatialPredicates = SpatialPredicates.distanceWithin(builder, point1, comparisonPoint, radius);
+                predicates.add(spatialPredicates);
+                
+                predicates.add(builder.isNotNull(storeDetails.get("longitude")));
+                predicates.add(builder.isNotNull(storeDetails.get("latitude")));
+            }
 
             //use this if you want to group
             query.groupBy(root.get("id"));

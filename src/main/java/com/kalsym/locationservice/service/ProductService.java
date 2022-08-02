@@ -17,6 +17,8 @@ import com.kalsym.locationservice.model.CustomerActivitiesSummary;
 import com.kalsym.locationservice.model.RegionCountry;
 import com.kalsym.locationservice.model.Store;
 import com.kalsym.locationservice.model.StoreSnooze;
+import com.kalsym.locationservice.model.TagKeyword;
+import com.kalsym.locationservice.model.TagStoreDetails;
 import com.kalsym.locationservice.model.Config.ProductFeatureConfig;
 import com.kalsym.locationservice.model.Discount.StoreDiscountProduct;
 import com.kalsym.locationservice.model.Product.ItemDiscount;
@@ -102,7 +104,7 @@ public class ProductService {
     public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(
             List<String> status,String regionCountryId,String parentCategoryId, 
             List<String> cityId, String cityName, String name, 
-            String latitude, String longitude, double radius,
+            String latitude, String longitude, double radius,String storeTagKeyword,
             int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){           
 
         //get reqion country for store
@@ -131,7 +133,7 @@ public class ProductService {
                 .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<ProductMain> example = Example.of(productMatch, matcher);
         
-        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius, example );
+        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, example );
         
         Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);       
         
@@ -147,27 +149,27 @@ public class ProductService {
         List<ProductMain> newArrayList = new ArrayList<>(Arrays.asList(productWithDetailsList));
         
         //set store distance
-        if (sortByCol.equalsIgnoreCase("distanceInMeter") && newArrayList.size()>0) {
-            for (int i=0;i<newArrayList.size();i++) {
-                Store s = newArrayList.get(i).getStoreDetails();
-                if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
-                    //set store distance
-                    double storeLat = Double.parseDouble(s.getLatitude());
-                    double storeLong = Double.parseDouble(s.getLongitude());
-                    double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
-                    s.setDistanceInMeter(distance);
-                } else {
-                    s.setDistanceInMeter(0.00);
-                }
-            }     
-            Collections.sort(newArrayList);  
+        // if (sortByCol.equalsIgnoreCase("distanceInMeter") && newArrayList.size()>0) {
+        //     for (int i=0;i<newArrayList.size();i++) {
+        //         Store s = newArrayList.get(i).getStoreDetails();
+        //         if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
+        //             //set store distance
+        //             double storeLat = Double.parseDouble(s.getLatitude());
+        //             double storeLong = Double.parseDouble(s.getLongitude());
+        //             double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
+        //             s.setDistanceInMeter(distance);
+        //         } else {
+        //             s.setDistanceInMeter(0.00);
+        //         }
+        //     }     
+        //     Collections.sort(newArrayList);  
             
-            String logprefix="ProductService()";
-            Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "After Sort:");
-            for (int x=0;x<newArrayList.size();x++) {
-                Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product store distance:"+newArrayList.get(x).getStoreDetails().getDistanceInMeter());
-            }
-        }
+        //     String logprefix="ProductService()";
+        //     Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "After Sort:");
+        //     for (int x=0;x<newArrayList.size();x++) {
+        //         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product store distance:"+newArrayList.get(x).getStoreDetails().getDistanceInMeter());
+        //     }
+        // }
         
         //Page mapper
         Page<ProductMain> output = new PageImpl<ProductMain>(newArrayList,pageable,result.getTotalElements());
@@ -257,20 +259,19 @@ public class ProductService {
      * @param sortingOrder
      * @return
      */
-    public Page<ProductFeatureConfig> getFeaturedProductWithLocationParentCategory(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name, Boolean isMainLevel,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
+    public Page<ProductFeatureConfig> getFeaturedProductWithLocationParentCategory(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name, Boolean isMainLevel,String latitude,String longitude,double searchRadius,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
 
 
         ProductFeatureConfig productFeatureConfigMatch = new ProductFeatureConfig();
 
-        Pageable pageable;
+        Pageable pageable =null;
 
-        if (sortingOrder==Sort.Direction.DESC){
-            pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
-        }
-        else if (sortingOrder==Sort.Direction.ASC){
-            pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
-        }
-        else{
+        if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
+            if (sortingOrder==Sort.Direction.ASC)
+                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+            else if (sortingOrder==Sort.Direction.DESC)
+                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+        } else {
             pageable = PageRequest.of(page, pageSize);
         }
 
@@ -288,7 +289,7 @@ public class ProductService {
         }
 
         
-        Specification<ProductFeatureConfig> productFeatureConfigSpecs = searchProductFeatureConfigSpecs(status,regionCountryId,parentCategoryId,cityId,cityName,name,isMainLevel,example);
+        Specification<ProductFeatureConfig> productFeatureConfigSpecs = searchProductFeatureConfigSpecs(status,regionCountryId,parentCategoryId,cityId,cityName,name,isMainLevel,latitude,longitude,searchRadius,example);
         Page<ProductFeatureConfig> result = productFeaturedRepository.findAll(productFeatureConfigSpecs, pageable);   
 
         // Page<ProductFeatureConfig> result;
@@ -512,6 +513,7 @@ public class ProductService {
             String latitude, 
             String longitude,
             double radius,
+            String storeTagKeyword,
             Example<ProductMain> example) {
 
         return (Specification<ProductMain>) (root, query, builder) -> {
@@ -519,6 +521,8 @@ public class ProductService {
             Join<ProductMain, Store> store = root.join("storeDetails");
             Join<ProductMain, Category> storeCategory = root.join("storeCategory");
             Join<Store, RegionCity> regionCity = store.join("regionCityDetails");
+            Join<Store,TagStoreDetails> storeTagDetails = store.join("storeTag");
+            Join<TagStoreDetails,TagKeyword> storeTagKeywords = storeTagDetails.join("tagKeyword");
             
             if (regionCountryId != null && !regionCountryId.isEmpty()) {
                 predicates.add(builder.equal(store.get("regionCountryId"), regionCountryId));
@@ -546,6 +550,11 @@ public class ProductService {
                 Predicate finalPredicate = builder.or(statusPredicatesList.toArray(new Predicate[statusCount]));
                 predicates.add(finalPredicate);
             }
+
+            if (storeTagKeyword != null && !storeTagKeyword.isEmpty()) {                
+                predicates.add(builder.equal(storeTagKeywords.get("keyword"), storeTagKeyword));
+            }
+
             
             if (cityIdList!=null) {
                 int cityCount = cityIdList.size();
@@ -598,6 +607,9 @@ public class ProductService {
 
     public static Specification<ProductFeatureConfig> searchProductFeatureConfigSpecs(
         List<String> statusList,String regionCountryId,String parentCategoryId, List<String> cityIdList, String cityName, String productName, Boolean isMainLevel,
+        String latitude, 
+        String longitude,
+        double radius,
         Example<ProductFeatureConfig> example) {
 
         return (Specification<ProductFeatureConfig>) (root, query, builder) -> {
@@ -650,6 +662,17 @@ public class ProductService {
             if (isMainLevel != null) {
                 predicates.add(builder.equal(root.get("isMainLevel"), isMainLevel));
             }
+
+            if (latitude!=null && longitude!=null) {
+                Expression<Point> point1 = builder.function("point", Point.class, storeDetails.get("longitude"), storeDetails.get("latitude"));
+                GeometryFactory factory = new GeometryFactory();
+                Point comparisonPoint = factory.createPoint(new Coordinate(Double.parseDouble(longitude), Double.parseDouble(latitude))); 
+                Predicate spatialPredicates = SpatialPredicates.distanceWithin(builder, point1, comparisonPoint, radius);
+                predicates.add(spatialPredicates);
+                
+                predicates.add(builder.isNotNull(storeDetails.get("longitude")));
+                predicates.add(builder.isNotNull(storeDetails.get("latitude")));
+            }
              
             predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
 
@@ -664,6 +687,8 @@ public class ProductService {
         javax.persistence.criteria.Expression<? extends org.locationtech.jts.geom.Geometry>,
         javax.persistence.criteria.Expression<java.lang.Double>) 
     */
+
+    //=============not using this one
     public static Specification<ProductMain> filterWithinRadius(double longitude, double latitude, double radius) {
         return new Specification<ProductMain>() {
             @Override

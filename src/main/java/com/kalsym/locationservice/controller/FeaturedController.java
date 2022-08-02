@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.beans.factory.annotation.Value;
+
 
 
 @RestController
@@ -37,6 +39,9 @@ public class FeaturedController {
 
     @Autowired
     ProductService productService;
+
+    @Value("${product.search.radius:20000}")
+    private Double searchRadius;
 
     @GetMapping(path = {"/location"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
@@ -94,6 +99,8 @@ public class FeaturedController {
         @RequestParam(required = false) List<String> cityId,
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String parentCategoryId,
+        @RequestParam(required = false) String latitude,
+        @RequestParam(required = false) String longitude,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
         @RequestParam(required = false,defaultValue = "sequence") String sortByCol,
@@ -104,7 +111,7 @@ public class FeaturedController {
 
         try{
                     // Page<StoreConfig> body = storeConfigService.getQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,page,pageSize,sortByCol,sortingOrder);
-        Page<StoreConfig> body = storeConfigService.getRawQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,page,pageSize,sortByCol,sortingOrder);
+        Page<StoreConfig> body = storeConfigService.getRawQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,latitude,longitude,searchRadius,page,pageSize,sortByCol,sortingOrder);
         response.setData(body);
         response.setStatus(HttpStatus.OK);
 
@@ -131,6 +138,8 @@ public class FeaturedController {
         @RequestParam(required = false) String cityName,
         @RequestParam(required = false) String name,
         @RequestParam(required = false) Boolean isMainLevel,
+        @RequestParam(required = false) String latitude,
+        @RequestParam(required = false) String longitude,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
         @RequestParam(required = false) String sortByCol,
@@ -140,7 +149,7 @@ public class FeaturedController {
         HttpResponse response = new HttpResponse(request.getRequestURI());
 
         try{
-            Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, isMainLevel,page, pageSize, sortByCol, sortingOrder );
+            Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, isMainLevel,latitude,longitude,searchRadius,page, pageSize, sortByCol, sortingOrder );
             response.setData(body);
             response.setStatus(HttpStatus.OK);
 

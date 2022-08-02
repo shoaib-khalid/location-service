@@ -1,7 +1,8 @@
+
 ##################################################
-# location-service-1.0.24 | 02-Aug-2022
+# location-service-1.0.25 | 02-Aug-2022
 ##################################################
-1. Change featured product and featured store search sql using predicate 
+1. rEQUEST PARAM LATITUDE LONTITUDE FOR FEATURE STORE AND PRODUCTS
 
 ##################################################
 # location-service-1.0.23 | 01-Aug-2022

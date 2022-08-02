@@ -213,27 +213,27 @@ public class CategoryLocationService {
         List<StoreCategory> newArrayList = new ArrayList<>(tempStoreList);
         
         //set store distance
-        if (sortByCol.equalsIgnoreCase("distanceInMeter") && newArrayList.size()>0) {
-            for (int i=0;i<newArrayList.size();i++) {
-                Store s = newArrayList.get(i).getStoreDetails();
-                if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
-                    //set store distance
-                    double storeLat = Double.parseDouble(s.getLatitude());
-                    double storeLong = Double.parseDouble(s.getLongitude());
-                    double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
-                    s.setDistanceInMeter(distance);
-                } else {
-                    s.setDistanceInMeter(0.00);
-                }
-            }     
-            Collections.sort(newArrayList);  
+        // if (sortByCol.equalsIgnoreCase("distanceInMeter") && newArrayList.size()>0) {
+        //     for (int i=0;i<newArrayList.size();i++) {
+        //         Store s = newArrayList.get(i).getStoreDetails();
+        //         if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
+        //             //set store distance
+        //             double storeLat = Double.parseDouble(s.getLatitude());
+        //             double storeLong = Double.parseDouble(s.getLongitude());
+        //             double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
+        //             s.setDistanceInMeter(distance);
+        //         } else {
+        //             s.setDistanceInMeter(0.00);
+        //         }
+        //     }     
+        //     Collections.sort(newArrayList);  
             
-            String logprefix="CategoryLocationService()";
-            Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "After Sort:");
-            for (int x=0;x<newArrayList.size();x++) {
-                Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product store distance:"+newArrayList.get(x).getStoreDetails().getDistanceInMeter());
-            }            
-        }
+        //     String logprefix="CategoryLocationService()";
+        //     Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "After Sort:");
+        //     for (int x=0;x<newArrayList.size();x++) {
+        //         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product store distance:"+newArrayList.get(x).getStoreDetails().getDistanceInMeter());
+        //     }            
+        // }
         
         //Page mapper
         Page<StoreCategory> output = new PageImpl<StoreCategory>(newArrayList,pageable,result.getTotalElements());
