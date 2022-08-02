@@ -30,8 +30,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatcher;
+import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
+
 
 @Service
 public class StoreConfigService {
@@ -91,26 +96,7 @@ public class StoreConfigService {
 
     public Page<StoreConfig> getRawQueryStoreConfig(String regionCountryId, List<String> cityId, String cityName, String parentCategoryId, int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
     
-        //Handling null value in order to use query
-        // if (stateId == null || stateId.isEmpty()) {
-        //     stateId = "";
-        // }
-        if (cityName == null || cityName.isEmpty()) {
-            cityName = "";
-        }
-
-        if (regionCountryId == null || regionCountryId.isEmpty()) {
-            regionCountryId = "";
-        }
-
-        // if (postcode == null || postcode.isEmpty()) {
-        //     postcode = "";
-        // }
-
-        if (parentCategoryId == null || parentCategoryId.isEmpty()) {
-            parentCategoryId = "";
-        }
-
+        StoreConfig storeConfigMatch = new StoreConfig();
 
         Pageable pageable;
    
@@ -125,13 +111,19 @@ public class StoreConfigService {
         }
 
 
+        ExampleMatcher matcher = ExampleMatcher
+        .matchingAll()
+        .withIgnoreCase()
+        .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
+        Example<StoreConfig> example = Example.of(storeConfigMatch, matcher);
+
+        Specification<StoreConfig> storeConfigSpecs = searchStoreConfigSpecs(regionCountryId,cityId, cityName, parentCategoryId,example);
+        Page<StoreConfig> result = storeConfigRepository.findAll(storeConfigSpecs, pageable);  
+
         //find the based on location with pageable
-        Page<StoreConfig> result = cityId == null?storeConfigRepository.getQueryStoreConfigRaw(cityName,regionCountryId,parentCategoryId,pageable)
-                                                :storeConfigRepository.getQueryStoreConfigRawWithCityId(cityId, cityName, regionCountryId, parentCategoryId, pageable) ;
+        // Page<StoreConfig> result = cityId == null?storeConfigRepository.getQueryStoreConfigRaw(cityName,regionCountryId,parentCategoryId,pageable)
+        //                                         :storeConfigRepository.getQueryStoreConfigRawWithCityId(cityId, cityName, regionCountryId, parentCategoryId, pageable) ;
      
-        // return categoryRepository.findAll(example,pageable);
-        // System.out.println("Checking current time ::::::"+Calendar.getInstance().getTime());
-        //to return store snooze
         for(StoreConfig sc : result){
             
             StoreSnooze st = new StoreSnooze();
@@ -195,6 +187,50 @@ public class StoreConfigService {
         }
 
         return result;
+    }
+
+    public static Specification<StoreConfig> searchStoreConfigSpecs(
+        String regionCountryId, List<String> cityIdList, String cityName, String parentCategoryId,
+        Example<StoreConfig> example) {
+
+        return (Specification<StoreConfig>) (root, query, builder) -> {
+            final List<Predicate> predicates = new ArrayList<>();
+            Join<StoreConfig, StoreCategory> storeCategory = root.join("storeCategory");
+            Join<StoreConfig, Store> storeDetails = root.join("storeDetails");
+            Join<Store,RegionCity> storeRegionCity = storeDetails.join("regionCityDetails");
+
+            if (regionCountryId != null && !regionCountryId.isEmpty()) {
+                predicates.add(builder.equal(storeDetails.get("regionCountryId"), regionCountryId));
+            }
+
+            if (cityIdList!=null) {
+                int cityCount = cityIdList.size();
+                List<Predicate> cityPredicatesList = new ArrayList<>();
+                for (int i=0;i<cityIdList.size();i++) {
+                    Predicate predicateForCity = builder.equal(storeDetails.get("city"), cityIdList.get(i));                                        
+                    cityPredicatesList.add(predicateForCity);                    
+                }
+                Predicate finalPredicate = builder.or(cityPredicatesList.toArray(new Predicate[cityCount]));
+                predicates.add(finalPredicate);
+            }
+
+            
+            if (cityName != null && !cityName.isEmpty()) {
+                predicates.add(builder.equal(storeRegionCity.get("name"), cityName));
+            }
+
+
+            if (parentCategoryId != null && !parentCategoryId.isEmpty()) {                
+                predicates.add(builder.equal(storeCategory.get("parentCategoryId"), parentCategoryId));
+            }    
+
+            //use this if you want to group
+            query.groupBy(root.get("id"));
+                    
+            predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
+
+            return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
     }
 
 

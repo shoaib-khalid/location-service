@@ -259,41 +259,8 @@ public class ProductService {
      */
     public Page<ProductFeatureConfig> getFeaturedProductWithLocationParentCategory(List<String> status,String regionCountryId,String parentCategoryId, List<String> cityId, String cityName, String name, Boolean isMainLevel,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
 
-        //Handling null value in order to use query
-        if (regionCountryId == null || regionCountryId.isEmpty()) {
-            regionCountryId = "";
-        }
 
-        // if (cityId == null || cityId.isEmpty()) {
-        //     cityId = "";
-        // }
-
-        if (cityName == null || cityName.isEmpty()) {
-            cityName = "";
-        }
-
-        if (name == null || name.isEmpty()) {
-            name = "";
-        }
-
-        if (parentCategoryId == null || parentCategoryId.isEmpty()) {
-            parentCategoryId = "";
-        }
-
-        if (status == null) {
-
-            List<String> statusList = new ArrayList<>();
-            statusList.add("ACTIVE");
-            statusList.add("INACTIVE");
-            statusList.add("OUTOFSTOCK");
-
-            status = statusList;
-        }
-
-        // if (isMainLevel == null) {
-
-        //     isMainLevel = true;
-        // }
+        ProductFeatureConfig productFeatureConfigMatch = new ProductFeatureConfig();
 
         Pageable pageable;
 
@@ -306,8 +273,13 @@ public class ProductService {
         else{
             pageable = PageRequest.of(page, pageSize);
         }
-        
 
+        ExampleMatcher matcher = ExampleMatcher
+        .matchingAll()
+        .withIgnoreCase()
+        .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
+        Example<ProductFeatureConfig> example = Example.of(productFeatureConfigMatch, matcher);
+        
         //get reqion country for store
         RegionCountry regionCountry = null;
         Optional<RegionCountry> optRegion = regionCountriesRepository.findById(regionCountryId);
@@ -315,17 +287,21 @@ public class ProductService {
             regionCountry = optRegion.get();
         }
 
-        Page<ProductFeatureConfig> result;
-        if(isMainLevel != null){
-            //find the based on location with pageable
-            result = cityId == null?productFeaturedRepository.getQueryProductConfig(status,regionCountryId,parentCategoryId,cityName,name,isMainLevel,pageable)
-            :productFeaturedRepository.getQueryProductConfigWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,isMainLevel,pageable) ;
+        
+        Specification<ProductFeatureConfig> productFeatureConfigSpecs = searchProductFeatureConfigSpecs(status,regionCountryId,parentCategoryId,cityId,cityName,name,isMainLevel,example);
+        Page<ProductFeatureConfig> result = productFeaturedRepository.findAll(productFeatureConfigSpecs, pageable);   
 
-        } else{
-            //find the based on location with pageable
-            result = cityId == null?productFeaturedRepository.getAllQueryProductConfig(status,regionCountryId,parentCategoryId,cityName,name,pageable)
-            :productFeaturedRepository.getAllQueryProductConfigWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable) ;
-        }
+        // Page<ProductFeatureConfig> result;
+        // if(isMainLevel != null){
+        //     //find the based on location with pageable
+        //     result = cityId == null?productFeaturedRepository.getQueryProductConfig(status,regionCountryId,parentCategoryId,cityName,name,isMainLevel,pageable)
+        //     :productFeaturedRepository.getQueryProductConfigWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,isMainLevel,pageable) ;
+
+        // } else{
+        //     //find the based on location with pageable
+        //     result = cityId == null?productFeaturedRepository.getAllQueryProductConfig(status,regionCountryId,parentCategoryId,cityName,name,pageable)
+        //     :productFeaturedRepository.getAllQueryProductConfigWithCityId(status,regionCountryId,parentCategoryId,cityId,cityName,name,pageable) ;
+        // }
 
         //extract the result of content of pageable in order to proceed with dicount of item 
         List<ProductFeatureConfig> productFeaturedList = result.getContent();
@@ -614,6 +590,67 @@ public class ProductService {
                 predicates.add(builder.isNotNull(store.get("latitude")));
             }
             
+            predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
+
+            return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
+    }
+
+    public static Specification<ProductFeatureConfig> searchProductFeatureConfigSpecs(
+        List<String> statusList,String regionCountryId,String parentCategoryId, List<String> cityIdList, String cityName, String productName, Boolean isMainLevel,
+        Example<ProductFeatureConfig> example) {
+
+        return (Specification<ProductFeatureConfig>) (root, query, builder) -> {
+            final List<Predicate> predicates = new ArrayList<>();
+            Join<ProductFeatureConfig, ProductMain> productDetails = root.join("productDetails");
+            Join<ProductMain, Store> storeDetails = productDetails.join("storeDetails");
+            Join<ProductMain, Category> storeCategory = productDetails.join("storeCategory");
+            Join<Store, RegionCity> regionCityDetails = storeDetails.join("regionCityDetails");
+
+            
+            if (statusList!=null) {
+                int statusCount = statusList.size();
+                List<Predicate> statusPredicatesList = new ArrayList<>();
+                for (int i=0;i<statusList.size();i++) {
+                    Predicate predicateForProductStatus = builder.equal(root.get("status"), statusList.get(i));                                        
+                    statusPredicatesList.add(predicateForProductStatus);                    
+                }
+                Predicate finalPredicate = builder.or(statusPredicatesList.toArray(new Predicate[statusCount]));
+                predicates.add(finalPredicate);
+            }
+
+                 
+            if (regionCountryId != null && !regionCountryId.isEmpty()) {
+                predicates.add(builder.equal(storeDetails.get("regionCountryId"), regionCountryId));
+            }
+
+            if (parentCategoryId != null && !parentCategoryId.isEmpty()) {                
+                predicates.add(builder.equal(storeCategory.get("parentCategoryId"), parentCategoryId));
+            } 
+
+            if (cityIdList!=null) {
+                int cityCount = cityIdList.size();
+                List<Predicate> cityPredicatesList = new ArrayList<>();
+                for (int i=0;i<cityIdList.size();i++) {
+                    Predicate predicateForCity = builder.equal(storeDetails.get("city"), cityIdList.get(i));                                        
+                    cityPredicatesList.add(predicateForCity);                    
+                }
+                Predicate finalPredicate = builder.or(cityPredicatesList.toArray(new Predicate[cityCount]));
+                predicates.add(finalPredicate);
+            }
+
+            if (cityName != null && !cityName.isEmpty()) {
+                predicates.add(builder.equal(regionCityDetails.get("name"), cityName));
+            }
+
+            if (productName != null && !productName.isEmpty()) {
+                predicates.add(builder.like(productDetails.get("name"), "%"+productName+"%"));
+            }
+
+            if (isMainLevel != null) {
+                predicates.add(builder.equal(root.get("isMainLevel"), isMainLevel));
+            }
+             
             predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
 
             return builder.and(predicates.toArray(new Predicate[predicates.size()]));

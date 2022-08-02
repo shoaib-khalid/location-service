@@ -423,7 +423,8 @@ public class CategoryLocationService {
             }     
             
             if (storeName != null && !storeName.isEmpty()) {                
-                predicates.add(builder.equal(storeDetails.get("name"), storeName));
+                predicates.add(builder.like(storeDetails.get("name"), "%"+storeName+"%"));
+
             }
 
                     

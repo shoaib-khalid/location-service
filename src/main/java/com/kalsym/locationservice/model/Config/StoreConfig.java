@@ -16,8 +16,10 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.RegionCity;
 import com.kalsym.locationservice.model.Store;
+import com.kalsym.locationservice.model.StoreCategory;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +48,11 @@ public class StoreConfig implements Serializable {
     @OneToOne()
     @JoinColumn(name = "storeId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
     private Store storeDetails;
+
+    @OneToMany(cascade = CascadeType.ALL,
+    fetch = FetchType.LAZY)
+    @JoinColumn(name = "storeId",referencedColumnName="storeId", insertable = false, updatable = false, nullable = true)
+    private List<Category> storeCategory;
 
     // @OneToMany(cascade = CascadeType.ALL,
     // fetch = FetchType.EAGER)

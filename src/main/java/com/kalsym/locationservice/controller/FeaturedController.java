@@ -96,16 +96,26 @@ public class FeaturedController {
         @RequestParam(required = false) String parentCategoryId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
-        @RequestParam(required = false) String sortByCol,
-        @RequestParam(required = false) Sort.Direction sortingOrder
+        @RequestParam(required = false,defaultValue = "sequence") String sortByCol,
+        @RequestParam(required = false,defaultValue = "ASC") Sort.Direction sortingOrder
     ) {
 
-        // Page<StoreConfig> body = storeConfigService.getQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,page,pageSize,sortByCol,sortingOrder);
-        Page<StoreConfig> body = storeConfigService.getRawQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,page,pageSize,sortByCol,sortingOrder);
-
         HttpResponse response = new HttpResponse(request.getRequestURI());
+
+        try{
+                    // Page<StoreConfig> body = storeConfigService.getQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,page,pageSize,sortByCol,sortingOrder);
+        Page<StoreConfig> body = storeConfigService.getRawQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,page,pageSize,sortByCol,sortingOrder);
         response.setData(body);
         response.setStatus(HttpStatus.OK);
+
+        }catch(Throwable e){
+
+                System.out.println("Error message:::::::::::::::::"+e.getMessage());
+                response.setStatus(HttpStatus.EXPECTATION_FAILED);//error code 417
+
+        }
+
+  
         return ResponseEntity.status(response.getStatus()).body(response);
 
     }
@@ -127,11 +137,18 @@ public class FeaturedController {
         @RequestParam(required = false) Sort.Direction sortingOrder
     ) {
 
-        Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, isMainLevel,page, pageSize, sortByCol, sortingOrder );
-        
         HttpResponse response = new HttpResponse(request.getRequestURI());
-        response.setData(body);
-        response.setStatus(HttpStatus.OK);
+
+        try{
+            Page<ProductFeatureConfig> body = productService.getFeaturedProductWithLocationParentCategory(status, regionCountryId, parentCategoryId, cityId, cityName, name, isMainLevel,page, pageSize, sortByCol, sortingOrder );
+            response.setData(body);
+            response.setStatus(HttpStatus.OK);
+
+        }catch(Throwable e){
+            response.setStatus(HttpStatus.EXPECTATION_FAILED);//error code 417
+
+        }
+       
         return ResponseEntity.status(response.getStatus()).body(response);
 
     }

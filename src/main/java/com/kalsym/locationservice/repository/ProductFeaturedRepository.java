@@ -15,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureConfig,Integer> {
+public interface ProductFeaturedRepository extends JpaRepository<ProductFeatureConfig,Integer>, JpaSpecificationExecutor<ProductFeatureConfig> {
     
     @Query(
         " SELECT pfc "

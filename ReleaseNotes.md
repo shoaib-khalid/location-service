@@ -1,4 +1,9 @@
 ##################################################
+# location-service-1.0.24 | 02-Aug-2022
+##################################################
+1. Change featured product and featured store search sql using predicate 
+
+##################################################
 # location-service-1.0.23 | 01-Aug-2022
 ##################################################
 Add distanceInMeter in getProducts()
