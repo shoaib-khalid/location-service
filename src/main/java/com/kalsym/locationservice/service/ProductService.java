@@ -177,6 +177,18 @@ public class ProductService {
         //to set snooze
         for(ProductMain p : output){
 
+            //set store distance
+            Store s = p.getStoreDetails();
+            if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
+                //set store distance
+                double storeLat = Double.parseDouble(s.getLatitude());
+                double storeLong = Double.parseDouble(s.getLongitude());
+                double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
+                s.setDistanceInMeter(distance);
+            } else {
+                s.setDistanceInMeter(0.00);
+            }
+            
             StoreSnooze st = new StoreSnooze();
             
             if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
@@ -442,7 +454,7 @@ public class ProductService {
         //Page mapper
         // Page<ProductMain> output = new PageImpl<ProductMain>(newArrayList,pageable,result.getTotalElements());
         for(ProductMain p : newArrayList){
-
+            
             StoreSnooze st = new StoreSnooze();
 
             if (p.getStoreDetails().getSnoozeStartTime()!=null && p.getStoreDetails().getSnoozeEndTime()!=null) {
@@ -521,8 +533,8 @@ public class ProductService {
             Join<ProductMain, Store> store = root.join("storeDetails");
             Join<ProductMain, Category> storeCategory = root.join("storeCategory");
             Join<Store, RegionCity> regionCity = store.join("regionCityDetails");
-            Join<Store,TagStoreDetails> storeTagDetails = store.join("storeTag");
-            Join<TagStoreDetails,TagKeyword> storeTagKeywords = storeTagDetails.join("tagKeyword");
+            Join<Store,TagStoreDetails> storeTagDetails = store.join("storeTag", JoinType.LEFT);
+            Join<TagStoreDetails,TagKeyword> storeTagKeywords = storeTagDetails.join("tagKeyword", JoinType.LEFT);
             
             if (regionCountryId != null && !regionCountryId.isEmpty()) {
                 predicates.add(builder.equal(store.get("regionCountryId"), regionCountryId));

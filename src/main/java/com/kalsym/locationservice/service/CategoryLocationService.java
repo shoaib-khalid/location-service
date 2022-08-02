@@ -56,6 +56,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.JoinType;
 import org.hibernate.spatial.predicate.SpatialPredicates;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -239,7 +240,18 @@ public class CategoryLocationService {
         Page<StoreCategory> output = new PageImpl<StoreCategory>(newArrayList,pageable,result.getTotalElements());
         
         for(StoreCategory c : output){
-
+            
+            Store s = c.getStoreDetails();
+            if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
+                //set store distance
+                double storeLat = Double.parseDouble(s.getLatitude());
+                double storeLong = Double.parseDouble(s.getLongitude());
+                double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
+                s.setDistanceInMeter(distance);
+            } else {
+                s.setDistanceInMeter(0.00);
+            }
+        
             StoreSnooze st = new StoreSnooze();
 
             if (c.getStoreDetails().getSnoozeStartTime()!=null && c.getStoreDetails().getSnoozeEndTime()!=null) {
@@ -386,8 +398,8 @@ public class CategoryLocationService {
             Join<StoreCategory, ParentCategory> storeParentCategory = root.join("parentCategory");
             Join<StoreCategory, Store> storeDetails = root.join("storeDetails");
             Join<Store,RegionCity> storeRegionCity = storeDetails.join("regionCityDetails");
-            Join<Store,TagStoreDetails> storeTagDetails = storeDetails.join("storeTag");
-            Join<TagStoreDetails,TagKeyword> storeTagKeyword = storeTagDetails.join("tagKeyword");
+            Join<Store,TagStoreDetails> storeTagDetails = storeDetails.join("storeTag", JoinType.LEFT);
+            Join<TagStoreDetails,TagKeyword> storeTagKeyword = storeTagDetails.join("tagKeyword", JoinType.LEFT);
 
             
             if (cityIdList!=null) {
