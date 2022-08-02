@@ -189,17 +189,7 @@ public class ProductService {
                 s.setDistanceInMeter(0.00);
             }
             
-            StoreSnooze st = new StoreSnooze();
-            
-            if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
-                if (latitude!=null && longitude!=null && p.getStoreDetails().getLatitude()!=null && p.getStoreDetails().getLongitude()!=null) {
-                    //set store distance
-                    double storeLat = Double.parseDouble(p.getStoreDetails().getLatitude());
-                    double storeLong = Double.parseDouble(p.getStoreDetails().getLongitude());
-                    double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
-                    p.getStoreDetails().setDistanceInMeter(distance);
-                }
-            }
+            StoreSnooze st = new StoreSnooze();            
             
             if (p.getStoreDetails().getSnoozeStartTime()!=null && p.getStoreDetails().getSnoozeEndTime()!=null) {
                 int resultSnooze = p.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
