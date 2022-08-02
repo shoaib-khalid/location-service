@@ -612,7 +612,7 @@ public class ProductService {
                 int statusCount = statusList.size();
                 List<Predicate> statusPredicatesList = new ArrayList<>();
                 for (int i=0;i<statusList.size();i++) {
-                    Predicate predicateForProductStatus = builder.equal(root.get("status"), statusList.get(i));                                        
+                    Predicate predicateForProductStatus = builder.equal(productDetails.get("status"), statusList.get(i));                                        
                     statusPredicatesList.add(predicateForProductStatus);                    
                 }
                 Predicate finalPredicate = builder.or(statusPredicatesList.toArray(new Predicate[statusCount]));

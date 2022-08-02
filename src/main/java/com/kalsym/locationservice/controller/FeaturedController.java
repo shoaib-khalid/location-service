@@ -145,6 +145,8 @@ public class FeaturedController {
             response.setStatus(HttpStatus.OK);
 
         }catch(Throwable e){
+            System.out.println("Error message:::::::::::::::::"+e.getMessage());
+
             response.setStatus(HttpStatus.EXPECTATION_FAILED);//error code 417
 
         }
