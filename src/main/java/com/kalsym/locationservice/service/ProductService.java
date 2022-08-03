@@ -42,6 +42,7 @@ import java.util.Date;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.CriteriaQuery;
@@ -116,16 +117,20 @@ public class ProductService {
         
         ProductMain productMatch = new ProductMain();
       
-        Pageable pageable = null;
+        Pageable pageable = PageRequest.of(page, pageSize);
         
-        if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
-            if (sortingOrder==Sort.Direction.ASC)
-                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
-            else if (sortingOrder==Sort.Direction.DESC)
-                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
-        } else {
-            pageable = PageRequest.of(page, pageSize);
-        }
+        // if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
+        //     if (sortingOrder==Sort.Direction.ASC)
+        //         // pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+        //         pageable = PageRequest.of(page, pageSize);
+
+        //     else if (sortingOrder==Sort.Direction.DESC)
+        //         // pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+        //         pageable = PageRequest.of(page, pageSize);
+
+        // } else {
+        //     pageable = PageRequest.of(page, pageSize);
+        // }
         
         ExampleMatcher matcher = ExampleMatcher
                 .matchingAll()
@@ -133,7 +138,7 @@ public class ProductService {
                 .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<ProductMain> example = Example.of(productMatch, matcher);
         
-        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, example );
+        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, sortByCol,sortingOrder,example);
         
         Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);       
         
@@ -266,16 +271,7 @@ public class ProductService {
 
         ProductFeatureConfig productFeatureConfigMatch = new ProductFeatureConfig();
 
-        Pageable pageable =null;
-
-        if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
-            if (sortingOrder==Sort.Direction.ASC)
-                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
-            else if (sortingOrder==Sort.Direction.DESC)
-                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
-        } else {
-            pageable = PageRequest.of(page, pageSize);
-        }
+        Pageable pageable =PageRequest.of(page, pageSize);
 
         ExampleMatcher matcher = ExampleMatcher
         .matchingAll()
@@ -516,6 +512,7 @@ public class ProductService {
             String longitude,
             double radius,
             String storeTagKeyword,
+            String sortByCol, Sort.Direction sortingOrder,
             Example<ProductMain> example) {
 
         return (Specification<ProductMain>) (root, query, builder) -> {
@@ -600,6 +597,31 @@ public class ProductService {
                 predicates.add(builder.isNotNull(store.get("longitude")));
                 predicates.add(builder.isNotNull(store.get("latitude")));
             }
+
+            // select * from product p 
+            // WHERE p.name like '%black%'
+            // ORDER BY 
+            // (CASE WHEN p.thumbnailUrl  IS NULL THEN 1 ELSE 0 END),
+            // p.name ASC
+
+            //https://stackoverflow.com/questions/46541922/jpa-criteriaquery-order-by-with-two-criteria
+
+            //sORT IMAGE FIRST , THEN PRODUCT SORT by <COLUMN>
+            List<Order> orderList = new ArrayList<Order>();
+            orderList.add
+            (builder.asc(builder.selectCase()
+            .when(root.get("thumbnailUrl").isNull(), 1)
+            .otherwise(0)));
+
+            if (sortingOrder==Sort.Direction.ASC){
+                orderList.add(builder.asc(root.get(sortByCol)));
+
+            }else{
+                orderList.add(builder.desc(root.get(sortByCol)));
+
+            }
+
+            query.orderBy(orderList);
             
             predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
 
