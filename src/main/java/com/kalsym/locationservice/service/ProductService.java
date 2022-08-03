@@ -342,6 +342,17 @@ public class ProductService {
         //to set store snooze
         for(ProductFeatureConfig pfc : result){
 
+            Store s = pfc.getProductDetails().getStoreDetails();
+            if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
+                //set store distance
+                double storeLat = Double.parseDouble(s.getLatitude());
+                double storeLong = Double.parseDouble(s.getLongitude());
+                double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
+                s.setDistanceInMeter(distance);
+            } else {
+                s.setDistanceInMeter(0.00);
+            }
+
             StoreSnooze st = new StoreSnooze();
 
             if ( pfc.getProductDetails().getStoreDetails().getSnoozeStartTime()!=null &&  pfc.getProductDetails().getStoreDetails().getSnoozeEndTime()!=null) {

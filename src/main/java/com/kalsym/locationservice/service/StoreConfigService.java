@@ -13,6 +13,7 @@ import com.kalsym.locationservice.repository.LocationConfigRepository;
 import com.kalsym.locationservice.repository.RegionCountriesRepository;
 import com.kalsym.locationservice.repository.StoreConfigRepository;
 import com.kalsym.locationservice.utility.DateTimeUtil;
+import com.kalsym.locationservice.utility.Location;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -128,6 +129,17 @@ public class StoreConfigService {
         //                                         :storeConfigRepository.getQueryStoreConfigRawWithCityId(cityId, cityName, regionCountryId, parentCategoryId, pageable) ;
      
         for(StoreConfig sc : result){
+
+            Store s = sc.getStoreDetails();
+            if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
+                //set store distance
+                double storeLat = Double.parseDouble(s.getLatitude());
+                double storeLong = Double.parseDouble(s.getLongitude());
+                double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
+                s.setDistanceInMeter(distance);
+            } else {
+                s.setDistanceInMeter(0.00);
+            }
             
             StoreSnooze st = new StoreSnooze();
 
