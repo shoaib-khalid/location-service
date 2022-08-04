@@ -45,6 +45,8 @@ public class StoreConfig implements Serializable {
 
     private Integer sequence;
 
+    private Boolean isMainLevel;
+
     @OneToOne()
     @JoinColumn(name = "storeId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
     private Store storeDetails;

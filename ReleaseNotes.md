@@ -1,4 +1,7 @@
-
+##################################################
+# location-service-1.0.26 | 04-Aug-2022
+##################################################
+1. Fix total elements for group by for specification executor. Change response body. IsMainLevel for feature store.
 ##################################################
 # location-service-1.0.25 | 02-Aug-2022
 ##################################################

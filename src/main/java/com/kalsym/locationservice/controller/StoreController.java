@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.kalsym.locationservice.model.StoreCategory;
+import com.kalsym.locationservice.model.StoreWithDetails;
 import com.kalsym.locationservice.model.TagStoreDetails;
 import com.kalsym.locationservice.service.CategoryLocationService;
 import com.kalsym.locationservice.service.StoreService;
@@ -57,7 +58,7 @@ public class StoreController {
         @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder
     ) {
 
-        Page<StoreCategory> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,tagKeyword,page,pageSize,latitude,longitude,searchRadius,sortByCol,sortingOrder);
+        Page<StoreWithDetails> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,tagKeyword,page,pageSize,latitude,longitude,searchRadius,sortByCol,sortingOrder);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

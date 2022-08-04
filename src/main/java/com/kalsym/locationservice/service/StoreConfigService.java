@@ -100,7 +100,7 @@ public class StoreConfigService {
 
     }
 
-    public Page<StoreConfig> getRawQueryStoreConfig(String regionCountryId, List<String> cityId, String cityName, String parentCategoryId,String latitude,String longitude,double searchRadius,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
+    public Page<StoreConfig> getRawQueryStoreConfig(String regionCountryId, List<String> cityId, String cityName, String parentCategoryId,String latitude,String longitude,double searchRadius,Boolean isMainLevel,int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){
     
         StoreConfig storeConfigMatch = new StoreConfig();
 
@@ -121,7 +121,7 @@ public class StoreConfigService {
         .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<StoreConfig> example = Example.of(storeConfigMatch, matcher);
 
-        Specification<StoreConfig> storeConfigSpecs = searchStoreConfigSpecs(regionCountryId,cityId, cityName, parentCategoryId,latitude,longitude,searchRadius,example);
+        Specification<StoreConfig> storeConfigSpecs = searchStoreConfigSpecs(regionCountryId,cityId, cityName, parentCategoryId,latitude,longitude,searchRadius,isMainLevel,example);
         Page<StoreConfig> result = storeConfigRepository.findAll(storeConfigSpecs, pageable);  
 
         //find the based on location with pageable
@@ -208,6 +208,7 @@ public class StoreConfigService {
         String regionCountryId, List<String> cityIdList, String cityName, String parentCategoryId, String latitude, 
         String longitude,
         double radius,
+        Boolean isMainLevel,
         Example<StoreConfig> example) {
 
         return (Specification<StoreConfig>) (root, query, builder) -> {
@@ -252,8 +253,13 @@ public class StoreConfigService {
                 predicates.add(builder.isNotNull(storeDetails.get("latitude")));
             }
 
+            if (isMainLevel != null) {
+                predicates.add(builder.equal(root.get("isMainLevel"), isMainLevel));
+            }
+
             //use this if you want to group
-            query.groupBy(root.get("id"));
+            // query.groupBy(root.get("id"));
+            query.distinct(true);
                     
             predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
 

@@ -101,6 +101,7 @@ public class FeaturedController {
         @RequestParam(required = false) String parentCategoryId,
         @RequestParam(required = false) String latitude,
         @RequestParam(required = false) String longitude,
+        @RequestParam(required = false) Boolean isMainLevel,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
         @RequestParam(required = false,defaultValue = "sequence") String sortByCol,
@@ -111,7 +112,7 @@ public class FeaturedController {
 
         try{
                     // Page<StoreConfig> body = storeConfigService.getQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,page,pageSize,sortByCol,sortingOrder);
-        Page<StoreConfig> body = storeConfigService.getRawQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,latitude,longitude,searchRadius,page,pageSize,sortByCol,sortingOrder);
+        Page<StoreConfig> body = storeConfigService.getRawQueryStoreConfig(regionCountryId,cityId,cityName,parentCategoryId,latitude,longitude,searchRadius,isMainLevel,page,pageSize,sortByCol,sortingOrder);
         response.setData(body);
         response.setStatus(HttpStatus.OK);
 

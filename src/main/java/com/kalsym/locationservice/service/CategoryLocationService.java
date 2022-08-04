@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+import com.kalsym.locationservice.model.Category;
 import com.kalsym.locationservice.model.ParentCategory;
 import com.kalsym.locationservice.model.Product.ProductMain;
 import com.kalsym.locationservice.model.RegionCity;
@@ -18,6 +19,7 @@ import com.kalsym.locationservice.model.Store;
 import com.kalsym.locationservice.model.StoreAssets;
 import com.kalsym.locationservice.model.StoreCategory;
 import com.kalsym.locationservice.model.StoreSnooze;
+import com.kalsym.locationservice.model.StoreWithDetails;
 import com.kalsym.locationservice.model.TagKeyword;
 import com.kalsym.locationservice.model.TagStoreDetails;
 // import com.kalsym.locationservice.model.CategoryLocation;
@@ -25,6 +27,7 @@ import com.kalsym.locationservice.model.TagStoreDetails;
 // import com.kalsym.locationservice.repository.CategoryLocationRepository;
 // import com.kalsym.locationservice.repository.LocationCategoryRepository;
 import com.kalsym.locationservice.repository.StoreCategoryRepository;
+import com.kalsym.locationservice.repository.StoreWithDetailsRepository;
 import com.kalsym.locationservice.repository.ParentCategoryRepository;
 import com.kalsym.locationservice.repository.RegionCountriesRepository;
 import com.kalsym.locationservice.utility.DateTimeUtil;
@@ -77,6 +80,9 @@ public class CategoryLocationService {
 
     @Autowired
     RegionCountriesRepository regionCountriesRepository;
+
+    @Autowired
+    StoreWithDetailsRepository storeWithDetailsRepository;
     
     //Get By Query WITH Pagination
     //Child category 
@@ -183,12 +189,12 @@ public class CategoryLocationService {
     //     return parentCategoriesList ;
     // }
 
-    public Page<StoreCategory> getQueryStore(List<String> cityId, String cityName, String stateId,
+    public Page<StoreWithDetails> getQueryStore(List<String> cityId, String cityName, String stateId,
             String regionCountryId, String postcode, String parentCategoryId, 
             String storeName,String tagKeyword, int page, int pageSize,
             String latitude, String longitude, double searchRadius, String sortByCol, Sort.Direction sortingOrder){
     
-        StoreCategory storeCategoryMatch = new StoreCategory();
+        StoreWithDetails storeCategoryMatch = new StoreWithDetails();
   
         Pageable pageable = PageRequest.of(page, pageSize);
         
@@ -205,13 +211,13 @@ public class CategoryLocationService {
         .matchingAll()
         .withIgnoreCase()
         .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
-        Example<StoreCategory> example = Example.of(storeCategoryMatch, matcher);
+        Example<StoreWithDetails> example = Example.of(storeCategoryMatch, matcher);
 
-        Specification<StoreCategory> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,latitude,longitude,searchRadius,example);
-        Page<StoreCategory> result = categoryRepository.findAll(storeCategorySpecs, pageable);       
+        Specification<StoreWithDetails> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,latitude,longitude,searchRadius,example);
+        Page<StoreWithDetails> result = storeWithDetailsRepository.findAll(storeCategorySpecs, pageable);       
         
-        List<StoreCategory> tempStoreList = result.getContent(); 
-        List<StoreCategory> newArrayList = new ArrayList<>(tempStoreList);
+        List<StoreWithDetails> tempStoreList = result.getContent(); 
+        List<StoreWithDetails> newArrayList = new ArrayList<>(tempStoreList);
         
         //set store distance
         // if (sortByCol.equalsIgnoreCase("distanceInMeter") && newArrayList.size()>0) {
@@ -237,61 +243,60 @@ public class CategoryLocationService {
         // }
         
         //Page mapper
-        Page<StoreCategory> output = new PageImpl<StoreCategory>(newArrayList,pageable,result.getTotalElements());
+        Page<StoreWithDetails> output = new PageImpl<StoreWithDetails>(newArrayList,pageable,result.getTotalElements());
         
-        for(StoreCategory c : output){
+        for(StoreWithDetails c : output){
             
-            Store s = c.getStoreDetails();
-            if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
+            if (latitude!=null && longitude!=null && c.getLatitude()!=null && c.getLongitude()!=null) {
                 //set store distance
-                double storeLat = Double.parseDouble(s.getLatitude());
-                double storeLong = Double.parseDouble(s.getLongitude());
+                double storeLat = Double.parseDouble(c.getLatitude());
+                double storeLong = Double.parseDouble(c.getLongitude());
                 double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
-                s.setDistanceInMeter(distance);
+                c.setDistanceInMeter(distance);
             } else {
-                s.setDistanceInMeter(0.00);
+                c.setDistanceInMeter(0.00);
             }
         
             StoreSnooze st = new StoreSnooze();
 
-            if (c.getStoreDetails().getSnoozeStartTime()!=null && c.getStoreDetails().getSnoozeEndTime()!=null) {
-                int resultSnooze = c.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
+            if (c.getSnoozeStartTime()!=null && c.getSnoozeEndTime()!=null) {
+                int resultSnooze = c.getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
                 if (resultSnooze < 0) {
-                    c.getStoreDetails().setIsSnooze(false);
+                    c.setIsSnooze(false);
 
                     st.snoozeStartTime = null;
                     st.snoozeEndTime = null;
                     st.isSnooze = false;
                     st.snoozeReason = null;
-                    c.getStoreDetails().setStoreSnooze(st);
+                    c.setStoreSnooze(st);
 
                 } else {
             
-                    c.getStoreDetails().setIsSnooze(true);
+                    c.setIsSnooze(true);
 
-                    Optional<RegionCountry> t = regionCountriesRepository.findById(c.getStoreDetails().getRegionCountryId());
+                    Optional<RegionCountry> t = regionCountriesRepository.findById(c.getRegionCountryId());
 
                     if(t.isPresent()){
-                        LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(c.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
-                        LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(c.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
+                        LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(c.getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
+                        LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(c.getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
                         
                         st.snoozeStartTime = startTime;
                         st.snoozeEndTime = endTime;
                         st.isSnooze = true;
-                        st.snoozeReason = c.getStoreDetails().getSnoozeReason();
+                        st.snoozeReason = c.getSnoozeReason();
 
-                        c.getStoreDetails().setStoreSnooze(st);
+                        c.setStoreSnooze(st);
                     }
          
                 }
             } else {
-                c.getStoreDetails().setIsSnooze(false);
+                c.setIsSnooze(false);
 
                 st.snoozeStartTime = null;
                 st.snoozeEndTime = null;
                 st.isSnooze = false;
                 st.snoozeReason = null;
-                c.getStoreDetails().setStoreSnooze(st);
+                c.setStoreSnooze(st);
             }
 
             // List<StoreAssets>  listOfAssets = new ArrayList<>();
@@ -379,7 +384,7 @@ public class CategoryLocationService {
         return result;
     }
 
-    public static Specification<StoreCategory> searchStoreCategorySpecs(
+    public static Specification<StoreWithDetails> searchStoreCategorySpecs(
         List<String> cityIdList,
         String cityName, 
         String stateId,
@@ -391,22 +396,29 @@ public class CategoryLocationService {
         String latitude, 
         String longitude,
         double radius,
-        Example<StoreCategory> example) {
+        Example<StoreWithDetails> example) {
 
-        return (Specification<StoreCategory>) (root, query, builder) -> {
+        return (Specification<StoreWithDetails>) (root, query, builder) -> {
             final List<Predicate> predicates = new ArrayList<>();
-            Join<StoreCategory, ParentCategory> storeParentCategory = root.join("parentCategory");
-            Join<StoreCategory, Store> storeDetails = root.join("storeDetails");
-            Join<Store,RegionCity> storeRegionCity = storeDetails.join("regionCityDetails");
-            Join<Store,TagStoreDetails> storeTagDetails = storeDetails.join("storeTag", JoinType.LEFT);
+            Join<StoreWithDetails, Category> storeCategory = root.join("storeCategory");
+            Join<Category, ParentCategory> storeParentCategory = storeCategory.join("parentCategory");
+            Join<StoreWithDetails,RegionCity> storeRegionCity = root.join("regionCityDetails");
+            Join<StoreWithDetails,TagStoreDetails> storeTagDetails = root.join("storeTag", JoinType.LEFT);
             Join<TagStoreDetails,TagKeyword> storeTagKeyword = storeTagDetails.join("tagKeyword", JoinType.LEFT);
+
+
+            // Join<StoreCategory, ParentCategory> storeParentCategory = root.join("parentCategory");
+            // Join<StoreCategory, Store> storeDetails = root.join("storeDetails");
+            // Join<Store,RegionCity> storeRegionCity = storeDetails.join("regionCityDetails");
+            // Join<Store,TagStoreDetails> storeTagDetails = storeDetails.join("storeTag", JoinType.LEFT);
+            // Join<TagStoreDetails,TagKeyword> storeTagKeyword = storeTagDetails.join("tagKeyword", JoinType.LEFT);
 
             
             if (cityIdList!=null) {
                 int cityCount = cityIdList.size();
                 List<Predicate> cityPredicatesList = new ArrayList<>();
                 for (int i=0;i<cityIdList.size();i++) {
-                    Predicate predicateForCity = builder.equal(storeDetails.get("city"), cityIdList.get(i));                                        
+                    Predicate predicateForCity = builder.equal(root.get("city"), cityIdList.get(i));                                        
                     cityPredicatesList.add(predicateForCity);                    
                 }
                 Predicate finalPredicate = builder.or(cityPredicatesList.toArray(new Predicate[cityCount]));
@@ -419,15 +431,15 @@ public class CategoryLocationService {
             }
 
             if (stateId != null && !stateId.isEmpty()) {
-                predicates.add(builder.equal(storeDetails.get("state"), stateId));
+                predicates.add(builder.equal(root.get("state"), stateId));
             }
 
             if (regionCountryId != null && !regionCountryId.isEmpty()) {
-                predicates.add(builder.equal(storeDetails.get("regionCountryId"), regionCountryId));
+                predicates.add(builder.equal(root.get("regionCountryId"), regionCountryId));
             }
 
             if (postcode != null && !postcode.isEmpty()) {
-                predicates.add(builder.equal(storeDetails.get("postcode"), postcode));
+                predicates.add(builder.equal(root.get("postcode"), postcode));
             }
 
             if (parentCategoryId != null && !parentCategoryId.isEmpty()) {                
@@ -435,7 +447,7 @@ public class CategoryLocationService {
             }     
             
             if (storeName != null && !storeName.isEmpty()) {                
-                predicates.add(builder.like(storeDetails.get("name"), "%"+storeName+"%"));
+                predicates.add(builder.like(root.get("name"), "%"+storeName+"%"));
 
             }
 
@@ -445,18 +457,20 @@ public class CategoryLocationService {
             }
 
             if (latitude!=null && longitude!=null) {
-                Expression<Point> point1 = builder.function("point", Point.class, storeDetails.get("longitude"), storeDetails.get("latitude"));
+                Expression<Point> point1 = builder.function("point", Point.class, root.get("longitude"), root.get("latitude"));
                 GeometryFactory factory = new GeometryFactory();
                 Point comparisonPoint = factory.createPoint(new Coordinate(Double.parseDouble(longitude), Double.parseDouble(latitude))); 
                 Predicate spatialPredicates = SpatialPredicates.distanceWithin(builder, point1, comparisonPoint, radius);
                 predicates.add(spatialPredicates);
                 
-                predicates.add(builder.isNotNull(storeDetails.get("longitude")));
-                predicates.add(builder.isNotNull(storeDetails.get("latitude")));
+                predicates.add(builder.isNotNull(root.get("longitude")));
+                predicates.add(builder.isNotNull(root.get("latitude")));
             }
             
             //use this if you want to group
-            query.groupBy(storeDetails.get("id"));
+            // query.groupBy(storeDetails.get("id"));
+            query.distinct(true);
+
                     
             predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
 
