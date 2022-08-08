@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kalsym.locationservice.LocationServiceApplication;
 import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import lombok.Getter;
@@ -63,6 +64,10 @@ public class StoreWithDetails implements Serializable  {
     private String longitude;
     
     private String latitude;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date created;
     
     @OneToMany(cascade = CascadeType.ALL,
     fetch = FetchType.LAZY)

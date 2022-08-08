@@ -53,8 +53,8 @@ public class ProductController {
         @RequestParam(required = false) String storeTagKeyword,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
-        @RequestParam(required = false, defaultValue = "name") String sortByCol,
-        @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder
+        @RequestParam(required = false, defaultValue = "created") String sortByCol,
+        @RequestParam(required = false, defaultValue = "DESC") Sort.Direction sortingOrder
     ) {
         
         String logprefix = "getProducts()";

@@ -54,8 +54,8 @@ public class StoreController {
         @RequestParam(defaultValue = "10") int pageSize,
         @RequestParam(required = false) String latitude,
         @RequestParam(required = false) String longitude,
-        @RequestParam(required = false, defaultValue = "name") String sortByCol,
-        @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder
+        @RequestParam(required = false, defaultValue = "created") String sortByCol,
+        @RequestParam(required = false, defaultValue = "DESC") Sort.Direction sortingOrder
     ) {
 
         Page<StoreWithDetails> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,tagKeyword,page,pageSize,latitude,longitude,searchRadius,sortByCol,sortingOrder);

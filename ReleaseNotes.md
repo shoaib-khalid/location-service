@@ -1,4 +1,8 @@
 ##################################################
+# location-service-1.0.27 | 08-Aug-2022
+##################################################
+1. Set created date default for sort by column in products and stores endpoint
+##################################################
 # location-service-1.0.26 | 04-Aug-2022
 ##################################################
 1. Fix total elements for group by for specification executor. Change response body. IsMainLevel for feature store.

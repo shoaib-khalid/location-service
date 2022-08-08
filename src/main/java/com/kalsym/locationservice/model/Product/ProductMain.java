@@ -1,6 +1,7 @@
 package com.kalsym.locationservice.model.Product;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -11,7 +12,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kalsym.locationservice.LocationServiceApplication;
 import com.kalsym.locationservice.model.Category;
@@ -48,6 +52,10 @@ public class ProductMain implements Serializable  {
     @OneToOne()
     @JoinColumn(name = "storeId",referencedColumnName="id")
     private Store storeDetails; 
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date created;
 
     // @OneToMany(cascade = CascadeType.ALL,
     //         fetch = FetchType.LAZY)
