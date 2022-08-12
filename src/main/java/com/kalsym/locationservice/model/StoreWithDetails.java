@@ -28,6 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import org.hibernate.annotations.Formula;
 
 @Entity
 @Table(name = "store")
@@ -107,4 +108,7 @@ public class StoreWithDetails implements Serializable  {
     
     @Transient
     private Double distanceInMeter;
+    
+    @Formula("isStoreOpen(id)" )
+    private Boolean isStoreOpen;
 }

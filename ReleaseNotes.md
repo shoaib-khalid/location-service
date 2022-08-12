@@ -1,4 +1,38 @@
 ##################################################
+# location-service-1.0.28 | 12-Aug-2022
+##################################################
+Add new column isStoreOpen in StoreWithDetails to allow sort by open store
+
+##DB Changes:
+DELIMITER $$
+
+USE `symplified`$$
+
+DROP FUNCTION IF EXISTS `isStoreOpen`$$
+
+CREATE DEFINER=`root`@`%` FUNCTION `isStoreOpen`(inStoreId VARCHAR(50)) RETURNS VARCHAR(50) CHARSET utf8
+    DETERMINISTIC
+BEGIN
+    
+    DECLARE foundOpenTime VARCHAR(50);
+    
+    SELECT openTime INTO foundOpenTime FROM store_timing 
+	WHERE STR_TO_DATE(openTime,'%H:%i')<TIME(NOW()) 
+	AND STR_TO_DATE(closeTime,'%H:%i')>TIME(NOW())
+	AND DAY=DAYNAME(NOW()) 
+	AND isOff=0
+	AND storeId = inStoreId;
+    IF foundOpenTime IS NOT NULL THEN
+    RETURN 1;
+    ELSE
+    RETURN 0;
+    END IF;
+    END$$
+
+DELIMITER ;
+
+
+##################################################
 # location-service-1.0.27 | 08-Aug-2022
 ##################################################
 1. Set created date default for sort by column in products and stores endpoint

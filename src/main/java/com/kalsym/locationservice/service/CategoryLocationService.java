@@ -200,9 +200,9 @@ public class CategoryLocationService {
         
         if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
             if (sortingOrder==Sort.Direction.ASC)
-                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
+                pageable = PageRequest.of(page, pageSize, Sort.by("isStoreOpen").descending().and(Sort.by(sortByCol).ascending()));
             else if (sortingOrder==Sort.Direction.DESC)
-                pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
+                pageable = PageRequest.of(page, pageSize, Sort.by("isStoreOpen").descending().and(Sort.by(sortByCol).ascending()));
         } else {
             pageable = PageRequest.of(page, pageSize);
         }
