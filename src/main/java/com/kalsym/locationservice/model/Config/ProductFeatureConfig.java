@@ -55,5 +55,8 @@ public class ProductFeatureConfig {
     @Column(name="updated_at")
     private Date updatedAt;
 
+    private Integer mainLevelSequence;
+
+
 }
 

@@ -1,4 +1,9 @@
 ##################################################
+# location-service-1.0.29 | 15-Aug-2022
+##################################################
+1. Add new request param storeName for endpoint featured store
+2. add new column mainLevelSequence for entity StoreConfig and ProductFeatureConfig
+##################################################
 # location-service-1.0.28 | 12-Aug-2022
 ##################################################
 Add new column isStoreOpen in StoreWithDetails to allow sort by open store

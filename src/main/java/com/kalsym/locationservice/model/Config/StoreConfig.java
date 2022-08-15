@@ -56,6 +56,8 @@ public class StoreConfig implements Serializable {
     @JoinColumn(name = "storeId",referencedColumnName="storeId", insertable = false, updatable = false, nullable = true)
     private List<Category> storeCategory;
 
+    private Integer mainLevelSequence;
+
     // @OneToMany(cascade = CascadeType.ALL,
     // fetch = FetchType.EAGER)
     // @JoinColumn(name = "storeId",referencedColumnName="storeId", insertable = false, updatable = false, nullable = true)
