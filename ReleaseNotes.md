@@ -2,6 +2,8 @@
 # location-service-1.0.30 | 15-Aug-2022
 ##################################################
 1. List the hashtag lists
+2. add new enum CoverImageUrl for storeAssets (note: alter table notes in product service)
+
 ##################################################
 # location-service-1.0.29 | 15-Aug-2022
 ##################################################
