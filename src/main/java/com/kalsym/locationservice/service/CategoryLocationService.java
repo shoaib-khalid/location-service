@@ -22,7 +22,7 @@ import com.kalsym.locationservice.model.StoreSnooze;
 import com.kalsym.locationservice.model.StoreWithDetails;
 import com.kalsym.locationservice.model.TagKeyword;
 import com.kalsym.locationservice.model.TagStoreDetails;
-import com.kalsym.locationservice.model.Config.StoreFeaturedConfig;
+import com.kalsym.locationservice.model.Config.StoreFeaturedSimple;
 
 // import com.kalsym.locationservice.model.CategoryLocation;
 // import com.kalsym.locationservice.model.LocationCategory;
@@ -414,7 +414,7 @@ public class CategoryLocationService {
             Join<StoreWithDetails,RegionCity> storeRegionCity = root.join("regionCityDetails");
             Join<StoreWithDetails,TagStoreDetails> storeTagDetails = root.join("storeTag", JoinType.LEFT);
             Join<TagStoreDetails,TagKeyword> storeTagKeyword = storeTagDetails.join("tagKeyword", JoinType.LEFT);
-            Join<StoreWithDetails,StoreFeaturedConfig> storeFeaturedConfig = root.join("featuredStore", JoinType.LEFT);
+            Join<StoreWithDetails,StoreFeaturedSimple> storeFeaturedConfig = root.join("featuredStore", JoinType.LEFT);
 
             // Join<StoreCategory, ParentCategory> storeParentCategory = root.join("parentCategory");
             // Join<StoreCategory, Store> storeDetails = root.join("storeDetails");

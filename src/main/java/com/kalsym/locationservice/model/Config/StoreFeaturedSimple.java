@@ -33,7 +33,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class StoreFeaturedConfig implements Serializable {
+public class StoreFeaturedSimple implements Serializable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

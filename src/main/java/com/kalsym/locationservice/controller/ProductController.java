@@ -51,6 +51,7 @@ public class ProductController {
         @RequestParam(required = false) String latitude,
         @RequestParam(required = false) String longitude,
         @RequestParam(required = false) String storeTagKeyword,
+        @RequestParam(required = false) Boolean isMainLevel,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
         @RequestParam(required = false, defaultValue = "created") String sortByCol,
@@ -60,7 +61,7 @@ public class ProductController {
         String logprefix = "getProducts()";
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products request...");
         
-        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,searchRadius,storeTagKeyword,page,pageSize,sortByCol,sortingOrder);
+        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,searchRadius,storeTagKeyword,isMainLevel,page,pageSize,sortByCol,sortingOrder);
         
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products result : "+body.toString());
        

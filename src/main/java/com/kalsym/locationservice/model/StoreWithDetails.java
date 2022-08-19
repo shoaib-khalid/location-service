@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import org.hibernate.annotations.Formula;
 
-import com.kalsym.locationservice.model.Config.StoreFeaturedConfig;
+import com.kalsym.locationservice.model.Config.StoreFeaturedSimple;
 
 @Entity
 @Table(name = "store")
@@ -94,7 +94,7 @@ public class StoreWithDetails implements Serializable  {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "storeId", insertable = false, updatable = false, nullable = true)
-    private StoreFeaturedConfig featuredStore;
+    private StoreFeaturedSimple featuredStore;
         
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

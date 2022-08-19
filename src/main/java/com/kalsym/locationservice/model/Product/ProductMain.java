@@ -19,7 +19,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kalsym.locationservice.LocationServiceApplication;
 import com.kalsym.locationservice.model.Category;
+import com.kalsym.locationservice.model.Config.ProductFeatureSimple;
 import com.kalsym.locationservice.model.Store;
+import javax.persistence.ManyToOne;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -82,4 +84,8 @@ public class ProductMain implements Serializable  {
     // public int compareTo(ProductMain o) {
     //     return this.getStoreDetails().getDistanceInMeter().compareTo(o.getStoreDetails().getDistanceInMeter());
     // }
+        
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", referencedColumnName = "productId", insertable = false, updatable = false, nullable = true)
+    private ProductFeatureSimple featuredProduct;
 }

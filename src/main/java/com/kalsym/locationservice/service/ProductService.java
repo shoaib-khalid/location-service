@@ -20,6 +20,7 @@ import com.kalsym.locationservice.model.StoreSnooze;
 import com.kalsym.locationservice.model.TagKeyword;
 import com.kalsym.locationservice.model.TagStoreDetails;
 import com.kalsym.locationservice.model.Config.ProductFeatureConfig;
+import com.kalsym.locationservice.model.Config.ProductFeatureSimple;
 import com.kalsym.locationservice.model.Discount.StoreDiscountProduct;
 import com.kalsym.locationservice.model.Product.ItemDiscount;
 import com.kalsym.locationservice.model.Product.ProductInventoryWithDetails;
@@ -105,7 +106,7 @@ public class ProductService {
     public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(
             List<String> status,String regionCountryId,String parentCategoryId, 
             List<String> cityId, String cityName, String name, 
-            String latitude, String longitude, double radius,String storeTagKeyword,
+            String latitude, String longitude, double radius,String storeTagKeyword, Boolean isMainLevel,
             int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){           
 
         //get reqion country for store
@@ -138,7 +139,7 @@ public class ProductService {
                 .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<ProductMain> example = Example.of(productMatch, matcher);
         
-        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, sortByCol,sortingOrder,example);
+        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, isMainLevel, sortByCol,sortingOrder,example);
         
         Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);       
         
@@ -523,6 +524,7 @@ public class ProductService {
             String longitude,
             double radius,
             String storeTagKeyword,
+            Boolean isMainLevel,
             String sortByCol, Sort.Direction sortingOrder,
             Example<ProductMain> example) {
 
@@ -533,6 +535,7 @@ public class ProductService {
             Join<Store, RegionCity> regionCity = store.join("regionCityDetails");
             Join<Store,TagStoreDetails> storeTagDetails = store.join("storeTag", JoinType.LEFT);
             Join<TagStoreDetails,TagKeyword> storeTagKeywords = storeTagDetails.join("tagKeyword", JoinType.LEFT);
+            Join<ProductMain,ProductFeatureSimple> productFeatured = root.join("featuredProduct", JoinType.LEFT);
             
             if (regionCountryId != null && !regionCountryId.isEmpty()) {
                 predicates.add(builder.equal(store.get("regionCountryId"), regionCountryId));
@@ -617,13 +620,33 @@ public class ProductService {
 
             //https://stackoverflow.com/questions/46541922/jpa-criteriaquery-order-by-with-two-criteria
 
-            //sORT IMAGE FIRST , THEN PRODUCT SORT by <COLUMN>
+            
             List<Order> orderList = new ArrayList<Order>();
-            orderList.add
-            (builder.asc(builder.selectCase()
-            .when(root.get("thumbnailUrl").isNull(), 1)
-            .otherwise(0)));
+            
+            if (isMainLevel!=null && isMainLevel==true) {
+               //sORT FEATURED FIRST , THEN IMAGE
+                orderList.add(builder.asc(builder.selectCase()
+                .when(productFeatured.get("id").isNull(), 1)
+                .otherwise(0)));
+                
+                orderList.add(builder.desc(productFeatured.get("isMainLevel")));
+                
+                orderList.add(builder.asc(productFeatured.get("mainLevelSequence")));
+            } else {
+                //sORT FEATURED FIRST , THEN IMAGE
+                orderList.add(builder.asc(builder.selectCase()
+                .when(productFeatured.get("id").isNull(), 1)
+                .otherwise(0)));
 
+                orderList.add(builder.asc(productFeatured.get("sequence")));              
+            }
+            
+            //sORT IMAGE FIRST , THEN PRODUCT SORT by <COLUMN>
+              orderList.add
+              (builder.asc(builder.selectCase()
+              .when(root.get("thumbnailUrl").isNull(), 1)
+              .otherwise(0)));
+            
             if (sortingOrder==Sort.Direction.ASC){
                 orderList.add(builder.asc(root.get(sortByCol)));
 
