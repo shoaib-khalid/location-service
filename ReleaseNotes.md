@@ -1,7 +1,8 @@
 ##################################################
 # location-service-1.0.31 | 19-Aug-2022
 ##################################################
-Combined feature store & normal store inside getStores() order by featured store
+Combined featured store & normal store inside getStores() order by featured store
+Combined featured product & normal store inside getProducts() order by featured product
 
 
 ##################################################
