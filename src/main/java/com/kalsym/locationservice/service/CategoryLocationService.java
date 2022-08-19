@@ -22,6 +22,8 @@ import com.kalsym.locationservice.model.StoreSnooze;
 import com.kalsym.locationservice.model.StoreWithDetails;
 import com.kalsym.locationservice.model.TagKeyword;
 import com.kalsym.locationservice.model.TagStoreDetails;
+import com.kalsym.locationservice.model.Config.StoreFeaturedConfig;
+
 // import com.kalsym.locationservice.model.CategoryLocation;
 // import com.kalsym.locationservice.model.LocationCategory;
 // import com.kalsym.locationservice.repository.CategoryLocationRepository;
@@ -192,17 +194,24 @@ public class CategoryLocationService {
     public Page<StoreWithDetails> getQueryStore(List<String> cityId, String cityName, String stateId,
             String regionCountryId, String postcode, String parentCategoryId, 
             String storeName,String tagKeyword, int page, int pageSize,
-            String latitude, String longitude, double searchRadius, String sortByCol, Sort.Direction sortingOrder){
+            String latitude, String longitude, double searchRadius, Boolean isMainLevel, String sortByCol, Sort.Direction sortingOrder){
     
         StoreWithDetails storeCategoryMatch = new StoreWithDetails();
   
         Pageable pageable = PageRequest.of(page, pageSize);
         
         if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
-            if (sortingOrder==Sort.Direction.ASC)
-                pageable = PageRequest.of(page, pageSize, Sort.by("isStoreOpen").descending().and(Sort.by(sortByCol).ascending()));
-            else if (sortingOrder==Sort.Direction.DESC)
-                pageable = PageRequest.of(page, pageSize, Sort.by("isStoreOpen").descending().and(Sort.by(sortByCol).ascending()));
+            if (isMainLevel!=null && isMainLevel) {
+                if (sortingOrder==Sort.Direction.ASC)
+                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.isMainLevel").descending().and(Sort.by("featuredStore.mainLevelSequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by(sortByCol).ascending()));
+                else if (sortingOrder==Sort.Direction.DESC)
+                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.isMainLevel").descending().and(Sort.by("featuredStore.mainLevelSequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by(sortByCol).ascending()));
+            } else {
+                if (sortingOrder==Sort.Direction.ASC)
+                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.id").descending().and(Sort.by("featuredStore.sequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by(sortByCol).ascending()));
+                else if (sortingOrder==Sort.Direction.DESC)
+                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.id").descending().and(Sort.by("featuredStore.sequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by(sortByCol).ascending()));
+            }
         } else {
             pageable = PageRequest.of(page, pageSize);
         }
@@ -395,7 +404,7 @@ public class CategoryLocationService {
         String keyword, 
         String latitude, 
         String longitude,
-        double radius,
+        double radius,        
         Example<StoreWithDetails> example) {
 
         return (Specification<StoreWithDetails>) (root, query, builder) -> {
@@ -405,7 +414,7 @@ public class CategoryLocationService {
             Join<StoreWithDetails,RegionCity> storeRegionCity = root.join("regionCityDetails");
             Join<StoreWithDetails,TagStoreDetails> storeTagDetails = root.join("storeTag", JoinType.LEFT);
             Join<TagStoreDetails,TagKeyword> storeTagKeyword = storeTagDetails.join("tagKeyword", JoinType.LEFT);
-
+            Join<StoreWithDetails,StoreFeaturedConfig> storeFeaturedConfig = root.join("featuredStore", JoinType.LEFT);
 
             // Join<StoreCategory, ParentCategory> storeParentCategory = root.join("parentCategory");
             // Join<StoreCategory, Store> storeDetails = root.join("storeDetails");

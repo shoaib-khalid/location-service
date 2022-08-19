@@ -30,6 +30,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import org.hibernate.annotations.Formula;
 
+import com.kalsym.locationservice.model.Config.StoreFeaturedConfig;
+
 @Entity
 @Table(name = "store")
 @Getter
@@ -89,7 +91,11 @@ public class StoreWithDetails implements Serializable  {
     fetch = FetchType.EAGER)
     @JoinColumn(name = "storeId", insertable = false, updatable = false, nullable = true)
     private List<StoreTiming> storeTiming;
-
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", referencedColumnName = "storeId", insertable = false, updatable = false, nullable = true)
+    private StoreFeaturedConfig featuredStore;
+        
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date snoozeStartTime;
@@ -111,4 +117,5 @@ public class StoreWithDetails implements Serializable  {
     
     @Formula("isStoreOpen(id)" )
     private Boolean isStoreOpen;
+    
 }

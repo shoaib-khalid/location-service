@@ -1,4 +1,10 @@
 ##################################################
+# location-service-1.0.31 | 19-Aug-2022
+##################################################
+Combined feature store & normal store inside getStores() order by featured store
+
+
+##################################################
 # location-service-1.0.30 | 15-Aug-2022
 ##################################################
 1. List the hashtag lists
