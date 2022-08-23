@@ -63,6 +63,8 @@ public class Store implements Serializable {
     
     private String latitude;
     
+    private String verticalCode;
+    
     // @OneToOne()
     // @JoinColumn(name = "id",referencedColumnName="storeId", insertable = false, updatable = false, nullable = true)
     // private StoreAsset storeAsset;

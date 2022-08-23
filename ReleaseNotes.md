@@ -1,4 +1,11 @@
 ##################################################
+# location-service-1.0.32 | 23-Aug-2022
+##################################################
+Put ecommerce store in back
+Put ecommerce product in back
+
+
+##################################################
 # location-service-1.0.31 | 19-Aug-2022
 ##################################################
 Combined featured store & normal store inside getStores() order by featured store

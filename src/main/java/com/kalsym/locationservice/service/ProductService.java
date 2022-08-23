@@ -647,6 +647,9 @@ public class ProductService {
               .when(root.get("thumbnailUrl").isNull(), 1)
               .otherwise(0)));
             
+            //sort by verticalCode, FNB front
+            orderList.add(builder.desc(store.get("verticalCode")));  
+              
             if (sortingOrder==Sort.Direction.ASC){
                 orderList.add(builder.asc(root.get(sortByCol)));
 

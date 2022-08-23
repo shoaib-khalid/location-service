@@ -68,6 +68,8 @@ public class StoreWithDetails implements Serializable  {
     
     private String latitude;
     
+    private String verticalCode;
+    
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date created;

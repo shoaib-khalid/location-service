@@ -203,14 +203,14 @@ public class CategoryLocationService {
         if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
             if (isMainLevel!=null && isMainLevel) {
                 if (sortingOrder==Sort.Direction.ASC)
-                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.isMainLevel").descending().and(Sort.by("featuredStore.mainLevelSequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by(sortByCol).ascending()));
+                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.isMainLevel").descending().and(Sort.by("featuredStore.mainLevelSequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
                 else if (sortingOrder==Sort.Direction.DESC)
-                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.isMainLevel").descending().and(Sort.by("featuredStore.mainLevelSequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by(sortByCol).ascending()));
+                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.isMainLevel").descending().and(Sort.by("featuredStore.mainLevelSequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
             } else {
                 if (sortingOrder==Sort.Direction.ASC)
-                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.id").descending().and(Sort.by("featuredStore.sequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by(sortByCol).ascending()));
+                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.id").descending().and(Sort.by("featuredStore.sequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
                 else if (sortingOrder==Sort.Direction.DESC)
-                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.id").descending().and(Sort.by("featuredStore.sequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by(sortByCol).ascending()));
+                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.id").descending().and(Sort.by("featuredStore.sequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
             }
         } else {
             pageable = PageRequest.of(page, pageSize);
