@@ -659,6 +659,9 @@ public class ProductService {
             }
 
             query.orderBy(orderList);
+
+            query.distinct(true);
+
             
             predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
 
