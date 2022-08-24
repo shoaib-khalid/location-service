@@ -222,7 +222,7 @@ public class CategoryLocationService {
         .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<StoreWithDetails> example = Example.of(storeCategoryMatch, matcher);
 
-        Specification<StoreWithDetails> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,latitude,longitude,searchRadius,example);
+        Specification<StoreWithDetails> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,isMainLevel,latitude,longitude,searchRadius,example);
         Page<StoreWithDetails> result = storeWithDetailsRepository.findAll(storeCategorySpecs, pageable);       
         
         List<StoreWithDetails> tempStoreList = result.getContent(); 
@@ -401,7 +401,8 @@ public class CategoryLocationService {
         String postcode, 
         String parentCategoryId,
         String storeName,
-        String keyword, 
+        String keyword,
+        Boolean isMainLevel, 
         String latitude, 
         String longitude,
         double radius,        
@@ -474,6 +475,10 @@ public class CategoryLocationService {
                 
                 predicates.add(builder.isNotNull(root.get("longitude")));
                 predicates.add(builder.isNotNull(root.get("latitude")));
+            }
+
+            if (isMainLevel != null) {
+                predicates.add(builder.equal(storeFeaturedConfig.get("isMainLevel"), isMainLevel));
             }
             
             //use this if you want to group
