@@ -14,6 +14,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -73,11 +74,37 @@ public class ProductMain implements Serializable  {
     @JoinColumn(name = "categoryId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
     private Category storeCategory;  
 
+    private Integer shortId;
+
+    @Transient 
+    String seoUrlMarketPlace;
+
+    @Transient 
+    String seoUrlSf;
+
+    @Transient 
+    String seoNameMarketplace;
+
     public String getThumbnailUrl() {
         if (thumbnailUrl==null)
             return null;
         else
             return LocationServiceApplication.ASSETURL+ thumbnailUrl;
+    }
+
+    public String getSeoUrlMarketPlace() {
+
+        return LocationServiceApplication.MARKETPLACEURL+"/"+shortId+"-"+seoName;
+    }
+
+    public String getSeoUrlSf() {
+
+        return seoUrl+"/"+shortId;
+    }
+
+    public String getSeoNameMarketplace() {
+
+        return shortId+"-"+seoName;
     }
     
     //  @Override

@@ -1,4 +1,10 @@
 ##################################################
+# location-service-1.0.33 | 30-Aug-2022
+##################################################
+1 . Update application properties , add seo thingy in response
+marketplace.url = https://dev-my.symplified.ai
+
+##################################################
 # location-service-1.0.32 | 23-Aug-2022
 ##################################################
 Put ecommerce store in back
