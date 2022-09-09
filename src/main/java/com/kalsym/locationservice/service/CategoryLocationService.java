@@ -194,7 +194,7 @@ public class CategoryLocationService {
     public Page<StoreWithDetails> getQueryStore(List<String> cityId, String cityName, String stateId,
             String regionCountryId, String postcode, String parentCategoryId, 
             String storeName,String tagKeyword, int page, int pageSize,
-            String latitude, String longitude, double searchRadius, Boolean isMainLevel, String sortByCol, Sort.Direction sortingOrder){
+            String latitude, String longitude, double searchRadius, Boolean isMainLevel,Boolean isDineIn,Boolean isDelivery, String sortByCol, Sort.Direction sortingOrder){
     
         StoreWithDetails storeCategoryMatch = new StoreWithDetails();
   
@@ -222,7 +222,7 @@ public class CategoryLocationService {
         .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<StoreWithDetails> example = Example.of(storeCategoryMatch, matcher);
 
-        Specification<StoreWithDetails> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,isMainLevel,latitude,longitude,searchRadius,example);
+        Specification<StoreWithDetails> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,isMainLevel,isDineIn, isDelivery, latitude,longitude,searchRadius,example);
         Page<StoreWithDetails> result = storeWithDetailsRepository.findAll(storeCategorySpecs, pageable);       
         
         List<StoreWithDetails> tempStoreList = result.getContent(); 
@@ -403,6 +403,8 @@ public class CategoryLocationService {
         String storeName,
         String keyword,
         Boolean isMainLevel, 
+        Boolean isDineIn,
+        Boolean isDelivery,
         String latitude, 
         String longitude,
         double radius,        
@@ -479,6 +481,14 @@ public class CategoryLocationService {
 
             if (isMainLevel != null) {
                 predicates.add(builder.equal(storeFeaturedConfig.get("isMainLevel"), isMainLevel));
+            }
+
+            if (isDineIn != null) {
+                predicates.add(builder.equal(root.get("isDineIn"), isDineIn));
+            }
+
+            if (isDelivery != null) {
+                predicates.add(builder.equal(root.get("isDelivery"), isDelivery));
             }
             
             //use this if you want to group

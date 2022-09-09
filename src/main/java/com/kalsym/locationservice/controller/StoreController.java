@@ -55,11 +55,18 @@ public class StoreController {
         @RequestParam(required = false) String latitude,
         @RequestParam(required = false) String longitude,
         @RequestParam(required = false) Boolean isMainLevel,
+        @RequestParam(required = false) Boolean isDineIn,
+        @RequestParam(required = false) Boolean isDelivery,
         @RequestParam(required = false, defaultValue = "created") String sortByCol,
         @RequestParam(required = false, defaultValue = "DESC") Sort.Direction sortingOrder
     ) {
 
-        Page<StoreWithDetails> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,tagKeyword,page,pageSize,latitude,longitude,searchRadius,isMainLevel,sortByCol,sortingOrder);
+        //to set default filter
+        if(isDelivery == null && isDineIn == null){
+            isDelivery = true;
+        }
+
+        Page<StoreWithDetails> body = categoryLocationService.getQueryStore(cityId,cityName,stateId,regionCountryId,postcode,parentCategoryId,storeName,tagKeyword,page,pageSize,latitude,longitude,searchRadius,isMainLevel,isDineIn,isDelivery,sortByCol,sortingOrder);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

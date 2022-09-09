@@ -1,4 +1,9 @@
 ##################################################
+# location-service-1.0.34 | 09-Aug-2022
+##################################################
+1 . Update db in product service first
+2 . Add query param for filtering isDine , isDelivery 
+##################################################
 # location-service-1.0.33 | 30-Aug-2022
 ##################################################
 1 . Update application properties , add seo thingy in response

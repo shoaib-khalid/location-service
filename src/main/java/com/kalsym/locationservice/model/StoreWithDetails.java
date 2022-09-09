@@ -108,6 +108,14 @@ public class StoreWithDetails implements Serializable  {
     
     private String snoozeReason;
 
+    private Boolean isDineIn;
+
+    private String dineInOption;
+
+    private String dineInPaymentType;
+
+    private Boolean isDelivery;
+
     @Transient
     Boolean isSnooze;
 

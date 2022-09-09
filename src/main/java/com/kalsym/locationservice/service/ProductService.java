@@ -106,7 +106,7 @@ public class ProductService {
     public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(
             List<String> status,String regionCountryId,String parentCategoryId, 
             List<String> cityId, String cityName, String name, 
-            String latitude, String longitude, double radius,String storeTagKeyword, Boolean isMainLevel,
+            String latitude, String longitude, double radius,String storeTagKeyword, Boolean isMainLevel,Boolean isDineIn,Boolean isDelivery,
             int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){           
 
         //get reqion country for store
@@ -139,7 +139,7 @@ public class ProductService {
                 .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<ProductMain> example = Example.of(productMatch, matcher);
         
-        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, isMainLevel, sortByCol,sortingOrder,example);
+        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, isMainLevel, isDineIn, isDelivery, sortByCol,sortingOrder,example);
         
         Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);       
         
@@ -525,6 +525,7 @@ public class ProductService {
             double radius,
             String storeTagKeyword,
             Boolean isMainLevel,
+            Boolean isDineIn,Boolean isDelivery,
             String sortByCol, Sort.Direction sortingOrder,
             Example<ProductMain> example) {
 
@@ -610,6 +611,14 @@ public class ProductService {
                 
                 predicates.add(builder.isNotNull(store.get("longitude")));
                 predicates.add(builder.isNotNull(store.get("latitude")));
+            }
+
+            if (isDineIn != null) {
+                predicates.add(builder.equal(store.get("isDineIn"), isDineIn));
+            }
+
+            if (isDineIn != null) {
+                predicates.add(builder.equal(store.get("isDelivery"), isDelivery));
             }
 
             // select * from product p 

@@ -52,16 +52,22 @@ public class ProductController {
         @RequestParam(required = false) String longitude,
         @RequestParam(required = false) String storeTagKeyword,
         @RequestParam(required = false) Boolean isMainLevel,
+        @RequestParam(required = false) Boolean isDineIn,
+        @RequestParam(required = false) Boolean isDelivery,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
         @RequestParam(required = false, defaultValue = "created") String sortByCol,
         @RequestParam(required = false, defaultValue = "DESC") Sort.Direction sortingOrder
     ) {
+        //to set default filter
+        if(isDelivery == null && isDineIn == null){
+            isDelivery = true;
+        }
         
         String logprefix = "getProducts()";
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products request...");
         
-        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,searchRadius,storeTagKeyword,isMainLevel,page,pageSize,sortByCol,sortingOrder);
+        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,searchRadius,storeTagKeyword,isMainLevel,isDineIn,isDelivery,page,pageSize,sortByCol,sortingOrder);
         
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products result : "+body.toString());
        
