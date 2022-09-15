@@ -26,5 +26,9 @@ public class TagKeyword {
     private Integer id;
 
     private String keyword;
-    
+
+    private String longitude;
+
+    private String latitude;
+
 }

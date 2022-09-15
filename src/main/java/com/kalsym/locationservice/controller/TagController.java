@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -26,18 +27,23 @@ public class TagController {
     @Autowired
     TagKeywordService tagKeywordService;
 
+    @Value("${product.search.radius:20000}")
+    private Double searchRadius;
+
     @GetMapping(path = {"/tags"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getTags(
         HttpServletRequest request,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
+        @RequestParam(required = false) String latitude,
+        @RequestParam(required = false) String longitude,
         @RequestParam(required = false, defaultValue = "keyword") String sortByCol,
         @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder
     ) {
 
         // List<TagKeyword> body = tagKeywordService.getTagList();
-        Page<TagKeyword> body = tagKeywordService.getTagListWithPageable(page,pageSize,sortByCol,sortingOrder);
+        Page<TagKeyword> body = tagKeywordService.getTagListWithPageable(page,pageSize,latitude,longitude,searchRadius,sortByCol,sortingOrder);
 
         
         HttpResponse response = new HttpResponse(request.getRequestURI());

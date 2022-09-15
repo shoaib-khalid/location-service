@@ -1,4 +1,13 @@
 ##################################################
+# location-service-1.0.35 | 15-September-2022
+##################################################
+1 . Add query param longitutde and latitude
+2 . Add new column
+
+ALTER TABLE symplified.tag_keyword ADD longitude varchar(100) NULL;
+ALTER TABLE symplified.tag_keyword ADD latitude varchar(20) NULL;
+
+##################################################
 # location-service-1.0.34 | 09-Aug-2022
 ##################################################
 1 . Update db in product service first
