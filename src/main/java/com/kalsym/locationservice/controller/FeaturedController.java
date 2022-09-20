@@ -40,7 +40,7 @@ public class FeaturedController {
     @Autowired
     ProductService productService;
 
-    @Value("${product.search.radius:20000}")
+    @Value("${product.search.radius}")
     private Double searchRadius;
 
     @GetMapping(path = {"/location"}, name = "store-customers-get")

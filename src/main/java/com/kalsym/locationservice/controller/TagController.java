@@ -27,7 +27,7 @@ public class TagController {
     @Autowired
     TagKeywordService tagKeywordService;
 
-    @Value("${product.search.radius:20000}")
+    @Value("${product.search.radius}")
     private Double searchRadius;
 
     @GetMapping(path = {"/tags"}, name = "store-customers-get")

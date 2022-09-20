@@ -35,7 +35,7 @@ public class StoreController {
     @Autowired
     StoreService storeService;
     
-    @Value("${product.search.radius:20000}")
+    @Value("${product.search.radius}")
     private Double searchRadius;
 
     @GetMapping(path = {"/stores"}, name = "store-customers-get")
