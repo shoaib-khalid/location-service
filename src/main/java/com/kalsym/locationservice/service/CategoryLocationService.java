@@ -509,6 +509,10 @@ public class CategoryLocationService {
                  orderList.add(builder.asc(builder.selectCase()
                  .when(storeFeaturedConfig.get("id").isNull(), 1)
                  .otherwise(0)));
+
+                 orderList.add(builder.asc(builder.selectCase()
+                 .when(storeFeaturedConfig.get("sequence").isNull(), 1)
+                 .otherwise(0)));
  
                  orderList.add(builder.asc(storeFeaturedConfig.get("sequence")));              
              }
