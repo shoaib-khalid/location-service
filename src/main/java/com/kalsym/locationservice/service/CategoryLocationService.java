@@ -67,6 +67,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.PageImpl;
+import javax.persistence.criteria.Order;
 
 @Service
 public class CategoryLocationService {
@@ -200,21 +201,21 @@ public class CategoryLocationService {
   
         Pageable pageable = PageRequest.of(page, pageSize);
         
-        if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
-            if (isMainLevel!=null && isMainLevel) {
-                if (sortingOrder==Sort.Direction.ASC)
-                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.isMainLevel").descending().and(Sort.by("featuredStore.mainLevelSequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
-                else if (sortingOrder==Sort.Direction.DESC)
-                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.isMainLevel").descending().and(Sort.by("featuredStore.mainLevelSequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
-            } else {
-                if (sortingOrder==Sort.Direction.ASC)
-                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.id").descending().and(Sort.by("featuredStore.sequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
-                else if (sortingOrder==Sort.Direction.DESC)
-                    pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.id").descending().and(Sort.by("featuredStore.sequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
-            }
-        } else {
-            pageable = PageRequest.of(page, pageSize);
-        }
+        // if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
+        //     if (isMainLevel!=null && isMainLevel) {
+        //         if (sortingOrder==Sort.Direction.ASC)
+        //             pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.isMainLevel").descending().and(Sort.by("featuredStore.mainLevelSequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
+        //         else if (sortingOrder==Sort.Direction.DESC)
+        //             pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.isMainLevel").descending().and(Sort.by("featuredStore.mainLevelSequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
+        //     } else {
+        //         if (sortingOrder==Sort.Direction.ASC)
+        //             pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.id").descending().and(Sort.by("featuredStore.sequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
+        //         else if (sortingOrder==Sort.Direction.DESC)
+        //             pageable = PageRequest.of(page, pageSize, Sort.by("featuredStore.id").descending().and(Sort.by("featuredStore.sequence").ascending()).and(Sort.by("isStoreOpen").descending()).and(Sort.by("verticalCode").descending()).and(Sort.by(sortByCol).ascending()));
+        //     }
+        // } else {
+        //     pageable = PageRequest.of(page, pageSize);
+        // }
         
         ExampleMatcher matcher = ExampleMatcher
         .matchingAll()
@@ -222,7 +223,7 @@ public class CategoryLocationService {
         .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<StoreWithDetails> example = Example.of(storeCategoryMatch, matcher);
 
-        Specification<StoreWithDetails> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,isMainLevel,isDineIn, isDelivery, latitude,longitude,searchRadius,example);
+        Specification<StoreWithDetails> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,isMainLevel,isDineIn, isDelivery, latitude,longitude,searchRadius,sortByCol,sortingOrder,example);
         Page<StoreWithDetails> result = storeWithDetailsRepository.findAll(storeCategorySpecs, pageable);       
         
         List<StoreWithDetails> tempStoreList = result.getContent(); 
@@ -407,7 +408,8 @@ public class CategoryLocationService {
         Boolean isDelivery,
         String latitude, 
         String longitude,
-        double radius,        
+        double radius, 
+        String sortByCol, Sort.Direction sortingOrder,       
         Example<StoreWithDetails> example) {
 
         return (Specification<StoreWithDetails>) (root, query, builder) -> {
@@ -490,7 +492,44 @@ public class CategoryLocationService {
             if (isDelivery != null) {
                 predicates.add(builder.equal(root.get("isDelivery"), isDelivery));
             }
+
+            List<Order> orderList = new ArrayList<Order>();
+
+            if (isMainLevel!=null && isMainLevel==true) {
+                //sORT FEATURED FIRST  is isMainLevel
+                 orderList.add(builder.asc(builder.selectCase()
+                 .when(storeFeaturedConfig.get("id").isNull(), 1)
+                 .otherwise(0)));
+
+                 orderList.add(builder.desc(storeFeaturedConfig.get("isMainLevel")));
+
+                 orderList.add(builder.asc(storeFeaturedConfig.get("mainLevelSequence")));
+             } else {
+                 //sORT FEATURED location level 
+                 orderList.add(builder.asc(builder.selectCase()
+                 .when(storeFeaturedConfig.get("id").isNull(), 1)
+                 .otherwise(0)));
+ 
+                 orderList.add(builder.asc(storeFeaturedConfig.get("sequence")));              
+             }
+
+            //sort by store open
+            orderList.add(builder.desc(root.get("isStoreOpen")));  
+
+            //sort by verticalCode, FNB front
+            orderList.add(builder.desc(root.get("verticalCode")));
             
+            //then sort by col
+            if (sortingOrder==Sort.Direction.ASC){
+                orderList.add(builder.asc(root.get(sortByCol)));
+
+            }else{
+                orderList.add(builder.desc(root.get(sortByCol)));
+
+            }
+
+            query.orderBy(orderList);
+
             //use this if you want to group
             // query.groupBy(storeDetails.get("id"));
             query.distinct(true);
