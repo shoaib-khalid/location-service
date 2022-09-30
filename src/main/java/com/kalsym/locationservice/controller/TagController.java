@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kalsym.locationservice.model.TagKeyword;
+import com.kalsym.locationservice.model.TagKeywordDetails;
 import com.kalsym.locationservice.service.TagKeywordService;
 import com.kalsym.locationservice.utility.HttpResponse;
 
@@ -43,8 +44,7 @@ public class TagController {
     ) {
 
         // List<TagKeyword> body = tagKeywordService.getTagList();
-        Page<TagKeyword> body = tagKeywordService.getTagListWithPageable(page,pageSize,latitude,longitude,searchRadius,sortByCol,sortingOrder);
-
+        Page<TagKeywordDetails> body = tagKeywordService.getTagListWithPageable(page,pageSize,latitude,longitude,searchRadius,sortByCol,sortingOrder);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

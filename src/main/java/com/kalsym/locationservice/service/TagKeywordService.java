@@ -18,6 +18,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.kalsym.locationservice.model.TagKeyword;
+import com.kalsym.locationservice.model.TagKeywordDetails;
+import com.kalsym.locationservice.repository.TagKeywordDetailsRepository;
 import com.kalsym.locationservice.repository.TagKeywordRepository;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -31,6 +33,9 @@ public class TagKeywordService {
     @Autowired
     TagKeywordRepository tagKeywordRepository;
 
+    @Autowired
+    TagKeywordDetailsRepository tagKeywordDetailsRepository;
+
     public List<TagKeyword> getTagList(){
 
         List<TagKeyword> result = tagKeywordRepository.findAll();
@@ -39,18 +44,18 @@ public class TagKeywordService {
         
     }
 
-    public Page<TagKeyword> getTagListWithPageable(
+    public Page<TagKeywordDetails> getTagListWithPageable(
         int page, int pageSize, String latitude,String longitude, double searchRadius,String sortByCol, Sort.Direction sortingOrder
     ){
         Pageable pageable;
 
-        TagKeyword tagKeywordMatch = new TagKeyword();
+        TagKeywordDetails tagKeywordMatch = new TagKeywordDetails();
 
         ExampleMatcher matcher = ExampleMatcher
         .matchingAll()
         .withIgnoreCase()
         .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
-        Example<TagKeyword> example = Example.of(tagKeywordMatch, matcher);
+        Example<TagKeywordDetails> example = Example.of(tagKeywordMatch, matcher);
 
         if (sortingOrder==Sort.Direction.ASC){
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
@@ -58,22 +63,22 @@ public class TagKeywordService {
         else{
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
         } 
-        Specification<TagKeyword> tagKeywordSpecs = searchStoreCategorySpecs(latitude, longitude,searchRadius,example);
+        Specification<TagKeywordDetails> tagKeywordSpecs = searchStoreCategorySpecs(latitude, longitude,searchRadius,example);
 
-        Page<TagKeyword> result = tagKeywordRepository.findAll(tagKeywordSpecs,pageable);       
+        Page<TagKeywordDetails> result = tagKeywordDetailsRepository.findAll(tagKeywordSpecs,pageable);       
 
         return result;
           
     }
     
 
-    public static Specification<TagKeyword> searchStoreCategorySpecs(
+    public static Specification<TagKeywordDetails> searchStoreCategorySpecs(
             String latitude, 
             String longitude,
             double radius,        
-            Example<TagKeyword> example) {
+            Example<TagKeywordDetails> example) {
     
-        return (Specification<TagKeyword>) (root, query, builder) -> {
+        return (Specification<TagKeywordDetails>) (root, query, builder) -> {
             final List<Predicate> predicates = new ArrayList<>();
        
 

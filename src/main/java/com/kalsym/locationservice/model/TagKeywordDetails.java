@@ -1,6 +1,5 @@
 package com.kalsym.locationservice.model;
 
-
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -27,7 +26,7 @@ import lombok.ToString;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @ToString
 @NoArgsConstructor
-public class TagKeyword {
+public class TagKeywordDetails {
 
     @Id
     private Integer id;
@@ -38,8 +37,8 @@ public class TagKeyword {
 
     private String latitude;
 
-    // @OneToMany(cascade = CascadeType.ALL,
-    // fetch = FetchType.LAZY)
-    // @JoinColumn(name = "tagId", insertable = false, updatable = false, nullable = true)    
-    // private List<TagConfig> tagConfig; 
+    @OneToMany(cascade = CascadeType.ALL,
+    fetch = FetchType.LAZY)
+    @JoinColumn(name = "tagId", insertable = false, updatable = false, nullable = true)    
+    private List<TagConfig> tagConfig; 
 }

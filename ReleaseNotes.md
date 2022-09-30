@@ -1,4 +1,20 @@
 ##################################################
+# location-service-1.0.37 | 30-September-2022
+##################################################
+1. modify body response for tag keyword
+##DB Changes:
+
+-- symplified.tag_config definition
+
+CREATE TABLE `tag_config` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `property` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `content` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `tagId` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+##################################################
 # location-service-1.0.36 | 20-September-2022
 ##################################################
 1. Fix sort stores endpoint
