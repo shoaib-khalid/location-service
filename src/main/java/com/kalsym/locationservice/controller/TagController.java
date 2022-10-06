@@ -39,12 +39,13 @@ public class TagController {
         @RequestParam(defaultValue = "10") int pageSize,
         @RequestParam(required = false) String latitude,
         @RequestParam(required = false) String longitude,
+        @RequestParam(required = false) String tagKeyword,
         @RequestParam(required = false, defaultValue = "keyword") String sortByCol,
         @RequestParam(required = false, defaultValue = "ASC") Sort.Direction sortingOrder
     ) {
 
         // List<TagKeyword> body = tagKeywordService.getTagList();
-        Page<TagKeywordDetails> body = tagKeywordService.getTagListWithPageable(page,pageSize,latitude,longitude,searchRadius,sortByCol,sortingOrder);
+        Page<TagKeywordDetails> body = tagKeywordService.getTagListWithPageable(page,pageSize,latitude,longitude,tagKeyword,searchRadius,sortByCol,sortingOrder);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);

@@ -45,7 +45,7 @@ public class TagKeywordService {
     }
 
     public Page<TagKeywordDetails> getTagListWithPageable(
-        int page, int pageSize, String latitude,String longitude, double searchRadius,String sortByCol, Sort.Direction sortingOrder
+        int page, int pageSize, String latitude,String longitude, String tagKeyword,double searchRadius,String sortByCol, Sort.Direction sortingOrder
     ){
         Pageable pageable;
 
@@ -63,7 +63,7 @@ public class TagKeywordService {
         else{
             pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
         } 
-        Specification<TagKeywordDetails> tagKeywordSpecs = searchStoreCategorySpecs(latitude, longitude,searchRadius,example);
+        Specification<TagKeywordDetails> tagKeywordSpecs = searchStoreCategorySpecs(latitude, longitude,tagKeyword,searchRadius,example);
 
         Page<TagKeywordDetails> result = tagKeywordDetailsRepository.findAll(tagKeywordSpecs,pageable);       
 
@@ -75,6 +75,7 @@ public class TagKeywordService {
     public static Specification<TagKeywordDetails> searchStoreCategorySpecs(
             String latitude, 
             String longitude,
+            String tagKeyword,
             double radius,        
             Example<TagKeywordDetails> example) {
     
@@ -91,6 +92,10 @@ public class TagKeywordService {
                 
                 predicates.add(builder.isNotNull(root.get("longitude")));
                 predicates.add(builder.isNotNull(root.get("latitude")));
+            }
+
+            if (tagKeyword != null && !tagKeyword.isEmpty()) {
+                predicates.add(builder.equal(root.get("keyword"), tagKeyword));
             }
             
             //use this if you want to group
