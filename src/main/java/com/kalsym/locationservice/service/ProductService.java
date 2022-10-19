@@ -617,7 +617,7 @@ public class ProductService {
                 predicates.add(builder.equal(store.get("isDineIn"), isDineIn));
             }
 
-            if (isDineIn != null) {
+            if (isDelivery != null) {
                 predicates.add(builder.equal(store.get("isDelivery"), isDelivery));
             }
 
