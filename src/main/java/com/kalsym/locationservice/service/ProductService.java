@@ -106,7 +106,7 @@ public class ProductService {
     public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(
             List<String> status,String regionCountryId,String parentCategoryId, 
             List<String> cityId, String cityName, String name, 
-            String latitude, String longitude, double radius,String storeTagKeyword, Boolean isMainLevel,Boolean isDineIn,Boolean isDelivery,
+            String latitude, String longitude, double radius,String storeTagKeyword, Boolean isMainLevel,Boolean isDineIn,Boolean isDelivery,Boolean showAllPrice,
             int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){           
 
         //get reqion country for store
@@ -139,7 +139,7 @@ public class ProductService {
                 .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<ProductMain> example = Example.of(productMatch, matcher);
         
-        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, isMainLevel, isDineIn, isDelivery, sortByCol,sortingOrder,example);
+        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, isMainLevel, isDineIn, isDelivery, showAllPrice,sortByCol,sortingOrder,example);
         
         Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);       
         
@@ -525,7 +525,7 @@ public class ProductService {
             double radius,
             String storeTagKeyword,
             Boolean isMainLevel,
-            Boolean isDineIn,Boolean isDelivery,
+            Boolean isDineIn,Boolean isDelivery,Boolean showAllPrice,
             String sortByCol, Sort.Direction sortingOrder,
             Example<ProductMain> example) {
 
@@ -533,6 +533,7 @@ public class ProductService {
             final List<Predicate> predicates = new ArrayList<>();
             Join<ProductMain, Store> store = root.join("storeDetails");
             Join<ProductMain, Category> storeCategory = root.join("storeCategory");
+            Join<ProductMain, ProductInventoryWithDetails> productInventories = root.join("productInventories", JoinType.INNER);
             Join<Store, RegionCity> regionCity = store.join("regionCityDetails");
             Join<Store,TagStoreDetails> storeTagDetails = store.join("storeTag", JoinType.LEFT);
             Join<TagStoreDetails,TagKeyword> storeTagKeywords = storeTagDetails.join("tagKeyword", JoinType.LEFT);
@@ -614,12 +615,25 @@ public class ProductService {
             }
 
             if (isDineIn != null) {
+                
                 predicates.add(builder.equal(store.get("isDineIn"), isDineIn));
+
+                if(isDineIn == true && showAllPrice == false){
+                    predicates.add(builder.notEqual(productInventories.get("dineInPrice"), 0));
+ 
+                }
             }
 
             if (isDelivery != null) {
+
                 predicates.add(builder.equal(store.get("isDelivery"), isDelivery));
+
+                if(isDelivery == true && showAllPrice == false){
+                    predicates.add(builder.notEqual(productInventories.get("price"), 0));
+ 
+                }
             }
+
 
             // select * from product p 
             // WHERE p.name like '%black%'
