@@ -2,6 +2,9 @@
 # location-service-1.0.40 | 21-October-2022
 ##################################################
 1. Include dine in disocunt price
+# location-service-1.0.39-HOTFIX | 21-October-2022
+##################################################
+1. Hide price zero in dine in
 ##################################################
 # location-service-1.0.39 | 19-October-2022
 ##################################################

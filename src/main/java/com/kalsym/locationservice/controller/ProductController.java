@@ -54,6 +54,7 @@ public class ProductController {
         @RequestParam(required = false) Boolean isMainLevel,
         @RequestParam(required = false) Boolean isDineIn,
         @RequestParam(required = false) Boolean isDelivery,
+        @RequestParam(required = false) Boolean showAllPrice,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
         @RequestParam(required = false, defaultValue = "created") String sortByCol,
@@ -63,11 +64,16 @@ public class ProductController {
         if(isDelivery == null && isDineIn == null){
             isDelivery = true;
         }
-        
+
+        //to hide the product that 0 price
+        if(showAllPrice == null ){
+            showAllPrice = false;
+        }
+
         String logprefix = "getProducts()";
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products request...");
         
-        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,searchRadius,storeTagKeyword,isMainLevel,isDineIn,isDelivery,page,pageSize,sortByCol,sortingOrder);
+        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,searchRadius,storeTagKeyword,isMainLevel,isDineIn,isDelivery,showAllPrice,page,pageSize,sortByCol,sortingOrder);
         
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products result : "+body.toString());
        
