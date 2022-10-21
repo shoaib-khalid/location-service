@@ -34,6 +34,12 @@ public class ItemDiscount {
     public boolean normalItemOnly;
     public String discountId;
     public DiscountCalculationType calculationType;
+
+    //dinein dicount :
+    public DiscountCalculationType dineInCalculationType;
+    public double dineInDiscountAmount;    
+    public double dineIndDiscountedPrice;
+    public double dineInNormalPrice;
     
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     public LocalDateTime discountStartTime;
