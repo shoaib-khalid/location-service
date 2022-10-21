@@ -43,6 +43,8 @@ public class ProductInventoryWithDetails implements Serializable {
 
     private String SKU;
 
+    private Double dineInPrice;
+
     //private String name;
     private Integer quantity;
 
