@@ -38,7 +38,7 @@ public class ItemDiscount {
     //dinein dicount :
     public DiscountCalculationType dineInCalculationType;
     public double dineInDiscountAmount;    
-    public double dineIndDiscountedPrice;
+    public double dineInDiscountedPrice;
     public double dineInNormalPrice;
     
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
