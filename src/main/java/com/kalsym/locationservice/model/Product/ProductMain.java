@@ -52,6 +52,8 @@ public class ProductMain implements Serializable  {
 
     private String status;
 
+    private Boolean allowOutOfStockPurchases;
+
     @OneToOne()
     @JoinColumn(name = "storeId",referencedColumnName="id")
     private Store storeDetails; 
