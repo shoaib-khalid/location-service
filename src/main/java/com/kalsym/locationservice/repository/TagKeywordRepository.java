@@ -6,8 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import com.kalsym.locationservice.model.TagKeyword;
 import com.kalsym.locationservice.model.TagStoreDetails;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface TagKeywordRepository extends JpaRepository<TagKeyword,Integer>, JpaSpecificationExecutor<TagKeyword> {
+    
     
 }

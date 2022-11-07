@@ -1,4 +1,25 @@
 ##################################################
+# location-service-1.1.0 | 7-Nov-2022
+##################################################
+Add new API : famous item
+
+##DB Changes:
+CREATE TABLE `tag_product_feature` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `tagId` bigint DEFAULT NULL,
+  `productId` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `sequence` decimal(10,2) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `product_feature_config_FK` (`productId`),
+  KEY `tagId` (`tagId`),
+  CONSTRAINT `tag_product_feature_ibfk_1` FOREIGN KEY (`tagId`) REFERENCES `tag_keyword` (`id`),
+  CONSTRAINT `tag_product_feature_ibfk_2` FOREIGN KEY (`productId`) REFERENCES `product` (`id`)
+) 
+
+
+##################################################
 # location-service-1.0.40 | 21-October-2022
 ##################################################
 1. Include dine in disocunt price

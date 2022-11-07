@@ -13,6 +13,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kalsym.locationservice.model.Config.TagConfig;
+import com.kalsym.locationservice.model.Config.TagConfig;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,4 +42,13 @@ public class TagKeywordDetails {
     fetch = FetchType.LAZY)
     @JoinColumn(name = "tagId", insertable = false, updatable = false, nullable = true)    
     private List<TagConfig> tagConfig; 
+    
+    @OneToMany(cascade = CascadeType.ALL,
+    fetch = FetchType.LAZY)
+    @JoinColumn(name = "tagId", insertable = false, updatable = false, nullable = true)    
+    private List<TagStoreDetails> tagStoreDetails;
+    
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tagId", insertable = false, updatable = false, nullable = true)
+    private List<TagProductFeature> productFeatureList;
 }

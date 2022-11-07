@@ -130,6 +130,18 @@ public interface ProductRepository extends JpaRepository<ProductMain,String>, Pa
 
     );
     
+    @Query(value = "SELECT COUNT(*) AS bil, A.itemCode, "
+            + "D.id " +
+        "FROM `order_item` A " +
+        "	INNER JOIN `order` B ON A.orderId=B.id " +
+        "	INNER JOIN `product_inventory` C ON A.itemCode=C.itemCode " +
+        "	INNER JOIN `product` D ON C.productId=D.id " +
+        "WHERE B.storeId=:storeId AND D.status='ACTIVE' " +
+        "GROUP BY itemcode " +
+        "ORDER BY bil DESC " +
+        "LIMIT :limit", nativeQuery = true)
+    List<Object[]> getFamousItemByStoreId(@Param("storeId") String storeId, int limit);
+    
 
 }
 
