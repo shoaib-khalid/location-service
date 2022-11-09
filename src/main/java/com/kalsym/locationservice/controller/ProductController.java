@@ -12,13 +12,22 @@ import com.kalsym.locationservice.model.TagKeywordDetails;
 import com.kalsym.locationservice.model.TagStoreDetails;
 import com.kalsym.locationservice.service.CategoryLocationService;
 import com.kalsym.locationservice.LocationServiceApplication;
+import com.kalsym.locationservice.enums.DiscountCalculationType;
 import com.kalsym.locationservice.model.Config.TagConfig;
+import com.kalsym.locationservice.model.Product.ItemDiscount;
+import com.kalsym.locationservice.model.Product.ProductInventoryWithDetails;
 import com.kalsym.locationservice.service.ProductService;
 import com.kalsym.locationservice.service.TagKeywordService;
 import com.kalsym.locationservice.repository.ProductRepository;
 import com.kalsym.locationservice.repository.TagKeywordDetailsRepository;
+import com.kalsym.locationservice.repository.StoreDiscountRepository;
+import com.kalsym.locationservice.repository.StoreWithDetailsRepository;
+import com.kalsym.locationservice.repository.RegionCountriesRepository;
 import com.kalsym.locationservice.utility.HttpResponse;
 import com.kalsym.locationservice.utility.Logger;
+import com.kalsym.locationservice.utility.ProductDiscount;
+import com.kalsym.locationservice.model.RegionCountry;
+import com.kalsym.locationservice.model.StoreWithDetails;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -52,7 +61,16 @@ public class ProductController {
     ProductRepository productRepository;
     
     @Autowired
+    StoreWithDetailsRepository storeRepository;
+    
+    @Autowired
+    StoreDiscountRepository storeDiscountRepository;
+    
+    @Autowired
     TagKeywordDetailsRepository tagKeywordDetailsRepository;
+    
+    @Autowired
+    RegionCountriesRepository regionCountriesRepository;
     
     @GetMapping(path = {"/products"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
@@ -147,6 +165,15 @@ public class ProductController {
             for (int x=0;x<tag.getTagStoreDetails().size();x++) {
                 TagStoreDetails tagDetails = tag.getTagStoreDetails().get(x);
                 String storeId = tagDetails.getStoreId();
+                
+                Optional<StoreWithDetails> store = storeRepository.findById(storeId);
+                //get reqion country for store
+                RegionCountry regionCountry = null;
+                Optional<RegionCountry> optRegion = regionCountriesRepository.findById(store.get().getRegionCountryId());
+                if (optRegion.isPresent()) {
+                    regionCountry = optRegion.get();
+                }
+            
                 if (storeId!=null) {
                  List<Object[]> productList = productRepository.getFamousItemByStoreId(storeId, limit);
                  for (int z=0;z<productList.size();z++) {
@@ -154,9 +181,17 @@ public class ProductController {
                        java.math.BigInteger count = (java.math.BigInteger)product[0];
                        String itemCode = (String)product[1];
                        String productId = (String)product[2];
-                       Optional<ProductMain> productInfo = productRepository.findById(productId);
-                       if (productInfo.isPresent()) {
-                            famousProductList.add(productInfo.get());
+                       Optional<ProductMain> productInfoOpt = productRepository.findById(productId);
+                       if (productInfoOpt.isPresent()) {
+                            ProductMain productInfo = productInfoOpt.get();
+                            if (productInfo.getProductInventories()!=null) {
+                                for (int i=0;i<productInfo.getProductInventories().size();i++) {
+                                    ProductInventoryWithDetails inventoryDetails = productInfo.getProductInventories().get(i);
+                                    setProductDiscount(storeDiscountRepository, inventoryDetails, storeId, regionCountry );                              
+                                }
+
+                            }
+                            famousProductList.add(productInfo);
                        }
                  }
                 }
@@ -166,14 +201,30 @@ public class ProductController {
             String storeId = tagKeyword;
             int limit=30;
             List<Object[]> productList = productRepository.getFamousItemByStoreId(storeId, limit);
+            Optional<StoreWithDetails> store = storeRepository.findById(storeId);
+            //get reqion country for store
+            RegionCountry regionCountry = null;
+            Optional<RegionCountry> optRegion = regionCountriesRepository.findById(store.get().getRegionCountryId());
+            if (optRegion.isPresent()) {
+                regionCountry = optRegion.get();
+            }
+        
             for (int z=0;z<productList.size();z++) {
                   Object[] product = productList.get(z);
                   java.math.BigInteger count = (java.math.BigInteger)product[0];
                   String itemCode = (String)product[1];
                   String productId = (String)product[2];
-                  Optional<ProductMain> productInfo = productRepository.findById(productId);
-                  if (productInfo.isPresent()) {
-                        famousProductList.add(productInfo.get());
+                  Optional<ProductMain> productInfoOpt = productRepository.findById(productId);
+                  if (productInfoOpt.isPresent()) {
+                      ProductMain productInfo = productInfoOpt.get();
+                      if (productInfo.getProductInventories()!=null) {
+                          for (int x=0;x<productInfo.getProductInventories().size();x++) {
+                              ProductInventoryWithDetails inventoryDetails = productInfo.getProductInventories().get(x);
+                              setProductDiscount(storeDiscountRepository, inventoryDetails, storeId, regionCountry );                              
+                          }
+                          
+                      }
+                      famousProductList.add(productInfo);
                   }
             }
         }
@@ -191,6 +242,36 @@ public class ProductController {
         response.setData(famousProductList);
         response.setStatus(HttpStatus.OK);
         return ResponseEntity.status(response.getStatus()).body(response);
+    }
+    
+    private void  setProductDiscount(StoreDiscountRepository storeDiscountRepository, ProductInventoryWithDetails inventoryDetails, String storeId, RegionCountry regionCountry) {
+        ItemDiscount discountDetails = ProductDiscount.getItemDiscount(storeDiscountRepository, storeId, inventoryDetails.getItemCode(), regionCountry);
+        if (discountDetails != null) {                    
+            double discountedPrice = inventoryDetails.getPrice();
+            double dineInDiscountedPrice = inventoryDetails.getDineInPrice();
+
+            if (discountDetails.calculationType.equals(DiscountCalculationType.FIX)) {
+                discountedPrice = inventoryDetails.getPrice() - discountDetails.discountAmount;
+            } else if (discountDetails.calculationType.equals(DiscountCalculationType.PERCENT)) {
+                discountedPrice = inventoryDetails.getPrice() - (discountDetails.discountAmount / 100 * inventoryDetails.getPrice());
+            }
+
+            if(discountDetails.dineInCalculationType!=null && discountDetails.dineInCalculationType.equals(DiscountCalculationType.FIX)){
+                dineInDiscountedPrice = inventoryDetails.getDineInPrice() - discountDetails.dineInDiscountAmount;
+
+            }
+            else if (discountDetails.dineInCalculationType!=null && discountDetails.dineInCalculationType.equals(DiscountCalculationType.PERCENT)) {
+                dineInDiscountedPrice = inventoryDetails.getDineInPrice() - (discountDetails.dineInDiscountAmount / 100 * inventoryDetails.getDineInPrice());
+            }
+
+            discountDetails.discountedPrice = discountedPrice;
+            discountDetails.normalPrice = inventoryDetails.getPrice();  
+
+            discountDetails.dineInDiscountedPrice= dineInDiscountedPrice;
+            discountDetails.dineInNormalPrice = inventoryDetails.getDineInPrice();
+
+            inventoryDetails.setItemDiscount(discountDetails); 
+        }         
     }
 
 }
