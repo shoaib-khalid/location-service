@@ -189,7 +189,6 @@ public class ProductController {
                                     ProductInventoryWithDetails inventoryDetails = productInfo.getProductInventories().get(i);
                                     setProductDiscount(storeDiscountRepository, inventoryDetails, storeId, regionCountry );                              
                                 }
-
                             }
                             famousProductList.add(productInfo);
                        }
@@ -221,8 +220,7 @@ public class ProductController {
                           for (int x=0;x<productInfo.getProductInventories().size();x++) {
                               ProductInventoryWithDetails inventoryDetails = productInfo.getProductInventories().get(x);
                               setProductDiscount(storeDiscountRepository, inventoryDetails, storeId, regionCountry );                              
-                          }
-                          
+                          }                          
                       }
                       famousProductList.add(productInfo);
                   }
@@ -271,6 +269,8 @@ public class ProductController {
             discountDetails.dineInNormalPrice = inventoryDetails.getDineInPrice();
 
             inventoryDetails.setItemDiscount(discountDetails); 
+            
+            Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, "setProductDiscount", "Set item dicount for item:"+inventoryDetails.getItemCode()+" -> "+discountDetails.toString());
         }         
     }
 
