@@ -197,7 +197,7 @@ public class ProductController {
         } else {
             //find in store
             String storeId = tagKeyword;
-            List<Object[]> productList = productRepository.getFamousItemByStoreIdSnapshot(storeId, productLimit, minimumOrder);
+            List<Object[]> productList = productRepository.getFamousItemByStoreId(storeId, productLimit);
             
             for (int z=0;z<productList.size();z++) {
                   Object[] product = productList.get(z);
