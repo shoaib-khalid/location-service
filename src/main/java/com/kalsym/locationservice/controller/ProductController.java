@@ -72,6 +72,15 @@ public class ProductController {
     @Autowired
     RegionCountriesRepository regionCountriesRepository;
     
+     @Value("${famous.max.list:30}")
+    private int famousMaxList;
+     
+    @Value("${famous.limit.perstore:5}")
+    private int famousLimitPerStore;
+      
+    @Value("${famous.min.order:30}")
+    private int famousMinimumOrder;
+       
     @GetMapping(path = {"/products"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getProducts(
@@ -146,6 +155,9 @@ public class ProductController {
         
         TagKeywordDetails tag = tagKeywordDetailsRepository.findByKeyword(tagKeyword);
         List<ProductMain> famousProductList = new ArrayList();
+        int minimumOrder=famousMinimumOrder;
+        int productLimit=famousMaxList;
+        int limitPerStore=famousLimitPerStore;
         
         if (tag!=null) {                            
             String tagType="foodcourt";
@@ -156,40 +168,25 @@ public class ProductController {
                 }
             }
             
-            int limit =5;
+            int limit = limitPerStore;
             if (tagType.equalsIgnoreCase("restaurant")) {
-               limit=30;
+               limit=productLimit;
             }
 
             //get famous product for the store
             for (int x=0;x<tag.getTagStoreDetails().size();x++) {
                 TagStoreDetails tagDetails = tag.getTagStoreDetails().get(x);
                 String storeId = tagDetails.getStoreId();
-                
-                Optional<StoreWithDetails> store = storeRepository.findById(storeId);
-                //get reqion country for store
-                RegionCountry regionCountry = null;
-                Optional<RegionCountry> optRegion = regionCountriesRepository.findById(store.get().getRegionCountryId());
-                if (optRegion.isPresent()) {
-                    regionCountry = optRegion.get();
-                }
-            
+               
                 if (storeId!=null) {
-                 List<Object[]> productList = productRepository.getFamousItemByStoreId(storeId, limit);
+                 List<Object[]> productList = productRepository.getFamousItemByStoreIdSnapshot(storeId, limit, minimumOrder);
+                 Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product found:"+productList.size());
                  for (int z=0;z<productList.size();z++) {
                        Object[] product = productList.get(z);
-                       java.math.BigInteger count = (java.math.BigInteger)product[0];
-                       String itemCode = (String)product[1];
                        String productId = (String)product[2];
                        Optional<ProductMain> productInfoOpt = productRepository.findById(productId);
                        if (productInfoOpt.isPresent()) {
-                            ProductMain productInfo = productInfoOpt.get();
-                            if (productInfo.getProductInventories()!=null) {
-                                for (int i=0;i<productInfo.getProductInventories().size();i++) {
-                                    ProductInventoryWithDetails inventoryDetails = productInfo.getProductInventories().get(i);
-                                    setProductDiscount(storeDiscountRepository, inventoryDetails, storeId, regionCountry );                              
-                                }
-                            }
+                            ProductMain productInfo = productInfoOpt.get();                            
                             famousProductList.add(productInfo);
                        }
                  }
@@ -198,41 +195,68 @@ public class ProductController {
         } else {
             //find in store
             String storeId = tagKeyword;
-            int limit=30;
-            List<Object[]> productList = productRepository.getFamousItemByStoreId(storeId, limit);
-            Optional<StoreWithDetails> store = storeRepository.findById(storeId);
-            //get reqion country for store
-            RegionCountry regionCountry = null;
-            Optional<RegionCountry> optRegion = regionCountriesRepository.findById(store.get().getRegionCountryId());
-            if (optRegion.isPresent()) {
-                regionCountry = optRegion.get();
-            }
-        
+            List<Object[]> productList = productRepository.getFamousItemByStoreIdSnapshot(storeId, productLimit, minimumOrder);
+            
             for (int z=0;z<productList.size();z++) {
                   Object[] product = productList.get(z);
-                  java.math.BigInteger count = (java.math.BigInteger)product[0];
-                  String itemCode = (String)product[1];
                   String productId = (String)product[2];
                   Optional<ProductMain> productInfoOpt = productRepository.findById(productId);
                   if (productInfoOpt.isPresent()) {
                       ProductMain productInfo = productInfoOpt.get();
-                      if (productInfo.getProductInventories()!=null) {
-                          for (int x=0;x<productInfo.getProductInventories().size();x++) {
-                              ProductInventoryWithDetails inventoryDetails = productInfo.getProductInventories().get(x);
-                              setProductDiscount(storeDiscountRepository, inventoryDetails, storeId, regionCountry );                              
-                          }                          
-                      }
                       famousProductList.add(productInfo);
                   }
             }
         }
-
-        if (famousProductList.isEmpty()) {
-            //query tag product feature
+        
+        
+        if (famousProductList.size()<productLimit) {
+            //add product from tag product feature
             if (tag!=null && tag.getProductFeatureList()!=null && !tag.getProductFeatureList().isEmpty()) {
+                Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "featured product list size:"+tag.getProductFeatureList().size());
                 for (int x=0;x<tag.getProductFeatureList().size();x++) {
-                    famousProductList.add(tag.getProductFeatureList().get(x).getProductDetails());
+                    ProductMain featureProduct = tag.getProductFeatureList().get(x).getProductDetails();
+                    Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "featured product["+x+"]:"+featureProduct);
+                    if (featureProduct!=null) {
+                        //check if already exist in the list
+                        boolean productExist = false;
+                        for (int z=0;z<famousProductList.size();z++) {
+                            Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "featureProduct:"+featureProduct+" famousProduct:"+famousProductList.get(z));
+                            if (featureProduct.getId().equals(famousProductList.get(z).getId())) {
+                                //already exist
+                                productExist=true;
+                                break;
+                            }
+                        }
+                        if (!productExist) {
+                            famousProductList.add(featureProduct);
+                        }
+                        if (famousProductList.size()>=productLimit) {
+                            break;
+                        }
+                    }
                 }
+            }
+        }
+        
+        //set product discount
+        for (int z=0;z<famousProductList.size();z++) {
+            ProductMain famousProduct = famousProductList.get(z);
+            Optional<ProductMain> productInfoOpt = productRepository.findById(famousProduct.getId());
+            if (productInfoOpt.isPresent()) {
+                ProductMain productInfo = productInfoOpt.get();
+                Optional<StoreWithDetails> store = storeRepository.findById(productInfo.getStoreDetails().getId());                
+                //get reqion country for store
+                RegionCountry regionCountry = null;
+                Optional<RegionCountry> optRegion = regionCountriesRepository.findById(store.get().getRegionCountryId());
+                if (optRegion.isPresent()) {
+                    regionCountry = optRegion.get();
+                }
+                if (productInfo.getProductInventories()!=null) {
+                    for (int i=0;i<productInfo.getProductInventories().size();i++) {
+                        ProductInventoryWithDetails inventoryDetails = productInfo.getProductInventories().get(i);
+                        setProductDiscount(storeDiscountRepository, inventoryDetails, store.get().getId(), regionCountry );                              
+                    }
+                }                 
             }
         }
         

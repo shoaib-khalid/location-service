@@ -142,6 +142,16 @@ public interface ProductRepository extends JpaRepository<ProductMain,String>, Pa
         "LIMIT :limit", nativeQuery = true)
     List<Object[]> getFamousItemByStoreId(@Param("storeId") String storeId, int limit);
     
+    @Query(value = "SELECT SUM(A.totalOrder) AS bil, A.itemCode, A.productId " +
+        "FROM `order_item_snapshot` A " +
+        " INNER JOIN `product` B ON A.productId=B.id " +
+       "WHERE B.storeId=:storeId AND B.status='ACTIVE' "
+            + "AND A.totalOrder > :minOrder "
+            + "AND A.dt BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW() " +
+        "ORDER BY bil DESC " +
+        "LIMIT :limit", nativeQuery = true)
+    List<Object[]> getFamousItemByStoreIdSnapshot(@Param("storeId") String storeId, int limit, int minOrder);
+    
 
 }
 

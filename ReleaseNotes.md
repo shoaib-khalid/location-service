@@ -1,5 +1,5 @@
 ##################################################
-# location-service-1.1.0 | 7-Nov-2022
+# location-service-1.1.0 | 11-Nov-2022
 ##################################################
 Add new API : famous item
 
@@ -17,6 +17,11 @@ CREATE TABLE `tag_product_feature` (
   CONSTRAINT `tag_product_feature_ibfk_1` FOREIGN KEY (`tagId`) REFERENCES `tag_keyword` (`id`),
   CONSTRAINT `tag_product_feature_ibfk_2` FOREIGN KEY (`productId`) REFERENCES `product` (`id`)
 ) 
+
+##Config changes:
+famous.max.list=30
+famous.limit.perstore=5
+famous.min.order=30
 
 
 ##################################################
