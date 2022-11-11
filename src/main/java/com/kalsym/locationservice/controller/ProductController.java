@@ -179,17 +179,19 @@ public class ProductController {
                 String storeId = tagDetails.getStoreId();
                
                 if (storeId!=null) {
-                 List<Object[]> productList = productRepository.getFamousItemByStoreIdSnapshot(storeId, limit, minimumOrder);
-                 Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product found:"+productList.size());
-                 for (int z=0;z<productList.size();z++) {
-                       Object[] product = productList.get(z);
-                       String productId = (String)product[2];
-                       Optional<ProductMain> productInfoOpt = productRepository.findById(productId);
-                       if (productInfoOpt.isPresent()) {
-                            ProductMain productInfo = productInfoOpt.get();                            
-                            famousProductList.add(productInfo);
-                       }
-                 }
+                    List<Object[]> productList = productRepository.getFamousItemByStoreIdSnapshot(storeId, limit, minimumOrder);
+                    Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product found:"+productList.size());
+                    for (int z=0;z<productList.size();z++) {
+                           Object[] product = productList.get(z);
+                           String productId = (String)product[2];
+                           if (productId!=null) {
+                                Optional<ProductMain> productInfoOpt = productRepository.findById(productId);
+                                if (productInfoOpt.isPresent()) {
+                                     ProductMain productInfo = productInfoOpt.get();                            
+                                     famousProductList.add(productInfo);
+                                }
+                           }
+                    }
                 }
             }
         } else {
@@ -200,10 +202,12 @@ public class ProductController {
             for (int z=0;z<productList.size();z++) {
                   Object[] product = productList.get(z);
                   String productId = (String)product[2];
-                  Optional<ProductMain> productInfoOpt = productRepository.findById(productId);
-                  if (productInfoOpt.isPresent()) {
-                      ProductMain productInfo = productInfoOpt.get();
-                      famousProductList.add(productInfo);
+                  if (productId!=null) {
+                    Optional<ProductMain> productInfoOpt = productRepository.findById(productId);
+                    if (productInfoOpt.isPresent()) {
+                        ProductMain productInfo = productInfoOpt.get();
+                        famousProductList.add(productInfo);
+                    }
                   }
             }
         }
