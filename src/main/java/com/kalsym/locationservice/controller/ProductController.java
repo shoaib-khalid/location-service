@@ -177,8 +177,10 @@ public class ProductController {
             for (int x=0;x<tag.getTagStoreDetails().size();x++) {
                 TagStoreDetails tagDetails = tag.getTagStoreDetails().get(x);
                 String storeId = tagDetails.getStoreId();
-               
-                if (storeId!=null) {
+                
+                //check if store open
+                List<Object[]> storeOpen = productRepository.isStoreOpen(storeId);
+                if (storeId!=null && storeOpen.get(0)[0].equals("1")) {              
                     List<Object[]> productList = productRepository.getFamousItemByStoreIdSnapshot(storeId, limit, minimumOrder);
                     Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product found:"+productList.size());
                     for (int z=0;z<productList.size();z++) {
@@ -219,23 +221,29 @@ public class ProductController {
                 Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "featured product list size:"+tag.getProductFeatureList().size());
                 for (int x=0;x<tag.getProductFeatureList().size();x++) {
                     ProductMain featureProduct = tag.getProductFeatureList().get(x).getProductDetails();
-                    Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "featured product["+x+"]:"+featureProduct);
+                    Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "featured product["+x+"]:"+featureProduct);                                           
+                    
                     if (featureProduct!=null) {
-                        //check if already exist in the list
-                        boolean productExist = false;
-                        for (int z=0;z<famousProductList.size();z++) {
-                            Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "featureProduct:"+featureProduct+" famousProduct:"+famousProductList.get(z));
-                            if (featureProduct.getId().equals(famousProductList.get(z).getId())) {
-                                //already exist
-                                productExist=true;
+                        String storeId = featureProduct.getStoreDetails().getId();
+                        //check if store open 
+                         List<Object[]> storeOpen = productRepository.isStoreOpen(storeId);
+                        if (storeOpen.get(0)[0].equals("1")) {
+                            //check if already exist in the list
+                            boolean productExist = false;
+                            for (int z=0;z<famousProductList.size();z++) {
+                                Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "featureProduct:"+featureProduct+" famousProduct:"+famousProductList.get(z));
+                                if (featureProduct.getId().equals(famousProductList.get(z).getId())) {
+                                    //already exist
+                                    productExist=true;
+                                    break;
+                                }
+                            }
+                            if (!productExist) {
+                                famousProductList.add(featureProduct);
+                            }
+                            if (famousProductList.size()>=productLimit) {
                                 break;
                             }
-                        }
-                        if (!productExist) {
-                            famousProductList.add(featureProduct);
-                        }
-                        if (famousProductList.size()>=productLimit) {
-                            break;
                         }
                     }
                 }
