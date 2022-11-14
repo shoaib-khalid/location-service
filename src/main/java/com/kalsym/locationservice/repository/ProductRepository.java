@@ -138,7 +138,7 @@ public interface ProductRepository extends JpaRepository<ProductMain,String>, Pa
         "	INNER JOIN `product` D ON C.productId=D.id " +
         "WHERE B.storeId=:storeId AND D.status='ACTIVE' "
         + " AND B.created BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW() "
-            + "AND isStoreOpen(:storeId)=1" +
+            + "AND isStoreOpen(:storeId)=1 " +
         "GROUP BY itemcode " +
         "ORDER BY bil DESC " +
         "LIMIT :limit", nativeQuery = true)
