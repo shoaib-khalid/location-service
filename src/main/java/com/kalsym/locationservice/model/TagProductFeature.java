@@ -36,7 +36,7 @@ public class TagProductFeature implements Serializable {
     
     String productId;
     
-    int sequence;
+    Integer sequence;
     
     @OneToOne()
     @JoinColumn(name = "productId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
