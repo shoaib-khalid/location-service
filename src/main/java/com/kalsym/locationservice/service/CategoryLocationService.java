@@ -2,6 +2,10 @@ package com.kalsym.locationservice.service;
 
 
 import com.kalsym.locationservice.LocationServiceApplication;
+
+import java.text.DateFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -19,6 +23,7 @@ import com.kalsym.locationservice.model.Store;
 import com.kalsym.locationservice.model.StoreAssets;
 import com.kalsym.locationservice.model.StoreCategory;
 import com.kalsym.locationservice.model.StoreSnooze;
+import com.kalsym.locationservice.model.StoreTiming;
 import com.kalsym.locationservice.model.StoreWithDetails;
 import com.kalsym.locationservice.model.TagKeyword;
 import com.kalsym.locationservice.model.TagStoreDetails;
@@ -37,6 +42,7 @@ import com.kalsym.locationservice.utility.Location;
 import com.kalsym.locationservice.utility.Logger;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -254,6 +260,13 @@ public class CategoryLocationService {
         
         //Page mapper
         Page<StoreWithDetails> output = new PageImpl<StoreWithDetails>(newArrayList,pageable,result.getTotalElements());
+
+        //variable involve to calculate store timing 
+        String dayNames[] = new DateFormatSymbols().getWeekdays();  
+        Calendar date = Calendar.getInstance();  
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");  
+        Date curr = new Date();  
+        String currentTime = formatter.format(curr);
         
         for(StoreWithDetails c : output){
             
@@ -266,6 +279,41 @@ public class CategoryLocationService {
             } else {
                 c.setDistanceInMeter(0.00);
             }
+                  
+            if(c.getStoreTiming().size()>0){
+                    
+                StoreTiming optStoreTiming = c.getStoreTiming().stream()
+                .filter((StoreTiming sti) -> sti.getDay().contains(dayNames[date.get(Calendar.DAY_OF_WEEK)].toUpperCase()))
+                .map((StoreTiming stt)-> {
+                    if(stt.getIsOff()){
+                        c.setIsOpen(false); 
+                    }
+                    else{
+                        c.setIsOpen(true); 
+                        try {
+                            if(formatter.parse(currentTime).after(formatter.parse(stt.getOpenTime())) && formatter.parse(currentTime).before(formatter.parse(stt.getCloseTime())) )
+                            {
+                                c.setIsOpen(true); 
+                            }else{
+                                c.setIsOpen(false); 
+                            }
+                        } catch (ParseException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                      
+                    }
+                    return stt;
+                })
+                .findFirst().get();
+                
+            }
+            //let say it is ecommerce where merchant set 24 hours open then we set it as open
+            if (c.getIsAlwaysOpen()){
+                c.setIsOpen(true); 
+
+            }
+
         
             StoreSnooze st = new StoreSnooze();
 

@@ -116,6 +116,11 @@ public class StoreWithDetails implements Serializable  {
 
     private Boolean isDelivery;
 
+    private Boolean isAlwaysOpen;
+
+    @Transient 
+    private Boolean isOpen;
+
     @Transient
     Boolean isSnooze;
 
