@@ -121,6 +121,9 @@ public class StoreWithDetails implements Serializable  {
     @Transient 
     private Boolean isOpen;
 
+    @Transient 
+    private String storeTimingMessage;
+
     @Transient
     Boolean isSnooze;
 

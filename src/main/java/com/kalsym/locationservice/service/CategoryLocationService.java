@@ -267,7 +267,8 @@ public class CategoryLocationService {
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");  
         Date curr = new Date();  
         String currentTime = formatter.format(curr);
-        
+        int   currentDayInteger = date.get(Calendar.DAY_OF_WEEK);
+
         for(StoreWithDetails c : output){
             
             if (latitude!=null && longitude!=null && c.getLatitude()!=null && c.getLongitude()!=null) {
@@ -287,6 +288,67 @@ public class CategoryLocationService {
                 .map((StoreTiming stt)-> {
                     if(stt.getIsOff()){
                         c.setIsOpen(false); 
+                            
+                        //to handle outbound array of dayNames
+                        int tomorrowDay = currentDayInteger+1>7?1:currentDayInteger+1;
+
+                        StoreTiming optStoreTimingTomorrow =  c.getStoreTiming().stream().filter((StoreTiming tomsti) -> tomsti.getDay().contains(dayNames[tomorrowDay].toUpperCase())).findFirst().get();
+
+                        Boolean isFoundOtherDay = false;
+                        String openDay = "";
+
+                        if(!optStoreTimingTomorrow.getIsOff()){
+                            c.setStoreTimingMessage("Please come back tomorrow at "+optStoreTimingTomorrow.getOpenTime());
+                
+                        } else{
+                
+                            int g = tomorrowDay;
+
+                            while (g < dayNames.length && isFoundOtherDay==false ) {
+                                
+                                String daysThisWeek = dayNames[g];
+                                StoreTiming optStoreTimingOtherDay =  c.getStoreTiming().stream().filter((StoreTiming otherDayStore) -> otherDayStore.getDay().contains(daysThisWeek.toUpperCase())).findFirst().get();
+
+                                if(!optStoreTimingOtherDay.getIsOff()){
+                                 isFoundOtherDay = true;
+                                 openDay = dayNames[g];
+                                 c.setStoreTimingMessage("Please come back on "+openDay+" "+optStoreTimingOtherDay.getOpenTime());
+
+                                }
+
+                
+                              g++;
+                            }
+                            
+                            if(openDay==""){
+                
+                                int m = 1;
+                
+                               while (m < currentDayInteger && isFoundOtherDay==false ) {
+                                String daysNextWeek = dayNames[m];
+
+                                StoreTiming optStoreTimeOtherDay =  c.getStoreTiming().stream().filter((StoreTiming otherDayStore) -> otherDayStore.getDay().contains(daysNextWeek.toUpperCase())).findFirst().get();
+
+                                    if(!optStoreTimeOtherDay.getIsOff()){
+                                    isFoundOtherDay = true;
+                                    openDay = dayNames[m];
+                                    c.setStoreTimingMessage("Please come back on "+openDay+" "+optStoreTimeOtherDay.getOpenTime());
+
+                                   }
+                    
+                                  m++;
+                                }
+                            }
+                                                
+                        }
+
+                        // condition all day closed
+                        if(!isFoundOtherDay){
+                            c.setStoreTimingMessage("Temporarily closed");
+
+                        }
+
+                       
                     }
                     else{
                         c.setIsOpen(true); 
@@ -295,7 +357,9 @@ public class CategoryLocationService {
                             {
                                 c.setIsOpen(true); 
                             }else{
+                                //open today but the store timing not yet open 
                                 c.setIsOpen(false); 
+                                c.setStoreTimingMessage("Please come back at "+stt.getOpenTime());
                             }
                         } catch (ParseException e) {
                             // TODO Auto-generated catch block
