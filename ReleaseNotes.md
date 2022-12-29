@@ -1,4 +1,26 @@
 ##################################################
+# location-service-1.2.0| 20-December-2022
+##################################################
+API to retrieve table number for spesific tag
+GET /tags/tables?storeId=
+
+##DB Changes
+CREATE TABLE tag_zone (
+id INT PRIMARY KEY AUTO_INCREMENT,
+zoneName VARCHAR(200),
+tagId BIGINT,
+);
+
+CREATE TABLE tag_table (
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+zoneId BIGINT,
+tablePrefix VARCHAR(10),
+tableNoStart INT,
+tableNoEnd INT
+);
+
+
+##################################################
 # location-service-1.1.3 | 10-Dec-2022
 ##################################################
 1. set isOpen store to check store timing

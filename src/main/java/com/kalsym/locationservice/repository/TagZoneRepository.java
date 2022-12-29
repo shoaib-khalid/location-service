@@ -8,11 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kalsym.locationservice.model.TagStoreDetails;
+import com.kalsym.locationservice.model.TagZone;
 
 @Repository
-public interface TagStoreDetailsRepository extends JpaRepository<TagStoreDetails,Integer> {
-    
-    // public Page<TagStoreDetails> findByStoreIdIsNotNull(Example<TagStoreDetails> example, Pageable pageable);
-    List<TagStoreDetails> findByStoreId(String storeId);
+public interface TagZoneRepository extends JpaRepository<TagZone,Integer> {    
+    List<TagZone> findByTagId(Integer tagId);
 }
