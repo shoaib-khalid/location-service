@@ -31,6 +31,8 @@ public class TagStoreDetails {
     // @Id
     private String storeId;
 
+    private Boolean isFoodCourtOwner;
+
     // private String categoryId;
 
     @OneToOne()
