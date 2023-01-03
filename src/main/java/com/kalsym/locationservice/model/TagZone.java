@@ -41,4 +41,30 @@ public class TagZone implements Serializable {
     fetch = FetchType.LAZY)
     @JoinColumn(name = "zoneId", insertable = false, updatable = false, nullable = true)    
     private List<TagTable> tagTables;
+
+    public static TagZone castReference(TagZoneTableRequest req){
+
+        TagZone body = new TagZone();
+        //set the id for update data
+        if(req.getId() != null){
+
+            body.setId(req.getId());
+
+        }
+        body.setTagId(req.getTagId());
+        body.setZoneName(req.getZoneName());
+
+        return body;
+    }
+
+    public static TagZone updateData(TagZone data,TagZone newBody){
+
+        data.setTagId(newBody.getTagId());
+        data.setZoneName(newBody.getZoneName());
+
+
+
+        return data;
+
+    }
 }

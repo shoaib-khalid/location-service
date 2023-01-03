@@ -1,8 +1,10 @@
 ##################################################
 # location-service-1.2.0| 20-December-2022
 ##################################################
-API to retrieve table number for spesific tag
+1. API to retrieve table number for spesific tag
 GET /tags/tables?storeId=
+
+2. Create or Edit Tag Zone and Tag Table
 
 ##DB Changes
 CREATE TABLE tag_zone (
@@ -18,6 +20,9 @@ tablePrefix VARCHAR(10),
 tableNoStart INT,
 tableNoEnd INT
 );
+
+
+ALTER TABLE symplified.tag_details ADD isFoodCourtOwner tinyint(1) DEFAULT 0 NULL COMMENT 'o differentiate which store in food court can set the zone and table';
 
 
 ##################################################

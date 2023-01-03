@@ -19,8 +19,13 @@ import org.springframework.stereotype.Service;
 
 import com.kalsym.locationservice.model.TagKeyword;
 import com.kalsym.locationservice.model.TagKeywordDetails;
+import com.kalsym.locationservice.model.TagTable;
+import com.kalsym.locationservice.model.TagZone;
 import com.kalsym.locationservice.repository.TagKeywordDetailsRepository;
 import com.kalsym.locationservice.repository.TagKeywordRepository;
+import com.kalsym.locationservice.repository.TagTableRepository;
+import com.kalsym.locationservice.repository.TagZoneRepository;
+
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Coordinate;
@@ -35,6 +40,12 @@ public class TagKeywordService {
 
     @Autowired
     TagKeywordDetailsRepository tagKeywordDetailsRepository;
+
+    @Autowired
+    TagZoneRepository tagZoneRepository;
+
+    @Autowired
+    TagTableRepository tagTableRepository;
 
     public List<TagKeyword> getTagList(){
 
@@ -109,4 +120,34 @@ public class TagKeywordService {
         };
 
     }
+
+    public TagZone createTagZone(TagZone tagZone){
+        
+        return tagZoneRepository.save(tagZone);
+
+    }
+
+    public TagZone updateTagZone(Integer id, TagZone tagZoneData){
+
+        TagZone data = tagZoneRepository.findById(id).get();
+        
+        return tagZoneRepository.save(TagZone.updateData(data,tagZoneData));  
+        
+    }
+
+    public TagTable createTagTable(TagTable tagTable){
+        
+        return tagTableRepository.save(tagTable);
+
+    }
+
+    public TagTable updateTagTable(Integer id, TagTable tagTableData){
+
+        TagTable data = tagTableRepository.findById(id).get();
+        
+        return tagTableRepository.save(TagTable.updateData(data,tagTableData));  
+        
+    }
+
+ 
 }

@@ -44,4 +44,31 @@ public class TagTable implements Serializable {
     
     @Transient
     private List<String> tableNoList;
+
+    public static TagTable castReference(TagTableRequest req){
+
+        TagTable body = new TagTable();
+        //set the id for update data
+        if(req.getId() != null){
+
+            body.setId(req.getId());
+
+        }
+        body.setZoneId(req.getZoneId());
+        body.setTablePrefix(req.getTablePrefix());
+        body.setTableNoStart(req.getTableNoStart());
+        body.setTableNoEnd(req.getTableNoEnd());
+
+        return body;
+    }
+
+    public static TagTable updateData(TagTable data,TagTable newBody){
+
+        data.setZoneId(newBody.getZoneId());
+        data.setTablePrefix(newBody.getTablePrefix());
+        data.setTableNoStart(newBody.getTableNoStart());
+        data.setTableNoEnd(newBody.getTableNoEnd());
+        return data;
+
+    }
 }

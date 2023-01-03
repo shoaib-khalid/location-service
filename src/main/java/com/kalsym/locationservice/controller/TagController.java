@@ -2,6 +2,7 @@ package com.kalsym.locationservice.controller;
 
 import com.kalsym.locationservice.LocationServiceApplication;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,13 +14,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kalsym.locationservice.model.TagKeyword;
 import com.kalsym.locationservice.model.TagTable;
+import com.kalsym.locationservice.model.TagTableRequest;
 import com.kalsym.locationservice.model.TagZone;
+import com.kalsym.locationservice.model.TagZoneTableRequest;
 import com.kalsym.locationservice.model.TagKeywordDetails;
 import com.kalsym.locationservice.model.TagStoreDetails;
 import com.kalsym.locationservice.service.TagKeywordService;
@@ -111,6 +116,55 @@ public class TagController {
             response.setStatus(HttpStatus.NOT_FOUND);
         }        
                 
+        return ResponseEntity.status(response.getStatus()).body(response);
+
+    }
+
+    @PostMapping(path = {"/tags/createEdit"}, name = "store-customers-get")
+    @PreAuthorize("hasAnyAuthority('stores-post', 'all')")
+    public ResponseEntity<HttpResponse> postTagZoneTable(
+        HttpServletRequest request,
+        @RequestBody TagZoneTableRequest tagZoneTableRequest
+
+    ) {
+        
+        TagZone dataTagZone;
+
+        TagZone body = TagZone.castReference(tagZoneTableRequest);
+        if(tagZoneTableRequest.getId()!= null){
+            dataTagZone = tagKeywordService.updateTagZone(tagZoneTableRequest.getId(),body);
+ 
+        } else{
+             dataTagZone = tagKeywordService.createTagZone(body);
+
+        }
+
+        List<TagTableRequest> tagTableReq = tagZoneTableRequest.getTagTable();
+        
+        List<TagTable> tagTable  = tagTableReq.stream()
+        .map((TagTableRequest x)->{
+
+            TagTable tagTableCastRef = TagTable.castReference(x);
+            tagTableCastRef.setZoneId(dataTagZone.getId());
+
+            TagTable dataTagTable;
+            if(tagZoneTableRequest.getId()!= null){
+                dataTagTable = tagKeywordService.updateTagTable(tagZoneTableRequest.getId(),tagTableCastRef);
+     
+            } else{
+                dataTagTable = tagKeywordService.createTagTable(tagTableCastRef);
+
+            }
+
+            return dataTagTable;
+        })
+        .collect(Collectors.toList());
+        
+        dataTagZone.setTagTables(tagTable);
+
+        HttpResponse response = new HttpResponse(request.getRequestURI());
+        response.setData(body);
+        response.setStatus(HttpStatus.OK);
         return ResponseEntity.status(response.getStatus()).body(response);
 
     }
