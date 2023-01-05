@@ -2,6 +2,7 @@ package com.kalsym.locationservice.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
@@ -135,11 +136,32 @@ public class TagKeywordService {
         
     }
 
+    public Boolean deleteTagZone(Integer id){
+
+        Optional<TagZone> data = tagZoneRepository.findById(id);
+
+        if (data.isPresent()) {
+
+            List<TagTable> tagTableList = tagTableRepository.findByZoneId(id);
+            for(TagTable t:tagTableList){
+                tagTableRepository.deleteById(t.getId());
+            }
+            tagZoneRepository.deleteById(id);
+
+            return true;
+
+        } else {
+            return false;
+        }
+
+    }
+
     public TagTable createTagTable(TagTable tagTable){
         
         return tagTableRepository.save(tagTable);
 
     }
+
 
     public TagTable updateTagTable(Integer id, TagTable tagTableData){
 
@@ -147,6 +169,22 @@ public class TagKeywordService {
         
         return tagTableRepository.save(TagTable.updateData(data,tagTableData));  
         
+    }
+
+    public Boolean deleteTagTable(Integer id){
+
+        Optional<TagTable> data = tagTableRepository.findById(id);
+
+        if (data.isPresent()) {
+
+            tagTableRepository.deleteById(id);
+
+            return true;
+
+        } else {
+            return false;
+        }
+
     }
 
  
