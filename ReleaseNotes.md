@@ -1,3 +1,12 @@
+
+##################################################
+# location-service-1.2.1| 05-January-2023
+##################################################
+1. Change structure for saving data for tag table
+##DB Changes
+
+ALTER TABLE symplified.tag_table ADD tableNumber varchar(100) NULL;
+
 ##################################################
 # location-service-1.2.0| 20-December-2022
 ##################################################

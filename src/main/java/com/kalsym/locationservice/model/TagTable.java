@@ -37,13 +37,11 @@ public class TagTable implements Serializable {
     private Integer zoneId;
 
     private String tablePrefix;
-    
-    private Integer tableNoStart;
-    
-    private Integer tableNoEnd;
-    
+
+    private String tableNumber; //let say number be 3A , 12B
+
     @Transient
-    private List<String> tableNoList;
+    private String combinationTableNumber;
 
     public static TagTable castReference(TagTableRequest req){
 
@@ -56,18 +54,23 @@ public class TagTable implements Serializable {
         }
         body.setZoneId(req.getZoneId());
         body.setTablePrefix(req.getTablePrefix());
-        body.setTableNoStart(req.getTableNoStart());
-        body.setTableNoEnd(req.getTableNoEnd());
+        body.setTableNumber(req.getTableNumber());
 
         return body;
+    }
+
+    public String getCombinationTableNumber(){
+
+        return tablePrefix== null?""+tableNumber:tablePrefix+tableNumber;
+        
     }
 
     public static TagTable updateData(TagTable data,TagTable newBody){
 
         data.setZoneId(newBody.getZoneId());
         data.setTablePrefix(newBody.getTablePrefix());
-        data.setTableNoStart(newBody.getTableNoStart());
-        data.setTableNoEnd(newBody.getTableNoEnd());
+        data.setTableNumber(newBody.getTableNumber());
+   
         return data;
 
     }

@@ -16,8 +16,6 @@ public class TagTableRequest {
 
     private String tablePrefix;
 
-    private Integer tableNoStart;
-
-    private Integer tableNoEnd;
+    private String tableNumber;
 
 }

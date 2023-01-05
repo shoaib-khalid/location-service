@@ -4,6 +4,8 @@ import com.kalsym.locationservice.LocationServiceApplication;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.Comparator;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,27 +92,24 @@ public class TagController {
             //get table list for this tag
             Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Tag found:"+tagStoreDetail.getTagId());
             List<TagZone> tableZoneList = tagZoneRepository.findByTagId(tagStoreDetail.getTagId());
-            for (int i=0;i<tableZoneList.size();i++) {
-                TagZone tagZone = tableZoneList.get(i);
-                for (int x=0;x<tagZone.getTagTables().size();x++) {
-                    TagTable tagTable = tagZone.getTagTables().get(x);
-                    int tblNo = tagTable.getTableNoStart();
-                    List<String> tableNoList = new ArrayList();
-                    int count=0;
-                    while (tblNo <= tagTable.getTableNoEnd()) {
-                        String tblNoStr = String.valueOf(tblNo);
-                        if (tagTable.getTablePrefix()!=null) {
-                            tblNoStr = tagTable.getTablePrefix()+tblNoStr;
-                        }                        
-                        tableNoList.add(tblNoStr);
-                        tblNo++;
-                        count++;
-                        if (count>1000) {break;}
-                    }
-                    tagTable.setTableNoList(tableNoList);
-                }
-            }
-            response.setData(tableZoneList);
+
+            //nested sort , sort the zone first then sort table 
+            List<TagZone> sortedDataTableZoneList = tableZoneList.stream() 
+            .sorted(Comparator.comparing(TagZone::getZoneName))
+            .map((TagZone mapper)->{
+            
+                //nullsLast,nullsFirst to handling null error
+                List<TagTable> tagTableDetails = mapper.getTagTables().stream()
+                .sorted(Comparator.comparing(TagTable::getTablePrefix, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+
+                mapper.setTagTables(tagTableDetails);
+                return mapper;
+
+            })
+            .collect(Collectors.toList());
+
+            response.setData(sortedDataTableZoneList);
             response.setStatus(HttpStatus.OK);
         } else {
             response.setStatus(HttpStatus.NOT_FOUND);
