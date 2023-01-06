@@ -117,7 +117,9 @@ public class TagController {
             response.setData(sortedDataTableZoneList);
             response.setStatus(HttpStatus.OK);
         } else {
-            response.setStatus(HttpStatus.NOT_FOUND);
+            response.setData(tagStoreDetails);
+
+            response.setStatus(HttpStatus.OK);
         }        
                 
         return ResponseEntity.status(response.getStatus()).body(response);
@@ -365,7 +367,7 @@ public class TagController {
 
     @GetMapping(path = {"/tags/details"}, name = "store-customers-get")
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
-    public ResponseEntity<HttpResponse> checkPermissionToCreateOrUpdateTagTableZone(
+    public ResponseEntity<HttpResponse> toGetDetailsByStoreId(
         HttpServletRequest request,
         @RequestParam(required = true) String storeId        
     ) {
@@ -374,17 +376,9 @@ public class TagController {
        
         //get tag for this store
         List<TagStoreDetails> tagStoreDetails = tagStoreDetailsRepository.findByStoreId(storeId);
-        if (tagStoreDetails!=null && tagStoreDetails.size()>0) {
-            TagStoreDetails tagStoreDetail = tagStoreDetails.get(0);
-            //get table list for this tag
-            Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Tag found:"+tagStoreDetail.getTagId());
-            
-            response.setData(tagStoreDetail);
-            response.setStatus(HttpStatus.OK);
-
-        } else {
-            response.setStatus(HttpStatus.NOT_FOUND);
-        }        
+        response.setData(tagStoreDetails);
+        response.setStatus(HttpStatus.OK);
+   
                 
         return ResponseEntity.status(response.getStatus()).body(response);
 
