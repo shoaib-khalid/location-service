@@ -170,7 +170,7 @@ public class TagController {
     // }
 
     @ApiOperation(value = "Create table zone", notes = "The request body need to exclude List<TagTableRequest> tagTable.")
-    @PostMapping(path = {"/tag/zone"}, name = "store-customers-get")
+    @PostMapping(path = {"/tag/zone"}, name = "stores-post")
     @PreAuthorize("hasAnyAuthority('stores-post', 'all')")
     public ResponseEntity<HttpResponse> postTagZone(
         HttpServletRequest request,
@@ -250,7 +250,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "Create tag table", notes = "Refer the request body exactly")
-    @PostMapping(path = {"/tag/table"}, name = "store-customers-get")
+    @PostMapping(path = {"/tag/table"}, name = "stores-post")
     @PreAuthorize("hasAnyAuthority('stores-post', 'all')")
     public ResponseEntity<HttpResponse> postTagTable(
         HttpServletRequest request,
@@ -276,7 +276,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "Create tag table", notes = "Refer the request body exactly")
-    @PostMapping(path = {"/tag/table/bulk"}, name = "store-customers-get")
+    @PostMapping(path = {"/tag/table/bulk"}, name = "stores-post")
     @PreAuthorize("hasAnyAuthority('stores-post', 'all')")
     public ResponseEntity<HttpResponse> postTagTableBulk(
         HttpServletRequest request,
