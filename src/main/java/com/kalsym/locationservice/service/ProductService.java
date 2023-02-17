@@ -106,7 +106,7 @@ public class ProductService {
     public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(
             List<String> status,String regionCountryId,String parentCategoryId, 
             List<String> cityId, String cityName, String name, 
-            String latitude, String longitude, double radius,String storeTagKeyword, Boolean isMainLevel,Boolean isDineIn,Boolean isDelivery,Boolean showAllPrice,
+            String latitude, String longitude, double radius,String storeTagKeyword, Boolean isMainLevel,Boolean isDineIn,Boolean isDelivery,Boolean showAllPrice,Boolean isCustomPrice,
             int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){           
 
         //get reqion country for store
@@ -139,7 +139,7 @@ public class ProductService {
                 .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<ProductMain> example = Example.of(productMatch, matcher);
         
-        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, isMainLevel, isDineIn, isDelivery, showAllPrice,sortByCol,sortingOrder,example);
+        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, isMainLevel, isDineIn, isDelivery, showAllPrice,isCustomPrice,sortByCol,sortingOrder,example);
         
         Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);       
         
@@ -525,7 +525,7 @@ public class ProductService {
             double radius,
             String storeTagKeyword,
             Boolean isMainLevel,
-            Boolean isDineIn,Boolean isDelivery,Boolean showAllPrice,
+            Boolean isDineIn,Boolean isDelivery,Boolean showAllPrice,Boolean isCustomPrice,
             String sortByCol, Sort.Direction sortingOrder,
             Example<ProductMain> example) {
 
@@ -633,6 +633,8 @@ public class ProductService {
  
                 }
             }
+
+            predicates.add(builder.equal(root.get("isCustomPrice"), isCustomPrice));
 
 
             // select * from product p 

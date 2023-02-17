@@ -97,6 +97,7 @@ public class ProductController {
         @RequestParam(required = false) Boolean isMainLevel,
         @RequestParam(required = false) Boolean isDineIn,
         @RequestParam(required = false) Boolean isDelivery,
+        @RequestParam(required = false) Boolean isCustomPrice,
         @RequestParam(required = false) Boolean showAllPrice,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int pageSize,
@@ -113,10 +114,15 @@ public class ProductController {
             showAllPrice = false;
         }
 
+        if(isCustomPrice == null ){
+            isCustomPrice = false;
+        }
+
+
         String logprefix = "getProducts()";
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products request...");
         
-        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,searchRadius,storeTagKeyword,isMainLevel,isDineIn,isDelivery,showAllPrice,page,pageSize,sortByCol,sortingOrder);
+        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,searchRadius,storeTagKeyword,isMainLevel,isDineIn,isDelivery,showAllPrice,isCustomPrice,page,pageSize,sortByCol,sortingOrder);
         
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products result : "+body.toString());
        
