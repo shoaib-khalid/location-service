@@ -186,7 +186,7 @@ public class ProductController {
                 
                 //check if store open
                 List<Object[]> storeOpen = productRepository.isStoreOpen(storeId);
-                if (storeId!=null && storeOpen.get(0)[0].equals("1")) {              
+                if (storeId!=null && storeOpen.get(0)[0].equals("1")) { 
                     List<Object[]> productList = productRepository.getFamousItemByStoreIdSnapshot(storeId, limit, minimumOrder);
                     Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product found:"+productList.size());
                     for (int z=0;z<productList.size();z++) {
@@ -205,6 +205,7 @@ public class ProductController {
         } else {
             //find in store
             String storeId = tagKeyword;
+
             List<Object[]> productList = productRepository.getFamousItemByStoreId(storeId, productLimit);
             
             for (int z=0;z<productList.size();z++) {
@@ -222,6 +223,7 @@ public class ProductController {
         
         
         if (famousProductList.size()<productLimit) {
+
             //add product from tag product feature
             if (tag!=null && tag.getProductFeatureList()!=null && !tag.getProductFeatureList().isEmpty()) {
                 Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "featured product list size:"+tag.getProductFeatureList().size());
@@ -245,7 +247,16 @@ public class ProductController {
                                 }
                             }
                             if (!productExist) {
-                                famousProductList.add(featureProduct);
+
+                                //we only display feature product which the price > 0 , since wee will implement open item, we will set the dineinprice and price = 0 
+                                Optional<ProductInventoryWithDetails> optFilteredProductInvo = featureProduct.getProductInventories().stream()
+                                .filter( pi -> pi.getDineInPrice() ==0 && pi.getPrice() == 0)
+                                .findFirst();
+                                
+                                if(!optFilteredProductInvo.isPresent()){
+                                    famousProductList.add(featureProduct);
+                                }
+                                
                             }
                             if (famousProductList.size()>=productLimit) {
                                 break;

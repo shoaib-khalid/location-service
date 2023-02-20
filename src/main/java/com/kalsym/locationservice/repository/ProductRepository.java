@@ -138,6 +138,8 @@ public interface ProductRepository extends JpaRepository<ProductMain,String>, Pa
         "	INNER JOIN `product` D ON C.productId=D.id " +
         "WHERE B.storeId=:storeId AND D.status='ACTIVE' "
         + " AND B.created BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW() "
+        + " AND C.price > 0 "
+        + " AND C.dineInPrice > 0 "
             + "AND isStoreOpen(:storeId)=1 " +
         "GROUP BY itemcode " +
         "ORDER BY bil DESC " +
@@ -147,10 +149,13 @@ public interface ProductRepository extends JpaRepository<ProductMain,String>, Pa
     @Query(value = "SELECT SUM(A.totalOrder) AS bil, A.itemCode, A.productId " +
         "FROM `order_item_snapshot` A " +
         " INNER JOIN `product` B ON A.productId=B.id " +
+        " INNER JOIN `product_inventory` C ON A.itemCode=C.itemCode " +
        "WHERE B.storeId=:storeId AND B.status='ACTIVE' "
-            + "AND A.totalOrder > :minOrder "
-            + "AND A.dt BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW() "
-            + "AND isStoreOpen(:storeId)=1 " +
+            + " AND A.totalOrder > :minOrder "
+            + " AND A.dt BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW() "
+            + " AND C.dineInPrice > 0 " 
+            + " AND C.price > 0 " 
+            +"AND isStoreOpen(:storeId)=1 " +
         "ORDER BY bil DESC " +
         "LIMIT :limit", nativeQuery = true)
     List<Object[]> getFamousItemByStoreIdSnapshot(@Param("storeId") String storeId, int limit, int minOrder);
