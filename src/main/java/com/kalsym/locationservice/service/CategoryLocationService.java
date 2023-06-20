@@ -73,6 +73,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.util.CollectionUtils;
+
 import javax.persistence.criteria.Order;
 
 @Service
@@ -441,7 +443,7 @@ public class CategoryLocationService {
         return output;
     }
 
-    public Page<ParentCategory> getQueryParentCategoriesBasedOnLocation(List<String> cityId, String stateId, String regionCountryId, String postcode, String parentCategoryId, String sortByCol,Sort.Direction sortingOrder, int page, int pageSize){
+    public Page<ParentCategory> getQueryParentCategoriesBasedOnLocation(List<String> cityId, String stateId, String regionCountryId, String postcode, String parentCategoryId, String sortByCol,Sort.Direction sortingOrder, int page, int pageSize, List<String> verticalCode){
 
         if (parentCategoryId == null || parentCategoryId.isEmpty()) {
             parentCategoryId = "";
@@ -459,36 +461,40 @@ public class CategoryLocationService {
             pageable = PageRequest.of(page, pageSize);
         }
 
-
         //If query param only regiOn country we will display all the parent category based on vertical code
-        List<String> verticalCode = new ArrayList<>();
+//        List<String> verticalCode = new ArrayList<>();
         
         Page<ParentCategory> result;
 
-        if(cityId == null){
+        if (cityId == null && CollectionUtils.isEmpty(verticalCode)){
+            verticalCode = new ArrayList<>();
+
             switch (regionCountryId){
 
                 case "PAK":
-    
+
                     verticalCode.add("FnB_PK");
                     verticalCode.add("ECommerce_PK");
-    
+
                     result = parentCategoryRepository.getAllParentCategoriesBasedOnCountry(verticalCode,parentCategoryId,pageable);
-    
+
                 break;
-    
+
                 default:
-    
+
                     verticalCode.add("FnB");
                     verticalCode.add("E-Commerce");
-    
+
                     result = parentCategoryRepository.getAllParentCategoriesBasedOnCountry(verticalCode,parentCategoryId,pageable);
-    
+
             }
 
+        } else if (cityId == null) {
+            result = parentCategoryRepository.getAllParentCategoriesBasedOnCountry(verticalCode, parentCategoryId, pageable);
+
         } else{
-            
             result = parentCategoryRepository.getParentCategoriesBasedOnLocationWithCityIdQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId,pageable);
+
         }
                         
         //to concat store asset url for response data

@@ -58,6 +58,7 @@ public class CategoryController {
     public ResponseEntity<HttpResponse> getParentCategory(
         HttpServletRequest request,
         @RequestParam(required = false) List<String> cityId,
+        @RequestParam(required = false) List<String> verticalCode,
         @RequestParam(required = false) String stateId,
         @RequestParam(required = false) String regionCountryId,
         @RequestParam(required = false) String postcode,
@@ -68,7 +69,7 @@ public class CategoryController {
         @RequestParam(defaultValue = "10") int pageSize
     ) {
 
-        Page<ParentCategory> body = categoryLocationService.getQueryParentCategoriesBasedOnLocation(cityId,stateId,regionCountryId,postcode,parentCategoryId,sortByCol,sortingOrder,page,pageSize);
+        Page<ParentCategory> body = categoryLocationService.getQueryParentCategoriesBasedOnLocation(cityId,stateId,regionCountryId,postcode,parentCategoryId,sortByCol,sortingOrder,page,pageSize,verticalCode);
         
         HttpResponse response = new HttpResponse(request.getRequestURI());
         response.setData(body);
