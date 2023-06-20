@@ -1,4 +1,8 @@
 ##################################################
+# location-service-1.2.3| 20-June-2023
+##################################################
+1. Filter by verticalCode for parent categories
+##################################################
 # location-service-1.2.2| 17-February-2023
 ##################################################
 1. add isCustomPrice for product level
