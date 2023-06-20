@@ -25,6 +25,7 @@ public interface ParentCategoryRepository extends JpaRepository<ParentCategory,S
         +"WHERE storeLocation.regionCountryId LIKE CONCAT('%', :regionCountryId ,'%') "
         +"AND pc.parentId LIKE CONCAT('%', :parentCategoryId ,'%') "
         +"AND storeLocation.city IN :city "
+        +"AND pc.verticalCode IN :verticalCode "
         +"OR storeLocation.state LIKE CONCAT('%', :state ,'%') "
         +"OR storeLocation.postcode LIKE CONCAT('%', :postcode ,'%') "
         +"GROUP BY pc.parentId"
@@ -35,6 +36,7 @@ public interface ParentCategoryRepository extends JpaRepository<ParentCategory,S
         @Param("postcode") String postcode,
         @Param("regionCountryId") String regionCountryId,
         @Param("parentCategoryId") String parentCategoryId,
+        @Param("verticalCode") List<String> verticalCode,
         Pageable pageable
     );
 

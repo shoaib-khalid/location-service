@@ -493,7 +493,14 @@ public class CategoryLocationService {
             result = parentCategoryRepository.getAllParentCategoriesBasedOnCountry(verticalCode, parentCategoryId, pageable);
 
         } else{
-            result = parentCategoryRepository.getParentCategoriesBasedOnLocationWithCityIdQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId,pageable);
+            if (CollectionUtils.isEmpty(verticalCode)) {
+                verticalCode = new ArrayList<>();
+
+                verticalCode.add("FnB");
+                verticalCode.add("E-Commerce");
+
+            }
+            result = parentCategoryRepository.getParentCategoriesBasedOnLocationWithCityIdQuery(stateId,cityId,postcode,regionCountryId,parentCategoryId, verticalCode, pageable);
 
         }
                         
