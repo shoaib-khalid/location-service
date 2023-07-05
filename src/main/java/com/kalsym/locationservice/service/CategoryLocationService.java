@@ -203,7 +203,8 @@ public class CategoryLocationService {
     public Page<StoreWithDetails> getQueryStore(List<String> cityId, String cityName, String stateId,
             String regionCountryId, String postcode, String parentCategoryId, 
             String storeName,String tagKeyword, int page, int pageSize,
-            String latitude, String longitude, double searchRadius, Boolean isMainLevel,Boolean isDineIn,Boolean isDelivery, String sortByCol, Sort.Direction sortingOrder){
+            String latitude, String longitude, double searchRadius, Boolean isMainLevel,Boolean isDineIn,Boolean isDelivery, String sortByCol, Sort.Direction sortingOrder,
+            String verticalCode){
     
         StoreWithDetails storeCategoryMatch = new StoreWithDetails();
   
@@ -231,7 +232,7 @@ public class CategoryLocationService {
         .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<StoreWithDetails> example = Example.of(storeCategoryMatch, matcher);
 
-        Specification<StoreWithDetails> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,isMainLevel,isDineIn, isDelivery, latitude,longitude,searchRadius,sortByCol,sortingOrder,example);
+        Specification<StoreWithDetails> storeCategorySpecs = searchStoreCategorySpecs(cityId, cityName, stateId, regionCountryId,  postcode, parentCategoryId, storeName,tagKeyword,isMainLevel,isDineIn, isDelivery, latitude,longitude,searchRadius,sortByCol,sortingOrder,verticalCode,example);
         Page<StoreWithDetails> result = storeWithDetailsRepository.findAll(storeCategorySpecs, pageable);       
         
         List<StoreWithDetails> tempStoreList = result.getContent(); 
@@ -534,7 +535,8 @@ public class CategoryLocationService {
         String latitude, 
         String longitude,
         double radius, 
-        String sortByCol, Sort.Direction sortingOrder,       
+        String sortByCol, Sort.Direction sortingOrder,
+        String verticalCode,
         Example<StoreWithDetails> example) {
 
         return (Specification<StoreWithDetails>) (root, query, builder) -> {
@@ -590,7 +592,6 @@ public class CategoryLocationService {
 
             }
 
-                    
             if (keyword != null && !keyword.isEmpty()) {                
                 predicates.add(builder.equal(storeTagKeyword.get("keyword"), keyword));
             }
@@ -616,6 +617,11 @@ public class CategoryLocationService {
 
             if (isDelivery != null) {
                 predicates.add(builder.equal(root.get("isDelivery"), isDelivery));
+            }
+
+            if (verticalCode != null && !verticalCode.isEmpty()) {
+                predicates.add(builder.like(root.get("verticalCode"), verticalCode));
+
             }
 
             List<Order> orderList = new ArrayList<Order>();
