@@ -29,8 +29,6 @@ public class ParentCategory implements Serializable {
     @Column(name="id")
     private String parentId;
 
-    private String parentCategoryId;
-
     @Column(name="name")
     private String parentName;
 
