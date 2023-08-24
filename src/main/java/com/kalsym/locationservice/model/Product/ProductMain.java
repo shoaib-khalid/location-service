@@ -24,6 +24,7 @@ import com.kalsym.locationservice.model.Config.ProductFeatureSimple;
 import com.kalsym.locationservice.model.Store;
 import javax.persistence.ManyToOne;
 
+import com.kalsym.locationservice.model.Voucher;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -56,9 +57,15 @@ public class ProductMain implements Serializable  {
 
     private Boolean isCustomPrice;
 
+    private String voucherId;
+
     @OneToOne()
     @JoinColumn(name = "storeId",referencedColumnName="id")
-    private Store storeDetails; 
+    private Store storeDetails;
+
+    @OneToOne()
+    @JoinColumn(name = "voucherId",referencedColumnName="id", updatable = false, insertable = false)
+    private Voucher voucherDetails;
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -119,4 +126,6 @@ public class ProductMain implements Serializable  {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "productId", insertable = false, updatable = false, nullable = true)
     private ProductFeatureSimple featuredProduct;
+
+
 }

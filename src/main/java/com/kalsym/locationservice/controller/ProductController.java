@@ -85,7 +85,7 @@ public class ProductController {
     @PreAuthorize("hasAnyAuthority('store-customers-get', 'all')")
     public ResponseEntity<HttpResponse> getProducts(
         HttpServletRequest request,
-        @RequestParam(required = true) String regionCountryId,
+        @RequestParam() String regionCountryId,
         @RequestParam(required = false) String parentCategoryId,
         @RequestParam(required = false) List<String> cityId,
         @RequestParam(required = false) String cityName,
@@ -122,7 +122,11 @@ public class ProductController {
         String logprefix = "getProducts()";
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products request...");
         
-        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,parentCategoryId,cityId,cityName,name,latitude,longitude,searchRadius,storeTagKeyword,isMainLevel,isDineIn,isDelivery,showAllPrice,isCustomPrice,page,pageSize,sortByCol,sortingOrder);
+        Page<ProductMain> body = productService.getQueryProductByParentCategoryIdAndLocation(status,regionCountryId,
+                parentCategoryId,cityId,cityName,name,latitude,
+                longitude,searchRadius,storeTagKeyword,isMainLevel,
+                isDineIn,isDelivery,showAllPrice,isCustomPrice,page,
+                pageSize,sortByCol,sortingOrder);
         
         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "get-products result : "+body.toString());
        

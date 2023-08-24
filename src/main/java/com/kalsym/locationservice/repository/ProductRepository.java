@@ -92,8 +92,14 @@ public interface ProductRepository extends JpaRepository<ProductMain,String>, Pa
             @Param("longitude") String longitude,
             Pageable pageable
     );*/
-    
-
+    @Query(   "SELECT pwd "
+            + "FROM ProductMain pwd "
+            + "WHERE pwd.storeCategory.parentCategoryId = :parentCategoryId "
+            + "ORDER BY pwd.thumbnailUrl NULLS LAST"
+    )
+    Page<ProductMain> findCustomProductsByParentCategoryId(
+            @Param("parentCategoryId") String parentCategoryId,
+            Pageable pageable);
     @Query(
         " SELECT pwd "
         + "FROM ProductMain pwd "
@@ -103,7 +109,6 @@ public interface ProductRepository extends JpaRepository<ProductMain,String>, Pa
         + "AND pwd.storeDetails.regionCountryId = :regionCountryId "
         + "AND pwd.status IN :status "
         + "AND pwd.storeDetails.regionCityDetails.name LIKE CONCAT('%', :cityName ,'%') "
-        + "AND pwd.storeDetails.city IN :cityId "
         + "ORDER BY pwd.thumbnailUrl NULLS LAST"
 
     )
@@ -111,7 +116,6 @@ public interface ProductRepository extends JpaRepository<ProductMain,String>, Pa
             @Param("status") List<String> status,
             @Param("regionCountryId") String regionCountryId,
             @Param("parentCategoryId") String parentCategoryId,
-            @Param("cityId") List<String> cityId,
             @Param("cityName") String cityName,
             @Param("name") String name,
             Pageable pageable
@@ -129,6 +133,8 @@ public interface ProductRepository extends JpaRepository<ProductMain,String>, Pa
             @Param("regionCountryId") String regionCountryId
 
     );
+
+
     
     @Query(value = "SELECT COUNT(*) AS bil, A.itemCode, "
             + "D.id " +

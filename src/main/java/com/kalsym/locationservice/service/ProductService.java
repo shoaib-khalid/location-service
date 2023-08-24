@@ -63,9 +63,6 @@ import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-//import com.vividsolutions.jts.geom.Coordinate;
-//import com.vividsolutions.jts.geom.Geometry;
-//import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
@@ -106,7 +103,9 @@ public class ProductService {
     public Page<ProductMain> getQueryProductByParentCategoryIdAndLocation(
             List<String> status,String regionCountryId,String parentCategoryId, 
             List<String> cityId, String cityName, String name, 
-            String latitude, String longitude, double radius,String storeTagKeyword, Boolean isMainLevel,Boolean isDineIn,Boolean isDelivery,Boolean showAllPrice,Boolean isCustomPrice,
+            String latitude, String longitude, double radius,
+            String storeTagKeyword, Boolean isMainLevel,Boolean isDineIn,
+            Boolean isDelivery,Boolean showAllPrice,Boolean isCustomPrice,
             int page, int pageSize, String sortByCol, Sort.Direction sortingOrder){           
 
         //get reqion country for store
@@ -120,65 +119,31 @@ public class ProductService {
       
         Pageable pageable = PageRequest.of(page, pageSize);
         
-        // if (!sortByCol.equalsIgnoreCase("distanceInMeter")) {
-        //     if (sortingOrder==Sort.Direction.ASC)
-        //         // pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).ascending());
-        //         pageable = PageRequest.of(page, pageSize);
-
-        //     else if (sortingOrder==Sort.Direction.DESC)
-        //         // pageable = PageRequest.of(page, pageSize, Sort.by(sortByCol).descending());
-        //         pageable = PageRequest.of(page, pageSize);
-
-        // } else {
-        //     pageable = PageRequest.of(page, pageSize);
-        // }
-        
         ExampleMatcher matcher = ExampleMatcher
                 .matchingAll()
                 .withIgnoreCase()
                 .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
         Example<ProductMain> example = Example.of(productMatch, matcher);
+
+        Specification<ProductMain> productSpecs = searchProductSpecs(status,
+                regionCountryId, parentCategoryId, cityId, cityName, name,
+                latitude, longitude, radius,storeTagKeyword, isMainLevel, isDineIn,
+                isDelivery, showAllPrice,isCustomPrice,sortByCol,sortingOrder,example);
+
+//        Page<ProductMain> result = productRepository.findCustomProductsByParentCategoryId
+//                ( parentCategoryId, pageable);
+        Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);
+
+        Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, " getQueryProductByParentCategoryIdAndLocation() result : "+result.toString());
         
-        Specification productSpecs = searchProductSpecs(status, regionCountryId, parentCategoryId, cityId, cityName, name, latitude, longitude, radius,storeTagKeyword, isMainLevel, isDineIn, isDelivery, showAllPrice,isCustomPrice,sortByCol,sortingOrder,example);
-        
-        Page<ProductMain> result = productRepository.findAll(productSpecs, pageable);       
-        
-        Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, "", "getQueryProductByParentCategoryIdAndLocation() result : "+result.toString());
-        
-        //extract the result of content of pageable in order to proceed with dicount of item 
+        //extract the result of content of pageable in order to proceed with discount of item 
         List<ProductMain> productList = result.getContent();                
         
         // to get discount of product
         ProductMain[] productWithDetailsList = GetDiscount.getProductDiscountList(productList, regionCountry, storeDiscountRepository, storeDiscountProductRepository);
 
         // convert array to array list
-        List<ProductMain> newArrayList = new ArrayList<>(Arrays.asList(productWithDetailsList));
-        
-        //set store distance
-        // if (sortByCol.equalsIgnoreCase("distanceInMeter") && newArrayList.size()>0) {
-        //     for (int i=0;i<newArrayList.size();i++) {
-        //         Store s = newArrayList.get(i).getStoreDetails();
-        //         if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
-        //             //set store distance
-        //             double storeLat = Double.parseDouble(s.getLatitude());
-        //             double storeLong = Double.parseDouble(s.getLongitude());
-        //             double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
-        //             s.setDistanceInMeter(distance);
-        //         } else {
-        //             s.setDistanceInMeter(0.00);
-        //         }
-        //     }     
-        //     Collections.sort(newArrayList);  
-            
-        //     String logprefix="ProductService()";
-        //     Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "After Sort:");
-        //     for (int x=0;x<newArrayList.size();x++) {
-        //         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product store distance:"+newArrayList.get(x).getStoreDetails().getDistanceInMeter());
-        //     }
-        // }
-        
-        //Page mapper
-        Page<ProductMain> output = new PageImpl<ProductMain>(newArrayList,pageable,result.getTotalElements());
+        Page<ProductMain> output = getProductMains(productWithDetailsList, pageable, result);
 
         //to set snooze
         for(ProductMain p : output){
@@ -194,9 +159,9 @@ public class ProductService {
             } else {
                 s.setDistanceInMeter(0.00);
             }
-            
-            StoreSnooze st = new StoreSnooze();            
-            
+
+            StoreSnooze st = new StoreSnooze();
+
             if (p.getStoreDetails().getSnoozeStartTime()!=null && p.getStoreDetails().getSnoozeEndTime()!=null) {
                 int resultSnooze = p.getStoreDetails().getSnoozeEndTime().compareTo(Calendar.getInstance().getTime());
                 if (resultSnooze < 0) {
@@ -217,7 +182,7 @@ public class ProductService {
                     if(t.isPresent()){
                         LocalDateTime startTime = DateTimeUtil.convertToLocalDateTimeViaInstant(p.getStoreDetails().getSnoozeStartTime(), ZoneId.of(t.get().getTimezone()));
                         LocalDateTime endTime = DateTimeUtil.convertToLocalDateTimeViaInstant(p.getStoreDetails().getSnoozeEndTime(), ZoneId.of(t.get().getTimezone()));
-                        
+
                         st.snoozeStartTime = startTime;
                         st.snoozeEndTime = endTime;
                         st.isSnooze = true;
@@ -225,12 +190,12 @@ public class ProductService {
 
                         p.getStoreDetails().setStoreSnooze(st);
                     }
-         
+
                 }
             } else {
                 p.getStoreDetails().setIsSnooze(false);
 
-                
+
                 st.snoozeStartTime = null;
                 st.snoozeEndTime = null;
                 st.isSnooze = false;
@@ -238,7 +203,7 @@ public class ProductService {
                 p.getStoreDetails().setStoreSnooze(st);
 
             }
-            
+
             //to concat with assetervice url
             //handle null
             // if(p.getThumbnailUrl() != null){
@@ -252,6 +217,36 @@ public class ProductService {
 
         return output;
 
+    }
+
+    private static Page<ProductMain> getProductMains(ProductMain[] productWithDetailsList, Pageable pageable, Page<ProductMain> result) {
+        List<ProductMain> newArrayList = new ArrayList<>(Arrays.asList(productWithDetailsList));
+
+        //set store distance
+        // if (sortByCol.equalsIgnoreCase("distanceInMeter") && newArrayList.size()>0) {
+        //     for (int i=0;i<newArrayList.size();i++) {
+        //         Store s = newArrayList.get(i).getStoreDetails();
+        //         if (latitude!=null && longitude!=null && s.getLatitude()!=null && s.getLongitude()!=null) {
+        //             //set store distance
+        //             double storeLat = Double.parseDouble(s.getLatitude());
+        //             double storeLong = Double.parseDouble(s.getLongitude());
+        //             double distance = Location.distance(Double.parseDouble(latitude), storeLat, Double.parseDouble(longitude), storeLong, 0.00, 0.00);
+        //             s.setDistanceInMeter(distance);
+        //         } else {
+        //             s.setDistanceInMeter(0.00);
+        //         }
+        //     }
+        //     Collections.sort(newArrayList);
+
+        //     String logprefix="ProductService()";
+        //     Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "After Sort:");
+        //     for (int x=0;x<newArrayList.size();x++) {
+        //         Logger.application.info(Logger.pattern, LocationServiceApplication.VERSION, logprefix, "Product store distance:"+newArrayList.get(x).getStoreDetails().getDistanceInMeter());
+        //     }
+        // }
+
+        //Page mapper
+        return new PageImpl<ProductMain>(newArrayList, pageable, result.getTotalElements());
     }
 
     /**
@@ -307,12 +302,9 @@ public class ProductService {
         List<ProductFeatureConfig> productFeaturedList = result.getContent();
 
         //In order to continue get item discount , extract productDetails first
+        // System.out.println("Checking m ::::::::::::::::::::::::::"+m.getProductDetails());
         List<ProductMain> productList = productFeaturedList.stream()
-        .map(m -> {
-            // System.out.println("Checking m ::::::::::::::::::::::::::"+m.getProductDetails());
-            ProductMain product = m.getProductDetails();
-            return product;
-        })
+        .map(ProductFeatureConfig::getProductDetails)
         .collect(Collectors.toList());
 
         // to get discount of product
@@ -396,15 +388,6 @@ public class ProductService {
                 pfc.getProductDetails().getStoreDetails().setStoreSnooze(st);
             }
 
-            //to concat with asseteservice
-            //handle null
-            // if(pfc.getProductDetails().getThumbnailUrl() != null){
-            //     pfc.getProductDetails().setThumbnailUrl(assetServiceUrl+pfc.getProductDetails().getThumbnailUrl());
-
-            // } else {
-            //     pfc.getProductDetails().setThumbnailUrl(null);
-
-            // }
         }
 
         return output;
@@ -426,7 +409,7 @@ public class ProductService {
         for (Object[] row : vals) {
 
             // casting
-            String seoName = (String)row[3].toString();
+            String seoName = row[3].toString();
             seoNames.add(seoName);
 
         }
@@ -529,7 +512,7 @@ public class ProductService {
             String sortByCol, Sort.Direction sortingOrder,
             Example<ProductMain> example) {
 
-        return (Specification<ProductMain>) (root, query, builder) -> {
+        return (root, query, builder) -> {
             final List<Predicate> predicates = new ArrayList<>();
             Join<ProductMain, Store> store = root.join("storeDetails");
             Join<ProductMain, Category> storeCategory = root.join("storeCategory");
@@ -553,14 +536,14 @@ public class ProductService {
 
             if (parentCategoryId != null && !parentCategoryId.isEmpty()) {                
                 predicates.add(builder.equal(storeCategory.get("parentCategoryId"), parentCategoryId));
-            }          
+            }
             
             if (statusList!=null) {
                 int statusCount = statusList.size();
                 List<Predicate> statusPredicatesList = new ArrayList<>();
-                for (int i=0;i<statusList.size();i++) {
-                    Predicate predicateForProductStatus = builder.equal(root.get("status"), statusList.get(i));                                        
-                    statusPredicatesList.add(predicateForProductStatus);                    
+                for (String s : statusList) {
+                    Predicate predicateForProductStatus = builder.equal(root.get("status"), s);
+                    statusPredicatesList.add(predicateForProductStatus);
                 }
                 Predicate finalPredicate = builder.or(statusPredicatesList.toArray(new Predicate[statusCount]));
                 predicates.add(finalPredicate);
@@ -574,9 +557,9 @@ public class ProductService {
             if (cityIdList!=null) {
                 int cityCount = cityIdList.size();
                 List<Predicate> cityPredicatesList = new ArrayList<>();
-                for (int i=0;i<cityIdList.size();i++) {
-                    Predicate predicateForCity = builder.equal(store.get("city"), cityIdList.get(i));                                        
-                    cityPredicatesList.add(predicateForCity);                    
+                for (String s : cityIdList) {
+                    Predicate predicateForCity = builder.equal(store.get("city"), s);
+                    cityPredicatesList.add(predicateForCity);
                 }
                 Predicate finalPredicate = builder.or(cityPredicatesList.toArray(new Predicate[cityCount]));
                 predicates.add(finalPredicate);
@@ -618,7 +601,7 @@ public class ProductService {
                 
                 predicates.add(builder.equal(store.get("isDineIn"), isDineIn));
 
-                if(isDineIn == true && showAllPrice == false){
+                if(isDineIn && !showAllPrice){
                     predicates.add(builder.notEqual(productInventories.get("dineInPrice"), 0));
  
                 }
@@ -628,27 +611,17 @@ public class ProductService {
 
                 predicates.add(builder.equal(store.get("isDelivery"), isDelivery));
 
-                if(isDelivery == true && showAllPrice == false){
+                if(isDelivery && !showAllPrice){
                     predicates.add(builder.notEqual(productInventories.get("price"), 0));
  
                 }
             }
 
             predicates.add(builder.equal(root.get("isCustomPrice"), isCustomPrice));
-
-
-            // select * from product p 
-            // WHERE p.name like '%black%'
-            // ORDER BY 
-            // (CASE WHEN p.thumbnailUrl  IS NULL THEN 1 ELSE 0 END),
-            // p.name ASC
-
-            //https://stackoverflow.com/questions/46541922/jpa-criteriaquery-order-by-with-two-criteria
-
             
             List<Order> orderList = new ArrayList<Order>();
             
-            if (isMainLevel!=null && isMainLevel==true) {
+            if (isMainLevel!=null && isMainLevel) {
                //sORT FEATURED FIRST , THEN IMAGE
                 orderList.add(builder.asc(builder.selectCase()
                 .when(productFeatured.get("id").isNull(), 1)
@@ -690,7 +663,7 @@ public class ProductService {
             
             predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
 
-            return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+            return builder.and(predicates.toArray(new Predicate[0]));
         };
     }
 
@@ -701,7 +674,7 @@ public class ProductService {
         double radius,
         Example<ProductFeatureConfig> example) {
 
-        return (Specification<ProductFeatureConfig>) (root, query, builder) -> {
+        return (root, query, builder) -> {
             final List<Predicate> predicates = new ArrayList<>();
             Join<ProductFeatureConfig, ProductMain> productDetails = root.join("productDetails");
             Join<ProductMain, Store> storeDetails = productDetails.join("storeDetails");
@@ -765,7 +738,7 @@ public class ProductService {
              
             predicates.add(QueryByExamplePredicateBuilder.getPredicate(root, builder, example));
 
-            return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+            return builder.and(predicates.toArray(new Predicate[0]));
         };
     }
     
