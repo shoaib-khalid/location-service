@@ -45,6 +45,7 @@ public interface ParentCategoryRepository extends JpaRepository<ParentCategory,S
         +"FROM ParentCategory pc "
         +"WHERE pc.verticalCode IN :verticalCode "
         +"AND pc.parentId LIKE CONCAT('%', :parentCategoryId ,'%') "
+        +"AND pc.isHidden = false "
         +"ORDER BY displaySequence ASC NULLS LAST"
     )
     Page<ParentCategory> getAllParentCategoriesBasedOnCountry(

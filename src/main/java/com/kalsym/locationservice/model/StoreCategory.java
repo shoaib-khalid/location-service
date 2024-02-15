@@ -44,6 +44,8 @@ public class StoreCategory implements Serializable  {
 
     private String storeId;
 
+    private Boolean isHidden;
+
     @OneToOne()
     @JoinColumn(name = "parentCategoryId",referencedColumnName="id", insertable = false, updatable = false, nullable = true)
     private ParentCategory parentCategory;   

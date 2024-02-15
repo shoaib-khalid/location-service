@@ -39,6 +39,8 @@ public class ParentCategory implements Serializable {
 
     private Integer displaySequence;
 
+    private Boolean isHidden;
+
     public String getParentThumbnailUrl() {
         if (parentThumbnailUrl==null)
             return null;
